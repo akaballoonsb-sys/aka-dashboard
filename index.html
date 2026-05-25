@@ -1,0 +1,36 @@
+Act as an expert data scientist, frontend developer, and UX designer. I need to build a single-page, live Dashboard application named exactly "AKA Dashboard" using Canvas. 
+
+This dashboard will connect to my Google Sheets via Google Apps Script. Please generate a SINGLE, complete, production-ready `index.html` file that includes all CSS (use Tailwind CSS via CDN) and JavaScript embedded inside it so I can upload it directly to GitHub Pages.
+
+### Access Control:
+- Page must load a full-screen login overlay BEFORE showing the dashboard.
+- Hardcode the password variable to exactly "Rudy56" (`const DASHBOARD_PASSWORD = "Rudy56";`).
+
+### Dashboard Structure & Layout:
+- **Tab 1: Sales & Invoices Analytics**
+  * Financial KPI cards: Total Revenue, Pending Invoices, Paid Invoices, and Average Invoice Value.
+  * Interactive Sales Trend Charts: Include a visual line/bar graph layout (using Chart.js via CDN) showing sales amount trends over time.
+  * Data Science Insights Section: Automatically compute and display predictive insights from the mock data, such as:
+    - Month-over-Month (MoM) revenue growth rate.
+    - Peak booking/sales periods.
+    - Revenue forecasting or anomaly detection indicators (e.g., highlighting unusually low/high sales weeks).
+  * A clean recent transactions table matching the structure of our master sheet.
+
+- **Tab 2: Fleet & Balloon Hours**
+  * Displays current flight hours progress bars per balloon relative to its next required service interval.
+  * Use realistic placeholder data matching our digital logbook fleet structure.
+  * Data Science Fleet Insight: Include a "Projected Service Date" for each balloon calculated by analyzing its historical flight hours per month to predict exactly *when* it will cross its next service threshold.
+  * Interactive Maintenance Log Form: A user selects a balloon (by name/registration) and enters a text update of what work was done. The JS function must be prepared to send this text update to a Google Apps Script Web App URL to update our digital logbook sheet automatically.
+
+- **Tab 3: Certificate Renewal Tracking**
+  * A clean, searchable table tracking annual "Permit to Fly" and 2-year "CofR" for each balloon registration.
+  * High-visibility alerts (glowing red/amber badges) and a top-level alert banner for any certificates expiring within the next 30 days.
+
+### Technical Specifications for the Code:
+- Use clean, premium Tailwind CSS (aviation blues, blacks, and sharp accent oranges for data points).
+- Include Chart.js via CDN link at the top for the data science visualizations.
+- Keep it entirely as pure, vanilla JavaScript inside a single HTML file so it runs instantly on GitHub Pages.
+- Include clear variable placeholders at the top of the `<script>` tag for `const GOOGLE_SCRIPT_URL = "YOUR_APPS_SCRIPT_URL_HERE";`.
+- Pre-populate all charts and tables with rich, beautiful mock data so it looks incredible and fully functional when I show my team today.
+
+Provide the entire output as a single, copyable code block in Canvas.
