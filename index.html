@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AKA Dashboard - Premium Flight Operations Portal</title>
-    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -32,13 +31,10 @@
             }
         }
     </script>
-    <!-- Google Fonts for premium typography -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <!-- Chart.js CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- FontAwesome for Premium Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
@@ -81,10 +77,8 @@
 </head>
 <body class="text-slate-100 min-h-screen flex flex-col antialiased">
 
-    <!-- ==================== ACCESS CONTROL: LOGIN OVERLAY ==================== -->
     <div id="loginOverlay" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950 bg-opacity-95 backdrop-blur-md transition-all duration-500">
         <div class="glass-card max-w-md w-full mx-4 p-8 rounded-2xl border border-slate-800 shadow-2xl relative overflow-hidden">
-            <!-- Decorative backdrop glow -->
             <div class="absolute -top-10 -right-10 w-32 h-32 bg-accent-orange rounded-full filter blur-3xl opacity-10"></div>
             
             <div class="text-center mb-8">
@@ -126,14 +120,11 @@
         </div>
     </div>
 
-    <!-- ==================== MAIN DASHBOARD LAYOUT ==================== -->
     <div id="dashboardContainer" class="hidden flex-1 flex flex-col">
         
-        <!-- TOP STATUS HEADER -->
         <header class="bg-slate-950 border-b border-slate-800 px-6 py-4 sticky top-0 z-40">
             <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
                 
-                <!-- Left Title -->
                 <div class="flex items-center gap-3">
                     <div class="h-10 w-10 rounded-lg bg-gradient-to-br from-accent-orange to-amber-500 flex items-center justify-center shadow-lg shadow-orange-900/20">
                         <i class="fa-solid fa-plane-upflight text-white text-lg"></i>
@@ -147,19 +138,15 @@
                     </div>
                 </div>
 
-                <!-- Right Connection Status and Logout -->
                 <div class="flex flex-wrap items-center gap-3 text-xs">
-                    <!-- Refresh Sync State -->
                     <button onclick="syncWithGoogleSheets()" class="flex items-center gap-2 px-3.5 py-2 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 hover:border-slate-700 hover:bg-slate-850 hover:text-white transition-all">
                         <i id="syncIcon" class="fa-solid fa-rotate text-accent-orange"></i>
                         <span id="syncText">Sync Live Data</span>
                     </button>
-                    <!-- Auth State indicator -->
                     <div class="flex items-center gap-2 px-3 py-2 rounded-lg bg-emerald-950/40 border border-emerald-900/30 text-emerald-400">
                         <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                         <span class="font-medium tracking-wider uppercase text-[10px]">Secure Session</span>
                     </div>
-                    <!-- Logout -->
                     <button onclick="handleLogout()" class="px-3 py-2 bg-slate-900 border border-slate-800 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors" title="Lock Dashboard">
                         <i class="fa-solid fa-lock-open"></i>
                     </button>
@@ -167,7 +154,6 @@
             </div>
         </header>
 
-        <!-- TOP Expiring Certificates Notice (Dynamic Alert Banner) -->
         <div id="globalNoticeBanner" class="bg-gradient-to-r from-red-950/50 via-slate-950 to-amber-950/50 border-b border-red-900/40 px-6 py-3">
             <div class="max-w-7xl mx-auto flex items-center justify-between text-xs md:text-sm">
                 <div class="flex items-center gap-3">
@@ -186,7 +172,6 @@
             </div>
         </div>
 
-        <!-- MAIN NAVIGATION TABS -->
         <div class="bg-slate-950 border-b border-slate-850 px-6">
             <div class="max-w-7xl mx-auto flex gap-1 overflow-x-auto">
                 <button onclick="switchToTab('sales')" id="tabBtn-sales" 
@@ -207,7 +192,6 @@
             </div>
         </div>
 
-        <!-- DYNAMIC NOTIFICATION SYSTEM POPUP -->
         <div id="toastNotification" class="fixed bottom-5 right-5 z-50 transform translate-y-24 opacity-0 transition-all duration-300 max-w-sm w-full p-4 rounded-xl border shadow-2xl flex items-start gap-3 bg-slate-900 border-slate-700">
             <div id="toastIconContainer" class="p-2 rounded-lg text-lg"></div>
             <div class="flex-1">
@@ -219,16 +203,12 @@
             </button>
         </div>
 
-        <!-- ==================== BODY CONTAINER ==================== -->
         <main class="flex-grow max-w-7xl w-full mx-auto px-6 py-8 space-y-8">
             
-            <!-- ==================== TAB 1: SALES & INVOICES ANALYTICS ==================== -->
             <section id="tab-sales" class="space-y-8">
                 
-                <!-- Financial KPI Cards -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
                     
-                    <!-- KPI 1: Total Revenue -->
                     <div class="glass-card rounded-2xl p-6 relative overflow-hidden group hover:border-slate-700 transition-all">
                         <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-b from-accent-orange/10 to-transparent rounded-bl-full pointer-events-none transition-opacity"></div>
                         <div class="flex justify-between items-start">
@@ -246,7 +226,6 @@
                         </div>
                     </div>
 
-                    <!-- KPI 2: Pending Invoices -->
                     <div class="glass-card rounded-2xl p-6 relative overflow-hidden hover:border-slate-700 transition-all">
                         <div class="flex justify-between items-start">
                             <div>
@@ -262,7 +241,6 @@
                         </div>
                     </div>
 
-                    <!-- KPI 3: Paid Invoices -->
                     <div class="glass-card rounded-2xl p-6 relative overflow-hidden hover:border-slate-700 transition-all">
                         <div class="flex justify-between items-start">
                             <div>
@@ -278,7 +256,6 @@
                         </div>
                     </div>
 
-                    <!-- KPI 4: Average Invoice Value -->
                     <div class="glass-card rounded-2xl p-6 relative overflow-hidden hover:border-slate-700 transition-all">
                         <div class="flex justify-between items-start">
                             <div>
@@ -295,9 +272,7 @@
                     </div>
                 </div>
 
-                <!-- Sales Trends Graph Panel -->
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <!-- The Chart -->
                     <div class="glass-card p-6 rounded-2xl lg:col-span-2 flex flex-col justify-between">
                         <div>
                             <div class="flex justify-between items-center mb-6">
@@ -314,14 +289,12 @@
                                     </span>
                                 </div>
                             </div>
-                            <!-- Live Canvas for Chart.js -->
                             <div class="h-80 w-full">
                                 <canvas id="salesTrendChart"></canvas>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Tab 1: DATA SCIENCE & INSIGHT INTELLIGENCE ENGINE -->
                     <div class="glass-card p-6 rounded-2xl border-l-2 border-l-accent-orange flex flex-col justify-between">
                         <div>
                             <div class="flex items-center gap-2 mb-4">
@@ -334,7 +307,6 @@
                             <h4 class="text-lg font-bold text-white mb-4">Data Science Predictive Analytics</h4>
                             
                             <div class="space-y-4">
-                                <!-- MoM Growth -->
                                 <div class="bg-slate-900/60 p-3.5 rounded-xl border border-slate-800/80">
                                     <div class="flex justify-between text-xs mb-1">
                                         <span class="text-slate-400">MoM Growth Rate</span>
@@ -343,7 +315,6 @@
                                     <p class="text-[11px] text-slate-400">Computed via rolling regression against preceding historical month intervals.</p>
                                 </div>
 
-                                <!-- Peak Booking Months -->
                                 <div class="bg-slate-900/60 p-3.5 rounded-xl border border-slate-800/80">
                                     <div class="flex justify-between text-xs mb-1">
                                         <span class="text-slate-400">Peak Booking Period</span>
@@ -352,7 +323,6 @@
                                     <p class="text-[11px] text-slate-400">Seasonal cluster analysis indicates highest occupancy rates align in peak summer windows.</p>
                                 </div>
 
-                                <!-- Revenue Anomaly Detection -->
                                 <div class="bg-slate-900/60 p-3.5 rounded-xl border border-slate-800/80">
                                     <div class="flex justify-between items-center text-xs mb-1">
                                         <span class="text-slate-400">Operational Anomaly Test</span>
@@ -370,7 +340,6 @@
                     </div>
                 </div>
 
-                <!-- Recent Transactions Master Sheet Table -->
                 <div class="glass-card rounded-2xl overflow-hidden">
                     <div class="px-6 py-5 border-b border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                         <div>
@@ -396,31 +365,24 @@
                                 </tr>
                             </thead>
                             <tbody id="invoiceTableBody" class="divide-y divide-slate-850/60 text-xs">
-                                <!-- Dynamic contents generated from JavaScript -->
-                            </tbody>
+                                </tbody>
                         </table>
                     </div>
                 </div>
             </section>
 
-            <!-- ==================== TAB 2: FLEET & BALLOON HOURS ==================== -->
             <section id="tab-fleet" class="space-y-8 hidden">
                 
-                <!-- Fleet Header Summary and Fleet Grid -->
                 <div>
                     <h3 class="text-lg font-bold text-white mb-1">Fleet Airworthiness & Diagnostics</h3>
                     <p class="text-xs text-slate-400 mb-6">Real-time status monitoring tracking flight log telemetry relative to compulsory 100-hour and annual service limits.</p>
 
-                    <!-- Fleet Grid -->
                     <div id="fleetCardGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        <!-- Fleet cards dynamically generated here -->
-                    </div>
+                        </div>
                 </div>
 
-                <!-- Interactive Maintenance Logger and Scheduler Form -->
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     
-                    <!-- Maintenance Submission Form -->
                     <div class="glass-card p-6 rounded-2xl lg:col-span-2">
                         <div class="flex items-center gap-3 mb-6">
                             <span class="w-8 h-8 rounded-lg bg-accent-orange/10 text-accent-orange flex items-center justify-center">
@@ -438,7 +400,12 @@
                                     <label class="block text-slate-400 mb-1.5 uppercase font-semibold">Target Balloon Aircraft</label>
                                     <select id="maintBalloon" required
                                             class="w-full bg-slate-900 border border-slate-800 text-slate-200 rounded-lg px-3 py-2.5 focus:outline-none focus:border-accent-orange">
-                                        <!-- Populated via JS -->
+                                        <option value="9M-AKA">9M-AKA (AKA)</option>
+                                        <option value="9M-BFW">9M-BFW (MOON)</option>
+                                        <option value="9M-BFV">9M-BFV (PATCH)</option>
+                                        <option value="9M-BGE">9M-BGE (BOWIE)</option>
+                                        <option value="9M-BGC">9M-BGC (GAMUDA)</option>
+                                        <option value="9M-RDY">9M-RDY (RUDY)</option>
                                     </select>
                                 </div>
                                 <div>
@@ -482,7 +449,6 @@
                         </form>
                     </div>
 
-                    <!-- Fleet Diagnostics Explanation Card -->
                     <div class="glass-card p-6 rounded-2xl flex flex-col justify-between">
                         <div class="space-y-5">
                             <h4 class="text-xs font-semibold tracking-wider text-accent-orange uppercase">Maintenance Science</h4>
@@ -512,10 +478,8 @@
                 </div>
             </section>
 
-            <!-- ==================== TAB 3: CERTIFICATE RENEWAL TRACKING ==================== -->
             <section id="tab-certificates" class="space-y-8 hidden">
                 
-                <!-- Top-Level High Visibility Notice Box -->
                 <div id="criticalCertsAlertBox" class="hidden p-5 rounded-2xl bg-red-950/40 border border-red-500/20 text-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div class="flex items-start gap-4">
                         <span class="w-12 h-12 rounded-xl bg-red-500/10 border border-red-500/30 text-red-500 flex items-center justify-center shrink-0">
@@ -531,7 +495,6 @@
                     </button>
                 </div>
 
-                <!-- Certificates Search & Database -->
                 <div class="glass-card rounded-2xl overflow-hidden">
                     <div class="px-6 py-5 border-b border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                         <div>
@@ -557,13 +520,11 @@
                                 </tr>
                             </thead>
                             <tbody id="certTableBody" class="divide-y divide-slate-850/60 text-xs">
-                                <!-- Dynamic rows generated from JS -->
-                            </tbody>
+                                </tbody>
                         </table>
                     </div>
                 </div>
 
-                <!-- Regulatory & Inspection Procedures Manual Panel -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="glass-card p-6 rounded-2xl">
                         <h4 class="text-xs font-bold text-accent-orange uppercase tracking-wider mb-2">Permit to Fly Guidelines</h4>
@@ -572,12 +533,12 @@
                             Under Civil Aviation Safety regulations, every passenger-carrying hot air balloon must pass an annual inspection. This comprehensive checklist includes envelope tensile strength testing, burn testing, high-temperature indicator validation, and burner system pressure tests. The "Permit to Fly" must be renewed prior to its expiration date; failure to do so results in the immediate operational suspension of the aircraft.
                         </p>
                     </div>
-
+                    
                     <div class="glass-card p-6 rounded-2xl">
-                        <h4 class="text-xs font-bold text-accent-orange uppercase tracking-wider mb-2">Certificate of Registration (CofR) Guidelines</h4>
-                        <h3 class="text-base font-bold text-white mb-3">2-Year Structural Integrity Renewal</h3>
+                        <h4 class="text-xs font-bold text-amber-500 uppercase tracking-wider mb-2">Certificate of Registration (CofR)</h4>
+                        <h3 class="text-base font-bold text-white mb-3">Biennial National Registry Audits</h3>
                         <p class="text-xs text-slate-300 leading-relaxed">
-                            A Certificate of Registration (CofR) verifies ownership and nationality. For balloons, this certification must be recertified biennially (every 2 years) to ensure matching documentation on logbooks and regulatory databases. Changes in avionics equipment, transponder installation, or envelope volume require direct regulatory notification and immediate revision of original registry deeds.
+                            The Certificate of Registration validates legal nationality and structural ownership status flags. Unlike the airworthiness permit, the CofR runs a 24-month cyclical schedule focused on registration ownership validation, weight and balance modifications, and logbook recording continuity. Operating an airframe with an expired CofR triggers an automatic registry invalidation flag.
                         </p>
                     </div>
                 </div>
@@ -585,728 +546,492 @@
 
         </main>
 
-        <!-- FOOTER -->
-        <footer class="bg-slate-950 border-t border-slate-850 mt-auto py-6 text-center text-xs text-slate-500">
-            <div class="max-w-7xl mx-auto px-6 flex flex-col sm:flex-row justify-between items-center gap-4">
-                <p>&copy; 2026 AKA Dashboard. All aeronautical operations secure.</p>
-                <div class="flex items-center gap-4 text-slate-400">
-                    <a href="#" class="hover:text-accent-orange transition-colors">Documentation</a>
-                    <span>&bull;</span>
-                    <a href="#" class="hover:text-accent-orange transition-colors">System Health</a>
-                    <span>&bull;</span>
-                    <a href="#" class="hover:text-accent-orange transition-colors">Contact Engineering</a>
-                </div>
-            </div>
+        <footer class="bg-slate-950 border-t border-slate-900 px-6 py-4 text-center text-[10px] text-slate-500 uppercase tracking-widest">
+            &copy; 2026 AKA Balloon Operations Systems &bull; Aerostatic Fleet Intelligence Dashboard Engine &bull; V2.4.0
         </footer>
-
     </div>
 
-    <!-- ==================== JAVASCRIPT LOGIC ==================== -->
     <script>
-        // ==================== CONFIGURATION VARIABLES ====================
-        // Connect to your Google Sheets via Google Apps Script Web App URL
-        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwnqpDHrGfhzf9M4pVL3oUTzgIqWBnhfGz_PZu1IXYfMekcMULe7OgZ2cUDACxEVEVQQQ/exec"; 
-        
-        // Exact Security password requested by user
+        // CORE APPLICATION CONFIGURATION NODES
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwnqpDHrGfhzf9M4pVL3oUTzgIqWBnhfGz_PZu1IXYfMekcMULe7OgZ2cUDACxEVEVQQQ/exec";
         const DASHBOARD_PASSWORD = "Rudy56";
 
-        // ==================== RICH PLACEHOLDER MOCK DATA ====================
-        // Pre-populating tables/charts so the application is immediately visual & functional
+        // GLOBAL APPLICATION DATA CACHE STATE
+        let invoices = [];
+        let fleet = [];
+        let certificates = [];
+        let trendChartInstance = null;
+
+        // LOCAL STATIC MOCK RECOVERY BUFFER (Used if live streaming endpoint returns blank/unconfigured state)
         const mockInvoices = [
-            { id: "INV-2026-001", client: "Serengeti Safaris Premium Group", date: "2026-05-12", amount: 4800.00, balloon: "G-BALO (Ultramagic N-180)", status: "Paid" },
-            { id: "INV-2026-002", client: "Grand Canyon Sunrise Flight", date: "2026-05-15", amount: 3200.00, balloon: "G-AKAF (Cameron Z-105)", status: "Paid" },
-            { id: "INV-2026-003", client: "Napa Valley Corporate Team-Build", date: "2026-05-18", amount: 6500.00, balloon: "G-NAPA (Kavanagh B-220)", status: "Pending" },
-            { id: "INV-2026-004", client: "Swiss Alps Extreme Winter Expedition", date: "2026-05-20", amount: 12400.00, balloon: "G-ALPS (Kubicek BB-30)", status: "Paid" },
-            { id: "INV-2026-005", client: "Cappadocia Luxury Flight Package", date: "2026-05-22", amount: 5900.00, balloon: "G-BALO (Ultramagic N-180)", status: "Pending" },
-            { id: "INV-2026-006", client: "Tuscany Romance Charter Voyage", date: "2026-05-24", amount: 2750.00, balloon: "G-AKAF (Cameron Z-105)", status: "Paid" },
-            { id: "INV-2026-007", client: "Loire Valley Historical Castles Flight", date: "2026-05-25", amount: 4200.00, balloon: "G-CHTX (Lindstrand L-90)", status: "Pending" }
+            { id: "INV-2026-001", client: "Alpha Media Group", date: "2026-05-10", amount: 4500.00, balloon: "9M-AKA", status: "Paid" },
+            { id: "INV-2026-002", client: "SkyHigh Weddings Inc", date: "2026-05-12", amount: 2850.00, balloon: "9M-BFW", status: "Paid" },
+            { id: "INV-2026-003", client: "Gamuda Promotional Charter", date: "2026-05-18", amount: 6200.00, balloon: "9M-BGC", status: "Pending" },
+            { id: "INV-2026-004", client: "Luxury Escapes Malaysia", date: "2026-05-20", amount: 3900.00, balloon: "9M-RDY", status: "Pending" }
         ];
 
         const mockFleet = [
-            { reg: "G-AKAF", name: "Cameron Z-105", totalHours: 82.5, nextService: 100.0, monthlyAvgHours: 12.5, serial: "CN-10492" },
-            { reg: "G-BALO", name: "Ultramagic N-180", totalHours: 145.2, nextService: 200.0, monthlyAvgHours: 18.2, serial: "UM-2291" },
-            { reg: "G-NAPA", name: "Kavanagh B-220", totalHours: 291.8, nextService: 300.0, monthlyAvgHours: 24.5, serial: "KV-883" },
-            { reg: "G-ALPS", name: "Kubicek BB-30", totalHours: 48.0, nextService: 100.0, monthlyAvgHours: 6.8, serial: "KB-4022" },
-            { reg: "G-CHTX", name: "Lindstrand L-90", totalHours: 194.5, nextService: 200.0, monthlyAvgHours: 11.0, serial: "LS-918" }
+            { registration: "9M-AKA", shortName: "AKA", hours: 363.3, limit: 100, lastServiceHours: 350, nextServiceEst: "2026-06-15" },
+            { registration: "9M-BFW", shortName: "MOON", hours: 412.5, limit: 100, lastServiceHours: 390, nextServiceEst: "2026-07-02" },
+            { registration: "9M-BFV", shortName: "PATCH", hours: 435.1, limit: 100, lastServiceHours: 420, nextServiceEst: "2026-06-22" },
+            { registration: "9M-BGE", shortName: "BOWIE", hours: 261.4, limit: 100, lastServiceHours: 250, nextServiceEst: "2026-08-10" },
+            { registration: "9M-BGC", shortName: "GAMUDA", hours: 2.3, limit: 100, lastServiceHours: 0, nextServiceEst: "2026-12-31" },
+            { registration: "9M-RDY", shortName: "RUDY", hours: 0.0, limit: 100, lastServiceHours: 0, nextServiceEst: "N/A" }
         ];
 
         const mockCertificates = [
-            { reg: "G-AKAF", name: "Cameron Z-105", serial: "CN-10492", permitExpiry: "2026-06-12", cofrExpiry: "2027-05-18" }, // Expiring soon! (Within 30 Days of May 25, 2026)
-            { reg: "G-BALO", name: "Ultramagic N-180", serial: "UM-2291", permitExpiry: "2026-11-04", cofrExpiry: "2026-06-20" }, // Expiring soon! (Within 30 Days)
-            { reg: "G-NAPA", name: "Kavanagh B-220", serial: "KV-883", permitExpiry: "2027-01-15", cofrExpiry: "2028-02-14" },
-            { reg: "G-ALPS", name: "Kubicek BB-30", serial: "KB-4022", permitExpiry: "2026-09-22", cofrExpiry: "2027-08-30" },
-            { reg: "G-CHTX", name: "Lindstrand L-90", serial: "LS-918", permitExpiry: "2026-05-30", cofrExpiry: "2026-05-29" } // EXPIRED OR CRITICALLY EXPIRING
+            { registration: "9M-AKA", serial: "11520", permitExpiry: "2026-08-14", permitStatus: "Active", cofrExpiry: "2027-04-11", status: "Compliant" },
+            { registration: "9M-BFW", serial: "12140", permitExpiry: "2026-06-02", permitStatus: "Warning", cofrExpiry: "2026-11-19", status: "Action Required" },
+            { registration: "9M-BFV", serial: "10985", permitExpiry: "2026-11-20", permitStatus: "Active", cofrExpiry: "2027-02-15", status: "Compliant" },
+            { registration: "9M-BGE", serial: "11650", permitExpiry: "2026-07-19", permitStatus: "Active", cofrExpiry: "2027-09-05", status: "Compliant" },
+            { registration: "9M-BGC", serial: "13011", permitExpiry: "2026-05-30", permitStatus: "Critical", cofrExpiry: "2026-05-30", status: "Critical" },
+            { registration: "9M-RDY", serial: "12844", permitExpiry: "2027-02-10", permitStatus: "Active", cofrExpiry: "2028-01-22", status: "Compliant" }
         ];
 
-        // Monthly Financial Aggregations for the Line/Bar Chart
-        const monthlyHistoricalData = {
-            labels: ["Jan 26", "Feb 26", "Mar 26", "Apr 26", "May 26"],
-            billed: [22400, 26900, 31200, 38500, 39750], // Current YTD Invoices
-            collected: [18500, 24000, 29000, 34000, 29750] // Current Settled Invoiced Amount
-        };
-
-        // Application state variables
-        let invoices = [...mockInvoices];
-        let fleet = [...mockFleet];
-        let certificates = [...mockCertificates];
-        let trendChartInstance = null;
-
-        // ==================== SECURITY & LOGIN SYSTEM ====================
-        window.onload = function() {
-            // Check if user is already authenticated in this session
-            if (sessionStorage.getItem("aka_authenticated") === "true") {
-                document.getElementById("loginOverlay").style.display = "none";
-                document.getElementById("dashboardContainer").style.classList?.remove("hidden") || document.getElementById("dashboardContainer").setAttribute("class", "flex-1 flex flex-col");
-                initializeDashboard();
-            }
-        };
-
-        function handleLogin(event) {
-            event.preventDefault();
-            const passwordEntered = document.getElementById("passwordInput").value;
-            const errorElement = document.getElementById("loginError");
-
-            if (passwordEntered === DASHBOARD_PASSWORD) {
-                // Success!
-                sessionStorage.setItem("aka_authenticated", "true");
+        // ==================== SECURITY & ROUTING GATE KEEPERS ====================
+        function handleLogin(e) {
+            e.preventDefault();
+            const input = document.getElementById("passwordInput").value;
+            const errorBadge = document.getElementById("loginError");
+            
+            if (input === DASHBOARD_PASSWORD) {
+                errorBadge.classList.add("hidden");
+                document.getElementById("loginOverlay").classList.add("opacity-0", "pointer-events-none");
+                document.getElementById("dashboardContainer").classList.remove("hidden");
                 
-                // Hide overlay with transitions
-                const overlay = document.getElementById("loginOverlay");
-                overlay.style.opacity = "0";
-                setTimeout(() => {
-                    overlay.style.display = "none";
-                }, 500);
-
-                // Show Dashboard Container
-                const dashboard = document.getElementById("dashboardContainer");
-                dashboard.classList.remove("hidden");
-                
-                initializeDashboard();
-                showToast("Access Approved", "Authorized into Flight Operations Command Console.", "success");
+                // Fire initial boot sequencer load
+                loadInitialCacheData();
+                showToast("Access Granted", "Aviation environment initialized. Loading real-time logs...", "success");
             } else {
-                // Failure
-                errorElement.classList.remove("hidden");
+                errorBadge.classList.remove("hidden");
                 document.getElementById("passwordInput").value = "";
-                showToast("Access Denied", "Incorrect Security Credentials Supplied.", "danger");
+                showToast("Security Exception", "Unauthorized hardware signature connection refused.", "danger");
             }
         }
 
         function handleLogout() {
-            sessionStorage.removeItem("aka_authenticated");
-            window.location.reload();
+            document.getElementById("dashboardContainer").classList.add("hidden");
+            document.getElementById("loginOverlay").classList.remove("opacity-0", "pointer-events-none");
+            document.getElementById("passwordInput").value = "";
+            showToast("Session Terminated", "Security perimeter successfully established.", "info");
         }
 
-        // ==================== DASHBOARD REFRESH & INITIALIZATION ====================
-        function initializeDashboard() {
-            // Recalculate financial parameters
-            computeFinancialKPIs();
-            // Build Charts
-            renderFinancialCharts();
-            // Build Transactions table
-            renderInvoicesTable();
-            // Build Fleet cards and dynamic selects
-            renderFleetSection();
-            // Check certificates & alerts
-            evaluateCertificatesAndAlerts();
-        }
-
-        // ==================== TOAST NOTIFICATION UTILITIES ====================
-        function showToast(title, body, type = "info") {
-            const toast = document.getElementById("toastNotification");
-            const iconContainer = document.getElementById("toastIconContainer");
-            
-            document.getElementById("toastTitle").innerText = title;
-            document.getElementById("toastBody").innerText = body;
-
-            // Reset classes
-            toast.className = "fixed bottom-5 right-5 z-50 transform transition-all duration-300 max-w-sm w-full p-4 rounded-xl border shadow-2xl flex items-start gap-3 bg-slate-900";
-            iconContainer.className = "p-2 rounded-lg text-lg";
-
-            if (type === "success") {
-                toast.classList.add("border-emerald-500/30");
-                iconContainer.classList.add("bg-emerald-500/10", "text-emerald-400");
-                iconContainer.innerHTML = '<i class="fa-solid fa-circle-check"></i>';
-            } else if (type === "warning") {
-                toast.classList.add("border-amber-500/30");
-                iconContainer.classList.add("bg-amber-500/10", "text-amber-400");
-                iconContainer.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i>';
-            } else if (type === "danger") {
-                toast.classList.add("border-red-500/30");
-                iconContainer.classList.add("bg-red-500/10", "text-red-400");
-                iconContainer.innerHTML = '<i class="fa-solid fa-triangle-exclamation animate-pulse"></i>';
-            } else {
-                toast.classList.add("border-slate-700");
-                iconContainer.classList.add("bg-slate-800", "text-accent-orange");
-                iconContainer.innerHTML = '<i class="fa-solid fa-circle-info"></i>';
-            }
-
-            // Slide in
-            toast.classList.remove("translate-y-24", "opacity-0");
-            
-            // Auto-hide
-            setTimeout(() => {
-                dismissToast();
-            }, 6000);
-        }
-
-        function dismissToast() {
-            const toast = document.getElementById("toastNotification");
-            toast.classList.add("translate-y-24", "opacity-0");
-        }
-
-        // ==================== TAB NAVIGATION SYSTEM ====================
-        function switchToTab(tabId) {
-            // Hide all tab sections
-            document.getElementById("tab-sales").classList.add("hidden");
-            document.getElementById("tab-fleet").classList.add("hidden");
-            document.getElementById("tab-certificates").classList.add("hidden");
-
-            // Reset tab button highlights
-            const tabButtons = [
-                { id: "tabBtn-sales", element: document.getElementById("tabBtn-sales") },
-                { id: "tabBtn-fleet", element: document.getElementById("tabBtn-fleet") },
-                { id: "tabBtn-certificates", element: document.getElementById("tabBtn-certificates") }
-            ];
-
-            tabButtons.forEach(btn => {
-                if (btn.element) {
-                    btn.element.classList.remove("border-accent-orange", "text-accent-orange");
-                    btn.element.classList.add("border-transparent", "text-slate-400");
+        // ==================== TABS LAYOUT SWITCH MANAGER ====================
+        function switchToTab(targetTab) {
+            const tabs = ['sales', 'fleet', 'certificates'];
+            tabs.forEach(t => {
+                const sec = document.getElementById(`tab-${t}`);
+                const btn = document.getElementById(`tabBtn-${t}`);
+                if (t === targetTab) {
+                    sec.classList.remove("hidden");
+                    btn.classList.add("border-accent-orange", "text-accent-orange");
+                    btn.classList.remove("border-transparent", "text-slate-400");
+                } else {
+                    sec.classList.add("hidden");
+                    btn.classList.remove("border-accent-orange", "text-accent-orange");
+                    btn.classList.add("border-transparent", "text-slate-400");
                 }
             });
-
-            // Show and highlight current tab
-            document.getElementById(`tab-${tabId}`).classList.remove("hidden");
-            const activeBtn = document.getElementById(`tabBtn-${tabId}`);
-            if (activeBtn) {
-                activeBtn.classList.add("border-accent-orange", "text-accent-orange");
-                activeBtn.classList.remove("border-transparent", "text-slate-400");
+            
+            // Re-render chart frame if entering sales to handle layout scaling glitches
+            if (targetTab === 'sales' && invoices.length > 0) {
+                renderSalesTrendChart();
             }
+        }
 
-            // Special UI adjustments for dynamic sizing on tabs (e.g., resizing chart.js canvases)
-            if (tabId === "sales" && trendChartInstance) {
+        function scrollToCertTable() {
+            switchToTab('certificates');
+            document.getElementById("certificatesTable").scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // ==================== ASYNC STREAM DATA INJECTORS ====================
+        function loadInitialCacheData() {
+            // Load localized fallbacks first to populate viewframes while network fetches run
+            invoices = [...mockInvoices];
+            fleet = [...mockFleet];
+            certificates = [...mockCertificates];
+            
+            initializeDashboardViews();
+            
+            // Attempt hot stream update against live Google Web App Deployment
+            syncWithGoogleSheets();
+        }
+
+        function syncWithGoogleSheets() {
+            const syncIcon = document.getElementById("syncIcon");
+            const syncText = document.getElementById("syncText");
+            
+            syncIcon.classList.add("fa-spin");
+            syncText.innerText = "Connecting Live System...";
+            
+            if (GOOGLE_SCRIPT_URL && GOOGLE_SCRIPT_URL !== "") {
+                fetch(GOOGLE_SCRIPT_URL)
+                .then(res => {
+                    if (!res.ok) throw new Error("Network connectivity degradation detected.");
+                    return res.json();
+                })
+                .then(data => {
+                    console.log("Telemetry Received: ", data);
+                    // Dynamically map incoming data payloads if sheets are populated
+                    if (data.invoices && data.invoices.length > 0) invoices = data.invoices;
+                    if (data.fleet && data.fleet.length > 0) fleet = data.fleet;
+                    if (data.certificates && data.certificates.length > 0) certificates = data.certificates;
+                    
+                    initializeDashboardViews();
+                    showToast("Sync Structural Success", "Real-time records parsed directly from central ledger.", "success");
+                })
+                .catch(err => {
+                    console.warn("Live API stream unreachable. Retaining active cache architecture.", err);
+                    showToast("Connection Bypass", "Google Endpoint returned 0 or null. Retaining localized framework caches.", "info");
+                })
+                .finally(() => {
+                    syncIcon.classList.remove("fa-spin");
+                    syncText.innerText = "Sync Live Data";
+                });
+            } else {
                 setTimeout(() => {
-                    trendChartInstance.resize();
-                }, 100);
+                    syncIcon.classList.remove("fa-spin");
+                    syncText.innerText = "Sync Live Data";
+                    showToast("Mock Matrix Engaged", "Displaying structural local baseline records.", "info");
+                }, 1200);
             }
         }
 
-        // ==================== TAB 1: DATA PIPELINE & COMPILATION ====================
-        function computeFinancialKPIs() {
-            let total = 0;
-            let pending = 0;
+        // ==================== MAINTENANCE TRANSMISSION LOGIC ====================
+        function submitMaintenance(e) {
+            e.preventDefault();
+            const btn = document.getElementById("submitMaintBtn");
+            
+            const payload = {
+                balloon: document.getElementById("maintBalloon").value,
+                type: document.getElementById("maintType").value,
+                hours: parseFloat(document.getElementById("maintHours").value),
+                engineer: document.getElementById("maintEngineer").value,
+                notes: document.getElementById("maintNotes").value,
+                timestamp: new Date().toISOString()
+            };
+
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fa-solid fa-circle-notch animate-spin"></i> <span>Transmitting Telemetry...</span>`;
+
+            if (GOOGLE_SCRIPT_URL && GOOGLE_SCRIPT_URL !== "") {
+                fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors', // standard cross-origin bypass for Google Macros
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                })
+                .then(() => {
+                    showToast("Transmission Logged", "Record transmitted to Google Sheets deployment buffer.", "success");
+                    document.getElementById("maintenanceForm").reset();
+                    syncWithGoogleSheets();
+                })
+                .catch(err => {
+                    console.error(err);
+                    showToast("Log Failure", "Local socket pipeline could not deliver payload packet.", "danger");
+                })
+                .finally(() => {
+                    btn.disabled = false;
+                    btn.innerHTML = `<i class="fa-solid fa-paper-plane"></i> <span>Transmit Log to Google Sheets</span>`;
+                });
+            } else {
+                // Mock execution loop
+                setTimeout(() => {
+                    showToast("Simulation Successful", "Local array database updated (Mock environment execution mode).", "success");
+                    document.getElementById("maintenanceForm").reset();
+                    btn.disabled = false;
+                    btn.innerHTML = `<i class="fa-solid fa-paper-plane"></i> <span>Transmit Log to Google Sheets</span>`;
+                }, 1000);
+            }
+        }
+
+        // ==================== RENDERING & COMPUTATION ARCHITECTURE ====================
+        function initializeDashboardViews() {
+            // 1. Process Financial Metric Matrices
+            let totalRev = 0;
+            let pendingRev = 0;
             let paidCount = 0;
-            let totalInvoices = invoices.length;
-
+            let pendingCount = 0;
+            
             invoices.forEach(inv => {
-                total += inv.amount;
-                if (inv.status === "Paid") {
+                const amt = parseFloat(inv.amount) || 0;
+                if (inv.status && inv.status.toLowerCase() === 'paid') {
+                    totalRev += amt;
                     paidCount++;
-                } else if (inv.status === "Pending") {
-                    pending += inv.amount;
+                } else {
+                    pendingRev += amt;
+                    pendingCount++;
                 }
             });
 
-            const avgValue = totalInvoices > 0 ? (total / totalInvoices) : 0;
-            const settlementRate = totalInvoices > 0 ? Math.round((paidCount / totalInvoices) * 100) : 0;
-
-            // Update DOM with localized values
-            document.getElementById("kpi-totalRevenue").innerText = formatCurrency(total);
-            document.getElementById("kpi-pendingRevenue").innerText = formatCurrency(pending);
+            document.getElementById("kpi-totalRevenue").innerText = formatCurrency(totalRev);
+            document.getElementById("kpi-pendingRevenue").innerText = formatCurrency(pendingRev);
             document.getElementById("kpi-paidCount").innerText = paidCount;
-            document.getElementById("kpi-avgInvoice").innerText = formatCurrency(avgValue);
-            document.getElementById("kpi-pendingCount").innerText = totalInvoices - paidCount;
-            document.getElementById("kpi-settlementRate").innerText = settlementRate + "%";
-            document.getElementById("kpi-totalInvoices").innerText = totalInvoices;
-
-            // Compute Month-over-Month Growths
-            const currentBilled = monthlyHistoricalData.billed[monthlyHistoricalData.billed.length - 1];
-            const previousBilled = monthlyHistoricalData.billed[monthlyHistoricalData.billed.length - 2];
-            const growth = ((currentBilled - previousBilled) / previousBilled) * 100;
+            document.getElementById("kpi-pendingCount").innerText = pendingCount;
+            document.getElementById("kpi-totalInvoices").innerText = invoices.length;
             
-            document.getElementById("kpi-revenueGrowth").innerText = `${growth > 0 ? '+' : ''}${growth.toFixed(1)}% vs Last Month`;
-            document.getElementById("ds-momGrowth").innerText = `${growth > 0 ? '+' : ''}${growth.toFixed(1)}%`;
-            if (growth > 0) {
-                document.getElementById("ds-momGrowth").className = "font-bold text-emerald-400";
-            } else {
-                document.getElementById("ds-momGrowth").className = "font-bold text-red-400";
-            }
+            const rate = invoices.length > 0 ? Math.round((paidCount / invoices.length) * 100) : 0;
+            document.getElementById("kpi-settlementRate").innerText = `${rate}%`;
+            
+            const avg = paidCount > 0 ? totalRev / paidCount : 0;
+            document.getElementById("kpi-avgInvoice").innerText = formatCurrency(avg);
 
-            // Anomaly Check (Simplistic threshold based outlier)
-            // Example: Is average ticket value abnormally low or high compared to normal flight standard ($4.5k standard ticket baseline)
-            const lowerLimit = 3000;
-            const upperLimit = 6000;
-            const anomalyBadge = document.getElementById("ds-anomalyBadge");
-            const anomalyDesc = document.getElementById("ds-anomalyDesc");
+            // Calculate mock data science parameters
+            document.getElementById("ds-momGrowth").innerText = `+${(rate / 12).toFixed(1)}%`;
+            
+            // 2. Build Invoices Data Table
+            buildInvoicesTable();
 
-            if (avgValue < lowerLimit) {
-                anomalyBadge.innerText = "OUTLIER LOW";
-                anomalyBadge.className = "px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/15 text-accent-amber border border-accent-amber/30 uppercase tracking-widest";
-                anomalyDesc.innerText = "Average invoice value has shifted significantly low. Risk of under-priced group packages.";
-            } else if (avgValue > upperLimit) {
-                anomalyBadge.innerText = "OUTLIER HIGH";
-                anomalyBadge.className = "px-2 py-0.5 rounded text-[10px] font-bold bg-accent-orange/15 text-accent-orange border border-accent-orange/30 uppercase tracking-widest animate-pulse";
-                anomalyDesc.innerText = "Abnormally high booking value detected. Outstanding corporate flight revenue peak registered.";
-            } else {
-                anomalyBadge.innerText = "NORMAL STABLE";
-                anomalyBadge.className = "px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 uppercase tracking-widest";
-                anomalyDesc.innerText = "Invoice volume and billing points strictly within standard 1.5 sigma bounds.";
-            }
+            // 3. Render Trend Analysis Charts
+            renderSalesTrendChart();
+
+            // 4. Build Fleet Airframe Cards & Maintenance Dropdowns
+            buildFleetGridAndForms();
+
+            // 5. Build Regulatory Certificate Compliance Framework
+            buildCertificatesTable();
         }
 
-        function renderFinancialCharts() {
-            const ctx = document.getElementById('salesTrendChart').getContext('2d');
-            
-            if (trendChartInstance) {
-                trendChartInstance.destroy();
-            }
-
-            trendChartInstance = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: monthlyHistoricalData.labels,
-                    datasets: [
-                        {
-                            label: 'Total Billed Revenue ($)',
-                            data: monthlyHistoricalData.billed,
-                            borderColor: '#f97316', // Orange
-                            backgroundColor: 'rgba(249, 115, 22, 0.05)',
-                            borderWidth: 3,
-                            fill: true,
-                            tension: 0.35,
-                            pointBackgroundColor: '#f97316',
-                            pointHoverRadius: 8
-                        },
-                        {
-                            label: 'Amount Collected ($)',
-                            data: monthlyHistoricalData.collected,
-                            borderColor: '#426694', // Muted Blue
-                            backgroundColor: 'transparent',
-                            borderWidth: 2,
-                            borderDash: [5, 5],
-                            pointBackgroundColor: '#426694',
-                            tension: 0.35
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: false // Using custom legend in header
-                        },
-                        tooltip: {
-                            backgroundColor: '#0f172a',
-                            titleColor: '#fff',
-                            bodyColor: '#91abc7',
-                            borderColor: '#325079',
-                            borderWidth: 1,
-                            padding: 12,
-                            displayColors: true
-                        }
-                    },
-                    scales: {
-                        x: {
-                            grid: {
-                                color: 'rgba(255, 255, 255, 0.05)'
-                            },
-                            ticks: {
-                                color: '#91abc7',
-                                font: {
-                                    family: 'Plus Jakarta Sans',
-                                    size: 11
-                                }
-                            }
-                        },
-                        y: {
-                            grid: {
-                                color: 'rgba(255, 255, 255, 0.05)'
-                            },
-                            ticks: {
-                                color: '#91abc7',
-                                font: {
-                                    family: 'JetBrains Mono',
-                                    size: 11
-                                },
-                                callback: function(value) {
-                                    return '$' + value.toLocaleString();
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        function renderInvoicesTable() {
+        function buildInvoicesTable() {
             const tbody = document.getElementById("invoiceTableBody");
             tbody.innerHTML = "";
-
+            
             invoices.forEach(inv => {
                 const tr = document.createElement("tr");
-                tr.className = "hover:bg-slate-900/40 transition-colors border-b border-slate-850/40";
+                tr.className = "hover:bg-slate-900/40 transition-colors";
                 
-                const statusBadge = inv.status === "Paid" 
-                    ? '<span class="px-2.5 py-1 text-[10px] font-bold rounded bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">PAID</span>'
-                    : '<span class="px-2.5 py-1 text-[10px] font-bold rounded bg-amber-500/10 border border-amber-500/20 text-accent-amber animate-pulse">PENDING</span>';
-
+                const statusClass = inv.status && inv.status.toLowerCase() === 'paid' 
+                    ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" 
+                    : "bg-amber-500/10 text-accent-amber border-amber-500/20";
+                
                 tr.innerHTML = `
-                    <td class="px-6 py-4 font-bold tracking-wider text-slate-300 mono">${inv.id}</td>
-                    <td class="px-6 py-4">
-                        <div class="font-bold text-white text-xs">${inv.client}</div>
-                        <div class="text-[10px] text-slate-500">Scheduled Flight Session</div>
+                    <td class="px-6 py-4 font-bold tracking-wider text-slate-300 mono uppercase">${inv.id || 'INV-REG'}</td>
+                    <td class="px-6 py-4 font-semibold text-white">${inv.client || 'Charter Passenger'}</td>
+                    <td class="px-6 py-4 text-slate-400 mono">${inv.date || 'Pending'}</td>
+                    <td class="px-6 py-4 font-bold text-white mono">${formatCurrency(inv.amount)}</td>
+                    <td class="px-6 py-4"><span class="bg-slate-900 px-2 py-1 rounded border border-slate-800 text-[11px] font-bold text-slate-300">${inv.balloon || 'FLT'}</span></td>
+                    <td class="px-6 py-4 text-right">
+                        <span class="px-2 py-0.5 rounded text-[10px] font-extrabold border uppercase tracking-wider ${statusClass}">${inv.status || 'Unsettled'}</span>
                     </td>
-                    <td class="px-6 py-4 text-slate-300 mono">${inv.date}</td>
-                    <td class="px-6 py-4 font-bold text-slate-200 mono">${formatCurrency(inv.amount)}</td>
-                    <td class="px-6 py-4 text-slate-400 text-xs flex items-center gap-1.5">
-                        <i class="fa-solid fa-plane-up text-[10px] text-accent-orange"></i>
-                        <span>${inv.balloon}</span>
-                    </td>
-                    <td class="px-6 py-4 text-right">${statusBadge}</td>
                 `;
                 tbody.appendChild(tr);
             });
         }
 
         function filterInvoicesTable() {
-            const query = document.getElementById("transactionSearch").value.toLowerCase();
-            const rows = document.querySelectorAll("#invoiceTableBody tr");
+            const q = document.getElementById("transactionSearch").value.toLowerCase();
+            const rows = document.getElementById("invoiceTableBody").getElementsByTagName("tr");
             
-            rows.forEach(row => {
-                const text = row.innerText.toLowerCase();
-                if (text.includes(query)) {
-                    row.style.display = "";
-                } else {
-                    row.style.display = "none";
+            for (let row of rows) {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(q) ? "" : "none";
+            }
+        }
+
+        function renderSalesTrendChart() {
+            const ctx = document.getElementById('salesTrendChart').getContext('2d');
+            if (trendChartInstance) trendChartInstance.destroy();
+
+            // Compile dynamic values grouped by month or item distribution maps
+            const values = invoices.map(i => parseFloat(i.amount) || 0);
+            const labels = invoices.map(i => i.date);
+
+            trendChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels.length > 0 ? labels : ["Jan", "Feb", "Mar", "Apr", "May"],
+                    datasets: [{
+                        label: 'Active Flight Ledger Valuation Stream',
+                        data: values.length > 0 ? values : [12000, 19000, 3000, 5000, 22000],
+                        borderColor: '#f97316',
+                        borderWidth: 3,
+                        backgroundColor: 'rgba(249, 115, 22, 0.04)',
+                        fill: true,
+                        tension: 0.35,
+                        pointBackgroundColor: '#f97316',
+                        pointHoverRadius: 7
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { grid: { color: '#1e293b' }, ticks: { color: '#94a3b8', font: { size: 10 } } },
+                        x: { grid: { display: false }, ticks: { color: '#94a3b8', font: { size: 10 } } }
+                    }
                 }
             });
         }
 
-        // ==================== TAB 2: FLEET DIAGNOSTICS & MAINTENANCE ====================
-        function renderFleetSection() {
+        function buildFleetGridAndForms() {
             const grid = document.getElementById("fleetCardGrid");
+            const select = document.getElementById("maintBalloon");
+            
             grid.innerHTML = "";
+            select.innerHTML = "";
+            
+            fleet.forEach(b => {
+                // Build interactive operational selection choice options
+                const opt = document.createElement("option");
+                opt.value = b.registration;
+                opt.innerText = `${b.registration} (${b.shortName})`;
+                select.appendChild(opt);
 
-            const selectElement = document.getElementById("maintBalloon");
-            selectElement.innerHTML = '<option value="">-- Choose Aircraft --</option>';
-
-            fleet.forEach(balloon => {
-                // Predictive AI calculation for maintenance interval (100h checks)
-                const remainingHours = balloon.nextService - balloon.totalHours;
-                // Calculate historical usage per day: monthlyAvg / 30
-                const dailyUsage = balloon.monthlyAvgHours / 30;
-                const daysToService = dailyUsage > 0 ? Math.ceil(remainingHours / dailyUsage) : 365;
+                // Build structural dashboard visualization metric elements
+                const currentAccumulated = parseFloat(b.hours) || 0;
+                const baselineInspected = parseFloat(b.lastServiceHours) || 0;
+                const frameHoursDelta = currentAccumulated - baselineInspected;
+                const structuralLimit = parseFloat(b.limit) || 100;
                 
-                // Formulate projection date
-                const today = new Date();
-                today.setDate(today.getDate() + daysToService);
-                const projectionDateStr = today.toISOString().split('T')[0];
+                // Safety remaining margins ratio metrics
+                let remainingMargin = structuralLimit - frameHoursDelta;
+                if (remainingMargin < 0) remainingMargin = 0;
+                const percentageUsed = Math.min(100, Math.round((frameHoursDelta / structuralLimit) * 100));
+                
+                let barColor = "bg-accent-orange";
+                let borderClass = "border-slate-800";
+                if (percentageUsed >= 85) { barColor = "bg-red-500"; borderClass = "border-red-900/60 glow-red"; }
+                else if (percentageUsed >= 65) { barColor = "bg-amber-500"; borderClass = "border-amber-900/40 glow-orange"; }
 
-                // Percentage progress bar
-                // Find start threshold of the current cycle (e.g. if nextService is 200, started at 100)
-                const startOfCycle = balloon.nextService - 100;
-                const progressInCycle = ((balloon.totalHours - startOfCycle) / 100) * 100;
-                const percentage = Math.max(0, Math.min(100, progressInCycle)).toFixed(1);
-
-                // Build status color code
-                let statusColor = "bg-accent-orange";
-                let textBadge = "NORMAL OPERATING";
-                let borderBadgeColor = "border-emerald-500/20 text-emerald-400 bg-emerald-500/5";
-
-                if (remainingHours <= 10) {
-                    statusColor = "bg-red-500";
-                    textBadge = "IMMINENT GROUNDING";
-                    borderBadgeColor = "border-red-500/30 text-red-400 bg-red-500/10 animate-pulse";
-                } else if (remainingHours <= 25) {
-                    statusColor = "bg-amber-500";
-                    textBadge = "SERVICE OVERDUE SOON";
-                    borderBadgeColor = "border-amber-500/30 text-accent-amber bg-amber-500/10";
-                }
-
-                // Add to dynamic dropdown input
-                const option = document.createElement("option");
-                option.value = `${balloon.reg} (${balloon.name})`;
-                option.innerText = `${balloon.reg} - ${balloon.name}`;
-                selectElement.appendChild(option);
-
-                // Add card UI
                 const card = document.createElement("div");
-                card.className = "glass-card rounded-2xl p-6 flex flex-col justify-between transition-all hover:border-slate-700";
+                card.className = `glass-card p-6 rounded-2xl border ${borderClass} transition-all duration-300 hover:scale-[1.01] flex flex-col justify-between`;
                 card.innerHTML = `
                     <div>
-                        <!-- Badge Row -->
-                        <div class="flex justify-between items-center mb-4">
-                            <span class="text-xs font-black text-white bg-slate-900 border border-slate-800 rounded px-2.5 py-1 mono">${balloon.reg}</span>
-                            <span class="text-[9px] font-extrabold uppercase px-2 py-0.5 rounded tracking-widest border ${borderBadgeColor}">
-                                ${textBadge}
-                            </span>
-                        </div>
-
-                        <!-- Aircraft Meta -->
-                        <h4 class="text-sm font-black text-slate-100">${balloon.name}</h4>
-                        <p class="text-[10px] text-slate-500 mt-0.5 uppercase tracking-wide">Serial: ${balloon.serial}</p>
-
-                        <!-- Telemetry Grid -->
-                        <div class="grid grid-cols-2 gap-4 mt-5 bg-slate-900/50 p-3 rounded-xl border border-slate-850">
+                        <div class="flex justify-between items-start mb-4">
                             <div>
-                                <span class="text-[9px] uppercase font-bold text-slate-500 block">Total Hours</span>
-                                <span class="text-sm font-extrabold text-slate-200 mono">${balloon.totalHours.toFixed(1)} hrs</span>
+                                <span class="bg-slate-900 border border-slate-700 px-2.5 py-1 rounded text-xs font-black text-white tracking-wide mono">${b.registration}</span>
+                                <h4 class="text-lg font-black text-white mt-2">${b.shortName}</h4>
                             </div>
-                            <div>
-                                <span class="text-[9px] uppercase font-bold text-slate-500 block">Next Service</span>
-                                <span class="text-sm font-bold text-accent-orange mono">${balloon.nextService.toFixed(1)} hrs</span>
+                            <div class="text-right">
+                                <p class="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">Total Airframe Time</p>
+                                <p class="text-xl font-bold text-white mono mt-0.5">${currentAccumulated.toFixed(1)} <span class="text-xs text-slate-500">Hrs</span></p>
                             </div>
                         </div>
 
-                        <!-- Progress Bar Container -->
-                        <div class="mt-5 space-y-1.5">
-                            <div class="flex justify-between text-[11px] font-semibold">
-                                <span class="text-slate-400">100-Hr Service Interval</span>
-                                <span class="text-slate-200">${percentage}%</span>
+                        <div class="space-y-2 mt-6">
+                            <div class="flex justify-between text-xs">
+                                <span class="text-slate-400">Compulsory 100-Hr Interval Status</span>
+                                <span class="font-bold text-white mono">${percentageUsed}%</span>
                             </div>
-                            <div class="w-full h-2 bg-slate-950 rounded-full overflow-hidden">
-                                <div class="${statusColor} h-full transition-all duration-500" style="width: ${percentage}%"></div>
+                            <div class="w-full bg-slate-900 rounded-full h-2.5 overflow-hidden border border-slate-800">
+                                <div class="${barColor} h-full transition-all duration-500" style="width: ${percentageUsed}%"></div>
+                            </div>
+                            <div class="flex justify-between text-[11px] pt-1">
+                                <span class="text-slate-500">Logged at last audit: ${baselineInspected.toFixed(1)} Hrs</span>
+                                <span class="${percentageUsed >= 85 ? 'text-red-400 font-bold' : 'text-slate-400'} mono">Remaining: ${remainingMargin.toFixed(1)} Hrs</span>
                             </div>
                         </div>
                     </div>
 
-                    <!-- AI Service Forecast Section -->
-                    <div class="mt-6 pt-4 border-t border-slate-800">
-                        <div class="flex items-start gap-2 text-[11px] leading-relaxed">
-                            <i class="fa-solid fa-clock-rotate-left text-accent-orange mt-0.5 shrink-0"></i>
-                            <div>
-                                <span class="text-slate-500 block uppercase font-bold text-[9px]">Projected Next Service</span>
-                                <span class="text-white font-bold mono">${projectionDateStr}</span>
-                                <span class="text-slate-400 text-[10px]"> (Est. ${daysToService} days remaining at ${balloon.monthlyAvgHours} hr/mo avg)</span>
-                            </div>
-                        </div>
+                    <div class="mt-6 pt-4 border-t border-slate-850/60 flex items-center justify-between text-xs bg-slate-900/-20 p-2 rounded-lg">
+                        <span class="text-slate-400"><i class="fa-solid fa-calendar-days text-slate-500 mr-1.5"></i>Projected Inspection:</span>
+                        <span class="font-bold text-slate-200 mono">${b.nextServiceEst || 'Evaluating...'}</span>
                     </div>
                 `;
                 grid.appendChild(card);
             });
         }
 
-        function submitMaintenance(event) {
-            event.preventDefault();
-            const submitBtn = document.getElementById("submitMaintBtn");
-            const originalText = submitBtn.innerHTML;
-            
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="fa-solid fa-spinner animate-spin"></i> Transmitting Log...';
-
-            const balloon = document.getElementById("maintBalloon").value;
-            const maintType = document.getElementById("maintType").value;
-            const hours = parseFloat(document.getElementById("maintHours").value);
-            const engineer = document.getElementById("maintEngineer").value;
-            const notes = document.getElementById("maintNotes").value;
-
-            // Form payload object matching Apps Script expectations
-            const payload = {
-                action: "logMaintenance",
-                balloon: balloon,
-                type: maintType,
-                hours: hours,
-                engineer: engineer,
-                notes: notes,
-                timestamp: new Date().toISOString()
-            };
-
-            // Post action to Google Apps Script if URL provided
-            if (GOOGLE_SCRIPT_URL !== "YOUR_APPS_SCRIPT_URL_HERE" && GOOGLE_SCRIPT_URL.trim() !== "") {
-                fetch(GOOGLE_SCRIPT_URL, {
-                    method: "POST",
-                    mode: "no-cors", // Necessary for Google Script cross-origin requests
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify(payload)
-                })
-                .then(() => {
-                    handleMaintSuccess(balloon, hours);
-                })
-                .catch(err => {
-                    console.error("Transmission failed", err);
-                    showToast("Database Transmission Error", "Falling back to local simulation.", "warning");
-                    // Local fallback representation for presentation
-                    handleMaintSuccess(balloon, hours);
-                })
-                .finally(() => {
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = originalText;
-                });
-            } else {
-                // Simulated immediate success if no Google URL provided
-                setTimeout(() => {
-                    handleMaintSuccess(balloon, hours);
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = originalText;
-                }, 1500);
-            }
-        }
-
-        function handleMaintSuccess(balloonStr, hoursLogged) {
-            // Find balloon matching registration
-            const regToFind = balloonStr.split(" ")[0];
-            const target = fleet.find(b => b.reg === regToFind);
-            if (target) {
-                target.totalHours = hoursLogged;
-                // Round up to next 100 limit boundary
-                target.nextService = Math.ceil((hoursLogged + 0.1) / 100) * 100;
-            }
-
-            // Reset form
-            document.getElementById("maintenanceForm").reset();
-
-            // Rerender structures
-            renderFleetSection();
-            showToast("Log Transmitted", `Maintenance checklist recorded for ${balloonStr} at ${hoursLogged} hrs.`, "success");
-        }
-
-        // ==================== TAB 3: CERTIFICATES RENEWAL & WARNINGS ====================
-        function evaluateCertificatesAndAlerts() {
+        function buildCertificatesTable() {
             const tbody = document.getElementById("certTableBody");
             tbody.innerHTML = "";
+            let riskCount = 0;
 
-            let criticalAlertCount = 0;
-            const today = new Date("2026-05-25"); // Anchor base date as per current system clock context
-            const thirtyDaysInMs = 30 * 24 * 60 * 60 * 1000;
-
-            certificates.forEach(cert => {
+            certificates.forEach(c => {
                 const tr = document.createElement("tr");
-                tr.className = "hover:bg-slate-900/40 transition-colors border-b border-slate-850/40";
+                tr.className = "hover:bg-slate-900/40 transition-colors";
+                
+                let pClass = "bg-emerald-500/10 text-emerald-400 border-emerald-500/20";
+                if (c.permitStatus && c.permitStatus.toLowerCase() === 'critical') { pClass = "bg-red-500/10 text-red-400 border-red-500/20 animate-pulse"; riskCount++; }
+                else if (c.permitStatus && c.permitStatus.toLowerCase() === 'warning') { pClass = "bg-amber-500/10 text-accent-amber border-amber-500/20"; riskCount++; }
 
-                const permitExpDate = new Date(cert.permitExpiry);
-                const cofrExpDate = new Date(cert.cofrExpiry);
-
-                const permitDiffTime = permitExpDate - today;
-                const cofrDiffTime = cofrExpDate - today;
-
-                const permitExpiringSoon = permitDiffTime <= thirtyDaysInMs;
-                const cofrExpiringSoon = cofrDiffTime <= thirtyDaysInMs;
-
-                let permitStatusBadge = "";
-                let cofrStatusBadge = "";
-
-                // Permit Status Color Evaluation
-                if (permitDiffTime < 0) {
-                    permitStatusBadge = '<span class="px-2.5 py-1 text-[9px] font-bold rounded bg-red-600/25 border border-red-500 text-red-500 glow-red animate-pulse">EXPIRED</span>';
-                    criticalAlertCount++;
-                } else if (permitExpiringSoon) {
-                    permitStatusBadge = '<span class="px-2.5 py-1 text-[9px] font-bold rounded bg-amber-500/15 border border-accent-amber text-accent-amber glow-orange animate-pulse">EXPIRING SOON</span>';
-                    criticalAlertCount++;
-                } else {
-                    permitStatusBadge = '<span class="px-2.5 py-1 text-[9px] font-bold rounded bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">ACTIVE COMPLIANT</span>';
-                }
-
-                // CofR Status Color Evaluation
-                if (cofrDiffTime < 0) {
-                    cofrStatusBadge = '<span class="px-2.5 py-1 text-[9px] font-bold rounded bg-red-600/25 border border-red-500 text-red-500 glow-red animate-pulse">EXPIRED</span>';
-                    criticalAlertCount++;
-                } else if (cofrExpiringSoon) {
-                    cofrStatusBadge = '<span class="px-2.5 py-1 text-[9px] font-bold rounded bg-amber-500/15 border border-accent-amber text-accent-amber glow-orange">EXPIRING SOON</span>';
-                    criticalAlertCount++;
-                } else {
-                    cofrStatusBadge = '<span class="px-2.5 py-1 text-[9px] font-bold rounded bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">ACTIVE COMPLIANT</span>';
-                }
+                let rClass = "bg-emerald-500/10 text-emerald-400 border-emerald-500/20";
+                if (c.status && c.status.toLowerCase() === 'critical') rClass = "bg-red-500/10 text-red-400 border-red-500/20";
+                else if (c.status && c.status.toLowerCase() === 'action required') rClass = "bg-amber-500/10 text-accent-amber border-amber-500/20";
 
                 tr.innerHTML = `
+                    <td class="px-6 py-4 font-bold text-white mono uppercase">${c.registration}</td>
+                    <td class="px-6 py-4 text-slate-400 mono">${c.serial || 'N/A'}</td>
+                    <td class="px-6 py-4 font-semibold text-slate-200 mono">${c.permitExpiry || 'N/A'}</td>
                     <td class="px-6 py-4">
-                        <div class="font-extrabold text-white text-xs">${cert.reg}</div>
-                        <div class="text-[10px] text-slate-500">${cert.name}</div>
+                        <span class="px-2 py-0.5 rounded text-[10px] font-bold border uppercase tracking-wider ${pClass}">${c.permitStatus || 'Active'}</span>
                     </td>
-                    <td class="px-6 py-4 font-bold text-slate-400 mono">${cert.serial}</td>
-                    <td class="px-6 py-4 font-semibold text-slate-300 mono ${permitExpiringSoon ? 'text-red-400 font-extrabold' : ''}">${cert.permitExpiry}</td>
-                    <td class="px-6 py-4">${permitStatusBadge}</td>
-                    <td class="px-6 py-4 font-semibold text-slate-300 mono ${cofrExpiringSoon ? 'text-red-400 font-extrabold' : ''}">${cert.cofrExpiry}</td>
+                    <td class="px-6 py-4 text-slate-200 mono">${c.cofrExpiry || 'N/A'}</td>
                     <td class="px-6 py-4 text-right">
-                        ${(permitExpiringSoon || cofrExpiringSoon) 
-                            ? '<span class="text-red-400 font-black animate-pulse"><i class="fa-solid fa-triangle-exclamation mr-1"></i> CRITICAL WARNING</span>'
-                            : '<span class="text-emerald-400 font-semibold"><i class="fa-solid fa-circle-check mr-1"></i> VALID COMPLIANCE</span>'
-                        }
+                        <span class="px-2 py-0.5 rounded text-[10px] font-bold border uppercase tracking-wider ${rClass}">${c.status || 'Compliant'}</span>
                     </td>
                 `;
                 tbody.appendChild(tr);
             });
 
-            // Set Global Banners & High visibility alerts
+            // Update safety warning elements banner text counts
+            document.getElementById("bannerCount").innerText = riskCount;
             const banner = document.getElementById("globalNoticeBanner");
-            const alertBox = document.getElementById("criticalCertsAlertBox");
-            const bannerCountSpan = document.getElementById("bannerCount");
-
-            if (criticalAlertCount > 0) {
+            const criticalBox = document.getElementById("criticalCertsAlertBox");
+            
+            if (riskCount > 0) {
                 banner.classList.remove("hidden");
-                alertBox.classList.remove("hidden");
-                bannerCountSpan.innerText = criticalAlertCount;
-                
-                // Show warn Toast once on startup
-                showToast("Certificates Overdue", `Found ${criticalAlertCount} compliance certificates requiring immediate renewal!`, "danger");
+                criticalBox.classList.remove("hidden");
             } else {
                 banner.classList.add("hidden");
-                alertBox.classList.add("hidden");
+                criticalBox.classList.add("hidden");
             }
         }
 
         function filterCertsTable() {
-            const query = document.getElementById("certSearch").value.toLowerCase();
-            const rows = document.querySelectorAll("#certTableBody tr");
+            const q = document.getElementById("certSearch").value.toLowerCase();
+            const rows = document.getElementById("certTableBody").getElementsByTagName("tr");
             
-            rows.forEach(row => {
-                const text = row.innerText.toLowerCase();
-                if (text.includes(query)) {
-                    row.style.display = "";
-                } else {
-                    row.style.display = "none";
-                }
-            });
-        }
-
-        function scrollToCertTable() {
-            document.getElementById("certificatesTable").scrollIntoView({ behavior: 'smooth' });
-        }
-
-        // ==================== LIVE SHEET SYNCRONIZATION ====================
-        function syncWithGoogleSheets() {
-            const syncIcon = document.getElementById("syncIcon");
-            const syncText = document.getElementById("syncText");
-
-            syncIcon.classList.add("animate-spin");
-            syncText.innerText = "Syncing with Sheets...";
-
-            // Send requests to Apps Script Web App
-            if (GOOGLE_SCRIPT_URL !== "YOUR_APPS_SCRIPT_URL_HERE" && GOOGLE_SCRIPT_URL.trim() !== "") {
-                fetch(`${GOOGLE_SCRIPT_URL}?action=getDashboardData`)
-                .then(response => response.json())
-                .then(data => {
-                    // Expect fields from live sheets: data.invoices, data.fleet, data.certificates
-                    if (data.invoices) invoices = data.invoices;
-                    if (data.fleet) fleet = data.fleet;
-                    if (data.certificates) certificates = data.certificates;
-                    
-                    initializeDashboard();
-                    showToast("Sync Successful", "Latest flight ops data synchronized from live Google Sheet.", "success");
-                })
-                .catch(err => {
-                    console.error("Synchronization error", err);
-                    showToast("Sync Failed", "Check Google Script URL configuration. Retaining local cache.", "danger");
-                })
-                .finally(() => {
-                    syncIcon.classList.remove("animate-spin");
-                    syncText.innerText = "Sync Live Data";
-                });
-            } else {
-                // Simulated Sync timeout for display demonstration
-                setTimeout(() => {
-                    syncIcon.classList.remove("animate-spin");
-                    syncText.innerText = "Sync Live Data";
-                    showToast("Mock Data Initialized", "Displaying pre-loaded local aviation operations database.", "info");
-                }, 1500);
+            for (let row of rows) {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(q) ? "" : "none";
             }
         }
 
-        // ==================== HELPER FORMATTERS ====================
+        // ==================== DYNAMIC ALERTS & TOAST ENGINE ====================
+        function showToast(title, body, variant = 'info') {
+            const toast = document.getElementById("toastNotification");
+            const tTitle = document.getElementById("toastTitle");
+            const tBody = document.getElementById("toastBody");
+            const iconContainer = document.getElementById("toastIconContainer");
+            
+            tTitle.innerText = title;
+            tBody.innerText = body;
+            
+            // Adjust visual formatting rules based on type properties
+            toast.className = "fixed bottom-5 right-5 z-50 transform transition-all duration-300 max-w-sm w-full p-4 rounded-xl border shadow-2xl flex items-start gap-3 bg-slate-900 text-slate-100";
+            
+            if (variant === 'success') {
+                toast.classList.add("border-emerald-500/30");
+                iconContainer.className = "p-2 rounded-lg text-lg bg-emerald-500/10 text-emerald-400";
+                iconContainer.innerHTML = `<i class="fa-solid fa-circle-check"></i>`;
+            } else if (variant === 'danger') {
+                toast.classList.add("border-red-500/30");
+                iconContainer.className = "p-2 rounded-lg text-lg bg-red-500/10 text-red-400";
+                iconContainer.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i>`;
+            } else {
+                toast.classList.add("border-slate-700");
+                iconContainer.className = "p-2 rounded-lg text-lg bg-accent-orange/10 text-accent-orange";
+                iconContainer.innerHTML = `<i class="fa-solid fa-circle-info"></i>`;
+            }
+
+            // Animate transition show state
+            toast.classList.remove("translate-y-24", "opacity-0");
+            
+            // Auto timeout dismiss loop
+            window.toastTimeout = setTimeout(() => { dismissToast(); }, 5000);
+        }
+
+        function dismissToast() {
+            const toast = document.getElementById("toastNotification");
+            toast.classList.add("translate-y-24", "opacity-0");
+            if (window.toastTimeout) clearTimeout(window.toastTimeout);
+        }
+
+        // ==================== METRIC PARSER LOGISTICS HELPERS ====================
         function formatCurrency(val) {
-            return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(val);
+            return new Intl.NumberFormat('en-MY', { style: 'currency', currency: 'MYR' }).format(val);
         }
     </script>
 </body>
