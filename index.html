@@ -1,735 +1,165 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AKA Dashboard - Premium Flight Operations Portal</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        aviation: {
-                            50: '#f0f4f8',
-                            100: '#dbe3ed',
-                            200: '#bdcbdc',
-                            300: '#91abc7',
-                            400: '#6184ae',
-                            500: '#426694',
-                            600: '#325079',
-                            700: '#2a4162',
-                            800: '#1b2a41', // Deep Navy
-                            900: '#0f172a', // Near Black
-                        },
-                        accent: {
-                            orange: '#f97316', // High-visibility Orange
-                            amber: '#f59e0b',  // Warning Amber
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+// ===================================================================================
+// AKA FLIGHT OPERATIONS & FLEET COMPLIANCE INTEGRATION ENGINE v3.0.0
+// ===================================================================================
+
+function doGet() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var logSheet = ss.getSheetByName("Flight_Logs");
+  var certSheet = ss.getSheetByName("Certificates");
+  
+  // Hardcoded real-world baseline hour historical carryovers from physical logs
+  var baselines = {
+    "9M-AKA": 350.33,
+    "9M-BFW": 393.33,
+    "9M-BFV": 392.08,
+    "9M-BGE": 246.08,
+    "9M-BGC": 2.3,
+    "9M-RDY": 0.0
+  };
+  
+  var logsData = logSheet.getDataRange().getValues();
+  var certData = certSheet.getDataRange().getValues();
+  
+  // 1. PROCESS REAL-TIME FLEET TELEMETRY & INTERVAL RESETS
+  var fleetCalculated = {};
+  var registrationKeys = ["9M-AKA", "9M-BFW", "9M-BFV", "9M-BGE", "9M-BGC", "9M-RDY"];
+  var shortNames = {"9M-AKA":"AKA", "9M-BFW":"MOON", "9M-BFV":"PATCH", "9M-BGE":"BOWIE", "9M-BGC":"GAMUDA", "9M-RDY":"RUDY"};
+  
+  registrationKeys.forEach(function(reg) {
+    fleetCalculated[reg] = {
+      registration: reg,
+      shortName: shortNames[reg],
+      totalHours: baselines[reg],
+      lastServiceHours: baselines[reg], // Default baseline fallback until audit entry found
+      limit: 100
+    };
+  });
+
+  // Parse logs chronologically to accumulate hours and capture the latest inspection reset mark
+  for (var i = 1; i < logsData.length; i++) {
+    var row = logsData[i];
+    var companyVal = String(row[2]).trim();
+    var aircraftReg = String(row[3]).trim().toUpperCase();
     
-    <style>
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: #0b0f19; /* Ultra dark aviation background */
-        }
-        .mono {
-            font-family: 'JetBrains Mono', monospace;
-        }
-        /* Glassmorphism card styles */
-        .glass-card {
-            background: rgba(15, 23, 42, 0.65);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-        }
-        .glow-orange {
-            box-shadow: 0 0 15px rgba(249, 115, 22, 0.25);
-        }
-        .glow-red {
-            box-shadow: 0 0 15px rgba(239, 68, 68, 0.35);
-        }
-        /* Custom scrollbar */
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #0f172a;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #325079;
-            border-radius: 3px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #f97316;
-        }
-    </style>
-</head>
-<body class="text-slate-100 min-h-screen flex flex-col antialiased">
+    // Normalize variant short names to official registration keys
+    if (aircraftReg === "AKA") aircraftReg = "9M-AKA";
+    if (aircraftReg === "MOON") aircraftReg = "9M-BFW";
+    if (aircraftReg === "PATCH") aircraftReg = "9M-BFV";
+    if (aircraftReg === "BOWIE") aircraftReg = "9M-BGE";
+    if (aircraftReg === "GAMUDA") aircraftReg = "9M-BGC";
+    if (aircraftReg === "RUDY") aircraftReg = "9M-RDY";
 
-    <div id="loginOverlay" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950 bg-opacity-95 backdrop-blur-md transition-all duration-500">
-        <div class="glass-card max-w-md w-full mx-4 p-8 rounded-2xl border border-slate-800 shadow-2xl relative overflow-hidden">
-            <div class="absolute -top-10 -right-10 w-32 h-32 bg-accent-orange rounded-full filter blur-3xl opacity-10"></div>
-            
-            <div class="text-center mb-8">
-                <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-slate-900 border border-slate-700 text-accent-orange text-2xl mb-4 shadow-inner">
-                    <i class="fa-solid fa-wind animate-pulse"></i>
-                </div>
-                <h1 class="text-2xl font-extrabold tracking-tight text-white">AKA DASHBOARD</h1>
-                <p class="text-xs text-slate-400 mt-2 uppercase tracking-widest">Aviation Flight Ops & Fleet Portal</p>
-            </div>
-            
-            <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-5">
-                <div>
-                    <label for="passwordInput" class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-2">Security Access Password</label>
-                    <div class="relative">
-                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-500">
-                            <i class="fa-solid fa-lock"></i>
-                        </span>
-                        <input type="password" id="passwordInput" required
-                               class="w-full pl-10 pr-4 py-3 bg-slate-900/90 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-accent-orange focus:ring-1 focus:ring-accent-orange transition-all duration-200"
-                               placeholder="••••••••">
-                    </div>
-                </div>
-                
-                <div id="loginError" class="hidden text-sm text-red-400 flex items-center gap-2 bg-red-950/40 border border-red-900/50 p-3 rounded-lg">
-                    <i class="fa-solid fa-circle-exclamation text-red-500"></i>
-                    <span>Access Denied. Incorrect Password.</span>
-                </div>
-                
-                <button type="submit" 
-                        class="w-full py-3 bg-gradient-to-r from-accent-orange to-amber-600 hover:from-orange-500 hover:to-amber-500 text-white font-bold rounded-lg transition-all duration-300 shadow-lg shadow-orange-900/30 flex items-center justify-center gap-2 hover:scale-[1.01]">
-                    <span>Authorize Device</span>
-                    <i class="fa-solid fa-chevron-right text-xs"></i>
-                </button>
-            </form>
-            
-            <div class="mt-8 pt-6 border-t border-slate-800 text-center">
-                <p class="text-[10px] text-slate-500 uppercase tracking-widest">Restricted Area &bull; Authorization Logs Recorded</p>
-            </div>
-        </div>
-    </div>
+    var hUsed = parseFloat(row[4]) || 0;
+    var mUsed = parseFloat(row[5]) || 0;
+    var decimalHours = hUsed + (mUsed / 60);
+    
+    if (fleetCalculated[aircraftReg]) {
+      fleetCalculated[aircraftReg].totalHours += decimalHours;
+      
+      // If row matches your strict dropdown inspection marker, lock this point as the 100hr baseline reset!
+      if (companyVal === "Annual Structural Airworthiness Audit") {
+        fleetCalculated[aircraftReg].lastServiceHours = fleetCalculated[aircraftReg].totalHours;
+      }
+    }
+  }
 
-    <div id="dashboardContainer" class="hidden flex-1 flex flex-col">
-        
-        <header class="bg-slate-950 border-b border-slate-800 px-6 py-4 sticky top-0 z-40">
-            <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
-                
-                <div class="flex items-center gap-3">
-                    <div class="h-10 w-10 rounded-lg bg-gradient-to-br from-accent-orange to-amber-500 flex items-center justify-center shadow-lg shadow-orange-900/20">
-                        <i class="fa-solid fa-plane-up text-white text-lg"></i>
-                    </div>
-                    <div>
-                        <h2 class="text-xl font-extrabold text-white tracking-tight flex items-center gap-2">
-                            AKA DASHBOARD 
-                            <span class="text-[10px] bg-accent-orange/10 border border-accent-orange/30 text-accent-orange px-2 py-0.5 rounded-full font-bold uppercase tracking-widest">Ops Portal</span>
-                        </h2>
-                        <p class="text-xs text-slate-400">Integrated Balloon Operations, Maintenance Logs & Compliance Intelligence</p>
-                    </div>
-                </div>
+  // 2. PARSE REGULATORY COMPLIANCE CERTIFICATES
+  var certificatesArray = [];
+  for (var j = 1; j < certData.length; j++) {
+    var cRow = certData[j];
+    if (!cRow[0]) continue;
+    
+    var pExpiry = cRow[3] instanceof Date ? cRow[3].toISOString().split('T')[0] : String(cRow[3]);
+    var cExpiry = cRow[4] instanceof Date ? cRow[4].toISOString().split('T')[0] : String(cRow[4]);
+    
+    // Evaluate alerting signatures
+    var today = new Date();
+    var pDate = new Date(pExpiry);
+    var diffTime = pDate - today;
+    var diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    var permitStatus = "Active";
+    var regStatus = "Compliant";
+    if (diffDays <= 0) { permitStatus = "Critical"; regStatus = "Critical"; }
+    else if (diffDays <= 30) { permitStatus = "Warning"; regStatus = "Action Required"; }
 
-                <div class="flex flex-wrap items-center gap-3 text-xs">
-                    <button onclick="syncWithGoogleSheets()" class="flex items-center gap-2 px-3.5 py-2 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 hover:border-slate-700 hover:bg-slate-850 hover:text-white transition-all">
-                        <i id="syncIcon" class="fa-solid fa-rotate text-accent-orange"></i>
-                        <span id="syncText">Sync Live Data</span>
-                    </button>
-                    <div class="flex items-center gap-2 px-3 py-2 rounded-lg bg-emerald-950/40 border border-emerald-900/30 text-emerald-400">
-                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                        <span class="font-medium tracking-wider uppercase text-[10px]">Secure Session</span>
-                    </div>
-                    <button onclick="handleLogout()" class="px-3 py-2 bg-slate-900 border border-slate-800 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors" title="Lock Dashboard">
-                        <i class="fa-solid fa-lock-open"></i>
-                    </button>
-                </div>
-            </div>
-        </header>
+    certificatesArray.push({
+      registration: String(cRow[0]),
+      serial: String(cRow[2]),
+      permitExpiry: pExpiry,
+      permitStatus: permitStatus,
+      cofrExpiry: cExpiry,
+      status: regStatus
+    });
+  }
 
-        <div id="globalNoticeBanner" class="bg-gradient-to-r from-red-950/50 via-slate-950 to-amber-950/50 border-b border-red-900/40 px-6 py-3">
-            <div class="max-w-7xl mx-auto flex items-center justify-between text-xs md:text-sm">
-                <div class="flex items-center gap-3">
-                    <span class="flex h-3 w-3 relative">
-                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                        <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
-                    </span>
-                    <p class="text-slate-300">
-                        <strong class="text-red-400"><i class="fa-solid fa-triangle-exclamation mr-1.5"></i> Action Required:</strong> 
-                        Certificate expiration risks detected on <span id="bannerCount" class="underline font-bold text-white">0</span> registration(s) in next 30 days!
-                    </p>
-                </div>
-                <button onclick="switchToTab('certificates')" class="text-accent-orange hover:text-orange-400 font-bold underline uppercase text-xs tracking-wider">
-                    Inspect Certificates <i class="fa-solid fa-arrow-right ml-1"></i>
-                </button>
-            </div>
-        </div>
+  // 3. GENERATE ADVANCED OPERATIONAL INSIGHTS (Pilot Analytics)
+  var pilotAnalytics = {};
+  for (var k = 1; k < logsData.length; k++) {
+    var pRow = logsData[k];
+    var pilotName = String(pRow[6]).trim();
+    var h = parseFloat(pRow[4]) || 0;
+    var m = parseFloat(pRow[5]) || 0;
+    var decHrs = h + (m / 60);
+    var bUsed = String(pRow[3]).trim().toUpperCase();
+    
+    if (!pilotName || pilotName === "" || pRow[2] === "Annual Structural Airworthiness Audit") continue;
+    
+    if (!pilotAnalytics[pilotName]) {
+      pilotAnalytics[pilotName] = { name: pilotName, totalFlights: 0, totalHours: 0, favoriteBalloon: {} };
+    }
+    pilotAnalytics[pilotName].totalFlights += 1;
+    pilotAnalytics[pilotName].totalHours += decHrs;
+    
+    if (bUsed && bUsed !== "") {
+      pilotAnalytics[pilotName].favoriteBalloon[bUsed] = (pilotAnalytics[pilotName].favoriteBalloon[bUsed] || 0) + 1;
+    }
+  }
 
-        <div class="bg-slate-950 border-b border-slate-850 px-6">
-            <div class="max-w-7xl mx-auto flex gap-1 overflow-x-auto">
-                <button onclick="switchToTab('fleet')" id="tabBtn-fleet" 
-                        class="px-5 py-3.5 border-b-2 font-bold text-sm tracking-wide transition-all duration-200 flex items-center gap-2 shrink-0 border-accent-orange text-accent-orange">
-                    <i class="fa-solid fa-helicopter text-xs"></i>
-                    Fleet & Balloon Hours
-                </button>
-                <button onclick="switchToTab('certificates')" id="tabBtn-certificates" 
-                        class="px-5 py-3.5 border-b-2 font-bold text-sm tracking-wide transition-all duration-200 flex items-center gap-2 shrink-0 border-transparent text-slate-400 hover:text-slate-200">
-                    <i class="fa-solid fa-id-card text-xs"></i>
-                    Certificate Renewal Tracking
-                </button>
-            </div>
-        </div>
+  // Format pilot summary array
+  var insightsArray = Object.keys(pilotAnalytics).map(function(key) {
+    var p = pilotAnalytics[key];
+    var fav = "None";
+    var maxCount = 0;
+    Object.keys(p.favoriteBalloon).forEach(function(b) {
+      if (p.favoriteBalloon[b] > maxCount) { maxCount = p.favoriteBalloon[b]; fav = b; }
+    });
+    return { name: p.name, flights: p.totalFlights, hours: p.totalHours.toFixed(1), favorite: fav };
+  });
 
-        <div id="toastNotification" class="fixed bottom-5 right-5 z-50 transform translate-y-24 opacity-0 transition-all duration-300 max-w-sm w-full p-4 rounded-xl border shadow-2xl flex items-start gap-3 bg-slate-900 border-slate-700">
-            <div id="toastIconContainer" class="p-2 rounded-lg text-lg"></div>
-            <div class="flex-1">
-                <h4 id="toastTitle" class="font-bold text-sm text-white">Notification</h4>
-                <p id="toastBody" class="text-xs text-slate-300 mt-1">Message body</p>
-            </div>
-            <button onclick="dismissToast()" class="text-slate-500 hover:text-white transition-colors">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-        </div>
+  var payload = {
+    fleet: Object.keys(fleetCalculated).map(function(k) { return fleetCalculated[k]; }),
+    certificates: certificatesArray,
+    insights: insightsArray
+  };
 
-        <main class="flex-grow max-w-7xl w-full mx-auto px-6 py-8 space-y-8">
+  return ContentService.createTextOutput(JSON.stringify(payload))
+    .setMimeType(ContentService.MimeType.JSON);
+}
 
-            <section id="tab-fleet" class="space-y-8">
-                
-                <div>
-                    <h3 class="text-lg font-bold text-white mb-1">Fleet Airworthiness & Diagnostics</h3>
-                    <p class="text-xs text-slate-400 mb-6">Real-time status monitoring tracking flight log telemetry relative to compulsory 100-hour and annual service limits.</p>
-
-                    <div id="fleetCardGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        </div>
-                </div>
-
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    
-                    <div class="glass-card p-6 rounded-2xl lg:col-span-2">
-                        <div class="flex items-center gap-3 mb-6">
-                            <span class="w-8 h-8 rounded-lg bg-accent-orange/10 text-accent-orange flex items-center justify-center">
-                                <i class="fa-solid fa-screwdriver-wrench"></i>
-                            </span>
-                            <div>
-                                <h3 class="text-md font-bold text-white">Log Fleet Maintenance Work</h3>
-                                <p class="text-xs text-slate-400">Record maintenance, inspect thresholds, and write updates directly back to Google Sheets.</p>
-                            </div>
-                        </div>
-
-                        <form id="maintenanceForm" onsubmit="submitMaintenance(event)" class="space-y-4 text-xs">
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <div>
-                                    <label class="block text-slate-400 mb-1.5 uppercase font-semibold">Target Balloon Aircraft</label>
-                                    <select id="maintBalloon" required
-                                            class="w-full bg-slate-900 border border-slate-800 text-slate-200 rounded-lg px-3 py-2.5 focus:outline-none focus:border-accent-orange">
-                                        <option value="9M-AKA">9M-AKA (AKA)</option>
-                                        <option value="9M-BFW">9M-BFW (MOON)</option>
-                                        <option value="9M-BFV">9M-BFV (PATCH)</option>
-                                        <option value="9M-BGE">9M-BGE (BOWIE)</option>
-                                        <option value="9M-BGC">9M-BGC (GAMUDA)</option>
-                                        <option value="9M-RDY">9M-RDY (RUDY)</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label class="block text-slate-400 mb-1.5 uppercase font-semibold">Service Type</label>
-                                    <select id="maintType" required
-                                            class="w-full bg-slate-900 border border-slate-800 text-slate-200 rounded-lg px-3 py-2.5 focus:outline-none focus:border-accent-orange">
-                                        <option value="100-Hour Inspection">100-Hour Scheduled Inspection</option>
-                                        <option value="Annual Airworthiness">Annual Structural Airworthiness Audit</option>
-                                        <option value="Unscheduled Repair">Ad-hoc Unscheduled Defect Correction</option>
-                                        <option value="Envelope Re-tag">Envelope Fabric Porosity / Burner Overhaul</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <div>
-                                    <label class="block text-slate-400 mb-1.5 uppercase font-semibold">Current Certified Hobbs Hour Meter</label>
-                                    <input type="number" step="0.1" id="maintHours" required placeholder="e.g. 142.5"
-                                           class="w-full bg-slate-900 border border-slate-800 text-slate-200 rounded-lg px-3 py-2.5 focus:outline-none focus:border-accent-orange">
-                                </div>
-                                <div>
-                                    <label class="block text-slate-400 mb-1.5 uppercase font-semibold">Assigned Certifying Engineer</label>
-                                    <input type="text" id="maintEngineer" required placeholder="e.g. Michael Rossi, LAE"
-                                           class="w-full bg-slate-900 border border-slate-800 text-slate-200 rounded-lg px-3 py-2.5 focus:outline-none focus:border-accent-orange">
-                                </div>
-                            </div>
-
-                            <div>
-                                <label class="block text-slate-400 mb-1.5 uppercase font-semibold">Maintenance Description & Parts Utilized</label>
-                                <textarea id="maintNotes" required rows="4" placeholder="Describe the maintenance findings, replacement of fabric panels, burner jet replacements, fuel cylinder safety relief valve pressure tests, etc..."
-                                          class="w-full bg-slate-900 border border-slate-800 text-slate-200 rounded-lg px-3 py-2.5 focus:outline-none focus:border-accent-orange"></textarea>
-                            </div>
-
-                            <div class="flex justify-end pt-2">
-                                <button type="submit" id="submitMaintBtn"
-                                        class="px-5 py-3 bg-accent-orange hover:bg-orange-600 text-white font-bold rounded-lg transition-colors flex items-center gap-2">
-                                    <i class="fa-solid fa-paper-plane"></i>
-                                    <span>Transmit Log to Google Sheets</span>
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-
-                    <div class="glass-card p-6 rounded-2xl flex flex-col justify-between">
-                        <div class="space-y-5">
-                            <h4 class="text-xs font-semibold tracking-wider text-accent-orange uppercase">Maintenance Science</h4>
-                            <h3 class="text-base font-bold text-white">Service Projection Mechanics</h3>
-                            <p class="text-xs text-slate-400 leading-relaxed">
-                                Our platform runs predictive scheduling calculations. By mapping historical flight hour accrual metrics over trailing segments, the software determines the precise estimated calendar date when the flight frame is anticipated to cross its maintenance boundary.
-                            </p>
-                            <div class="bg-slate-900 p-4 rounded-xl space-y-3">
-                                <div class="flex items-center gap-2 text-xs">
-                                    <i class="fa-solid fa-calculator text-amber-500"></i>
-                                    <span class="font-bold text-slate-200">Algorithmic Formula:</span>
-                                </div>
-                                <div class="mono text-[10px] text-accent-amber pl-6">
-                                    Days_To_Service = (S_Limit - C_Hours) / Daily_Usage_Rate
-                                </div>
-                            </div>
-                            <p class="text-[11px] text-slate-400">
-                                This allows flight coordinators to forecast aircraft downtime, align engineering crews, and maximize fleet availability during operational windows.
-                            </p>
-                        </div>
-                        <div class="pt-4 border-t border-slate-850 flex items-center gap-2 text-[10px] text-slate-500">
-                            <i class="fa-solid fa-circle-info text-slate-400"></i>
-                            <span>Updates recalculate on database modification.</span>
-                        </div>
-                    </div>
-
-                </div>
-            </section>
-
-            <section id="tab-certificates" class="space-y-8 hidden">
-                
-                <div id="criticalCertsAlertBox" class="hidden p-5 rounded-2xl bg-red-950/40 border border-red-500/20 text-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                    <div class="flex items-start gap-4">
-                        <span class="w-12 h-12 rounded-xl bg-red-500/10 border border-red-500/30 text-red-500 flex items-center justify-center shrink-0">
-                            <i class="fa-solid fa-triangle-exclamation text-xl animate-bounce"></i>
-                        </span>
-                        <div>
-                            <h4 class="font-black text-white text-md">Expiring Aviation Certificates Detected</h4>
-                            <p class="text-xs text-slate-300 mt-1">One or more hot air balloons have Permit to Fly or CofR certificates expiring in under 30 days. Action is required immediately to prevent aircraft grounding.</p>
-                        </div>
-                    </div>
-                    <button onclick="scrollToCertTable()" class="px-4 py-2 bg-red-600 hover:bg-red-500 text-white font-bold rounded-lg text-xs transition-colors shrink-0">
-                        View At-Risk Registrations
-                    </button>
-                </div>
-
-                <div class="glass-card rounded-2xl overflow-hidden">
-                    <div class="px-6 py-5 border-b border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                        <div>
-                            <h3 class="text-lg font-bold text-white">Annual & Biennial Compliance Registry</h3>
-                            <p class="text-xs text-slate-400">Database monitoring regulatory "Permit to Fly" and 2-year "Certificate of Registration (CofR)" metrics</p>
-                        </div>
-                        <div class="flex gap-2">
-                            <input type="text" id="certSearch" onkeyup="filterCertsTable()" placeholder="Search Registration/Serial..." 
-                                   class="text-xs bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-accent-orange min-w-[200px]">
-                        </div>
-                    </div>
-
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left border-collapse" id="certificatesTable">
-                            <thead>
-                                <tr class="bg-slate-950 text-slate-400 text-[10px] tracking-wider uppercase font-extrabold border-b border-slate-850">
-                                    <th class="px-6 py-4">Balloon Ref</th>
-                                    <th class="px-6 py-4">Serial Number</th>
-                                    <th class="px-6 py-4">Permit to Fly Expiry</th>
-                                    <th class="px-6 py-4">Permit Status</th>
-                                    <th class="px-6 py-4">CofR Expiry (2-Year)</th>
-                                    <th class="px-6 py-4 text-right">Regulatory Status</th>
-                                </tr>
-                            </thead>
-                            <tbody id="certTableBody" class="divide-y divide-slate-850/60 text-xs">
-                                </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="glass-card p-6 rounded-2xl">
-                        <h4 class="text-xs font-bold text-accent-orange uppercase tracking-wider mb-2">Permit to Fly Guidelines</h4>
-                        <h3 class="text-base font-bold text-white mb-3">Annual Flight Readiness Inspections</h3>
-                        <p class="text-xs text-slate-300 leading-relaxed">
-                            Under Civil Aviation Safety regulations, every passenger-carrying hot air balloon must pass an annual inspection. This comprehensive checklist includes envelope tensile strength testing, burn testing, high-temperature indicator validation, and burner system pressure tests. The "Permit to Fly" must be renewed prior to its expiration date; failure to do so results in the immediate operational suspension of the aircraft.
-                        </p>
-                    </div>
-                    
-                    <div class="glass-card p-6 rounded-2xl">
-                        <h4 class="text-xs font-bold text-amber-500 uppercase tracking-wider mb-2">Certificate of Registration (CofR)</h4>
-                        <h3 class="text-base font-bold text-white mb-3">Biennial National Registry Audits</h3>
-                        <p class="text-xs text-slate-300 leading-relaxed">
-                            The Certificate of Registration validates legal nationality and structural ownership status flags. Unlike the airworthiness permit, the CofR runs a 24-month cyclical schedule focused on registration ownership validation, weight and balance modifications, and logbook recording continuity. Operating an airframe with an expired CofR triggers an automatic registry invalidation flag.
-                        </p>
-                    </div>
-                </div>
-            </section>
-
-        </main>
-
-        <footer class="bg-slate-950 border-t border-slate-900 px-6 py-4 text-center text-[10px] text-slate-500 uppercase tracking-widest">
-            &copy; 2026 AKA Balloon Operations Systems &bull; Aerostatic Fleet Intelligence Dashboard Engine &bull; V2.4.0
-        </footer>
-    </div>
-
-    <script>
-        // CORE APPLICATION CONFIGURATION NODES
-        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwnqpDHrGfhzf9M4pVL3oUTzgIqWBnhfGz_PZu1IXYfMekcMULe7OgZ2cUDACxEVEVQQQ/exec";
-        const DASHBOARD_PASSWORD = "Rudy56";
-
-        // GLOBAL APPLICATION DATA CACHE STATE
-        let fleet = [];
-        let certificates = [];
-
-        // LOCAL STATIC MOCK RECOVERY BUFFER (Used if live streaming endpoint returns blank/unconfigured state)
-        const mockFleet = [
-            { registration: "9M-AKA", shortName: "AKA", hours: 363.3, limit: 100, lastServiceHours: 350, nextServiceEst: "2026-06-15" },
-            { registration: "9M-BFW", shortName: "MOON", hours: 412.5, limit: 100, lastServiceHours: 390, nextServiceEst: "2026-07-02" },
-            { registration: "9M-BFV", shortName: "PATCH", hours: 435.1, limit: 100, lastServiceHours: 420, nextServiceEst: "2026-06-22" },
-            { registration: "9M-BGE", shortName: "BOWIE", hours: 261.4, limit: 100, lastServiceHours: 250, nextServiceEst: "2026-08-10" },
-            { registration: "9M-BGC", shortName: "GAMUDA", hours: 2.3, limit: 100, lastServiceHours: 0, nextServiceEst: "2026-12-31" },
-            { registration: "9M-RDY", shortName: "RUDY", hours: 0.0, limit: 100, lastServiceHours: 0, nextServiceEst: "N/A" }
-        ];
-
-        const mockCertificates = [
-            { registration: "9M-AKA", serial: "11520", permitExpiry: "2026-08-14", permitStatus: "Active", cofrExpiry: "2027-04-11", status: "Compliant" },
-            { registration: "9M-BFW", serial: "12140", permitExpiry: "2026-06-02", permitStatus: "Warning", cofrExpiry: "2026-11-19", status: "Action Required" },
-            { registration: "9M-BFV", serial: "10985", permitExpiry: "2026-11-20", permitStatus: "Active", cofrExpiry: "2027-02-15", status: "Compliant" },
-            { registration: "9M-BGE", serial: "11650", permitExpiry: "2026-07-19", permitStatus: "Active", cofrExpiry: "2027-09-05", status: "Compliant" },
-            { registration: "9M-BGC", serial: "13011", permitExpiry: "2026-05-30", permitStatus: "Critical", cofrExpiry: "2026-05-30", status: "Critical" },
-            { registration: "9M-RDY", serial: "12844", permitExpiry: "2027-02-10", permitStatus: "Active", cofrExpiry: "2028-01-22", status: "Compliant" }
-        ];
-
-        // ==================== SECURITY & ROUTING GATE KEEPERS ====================
-        function handleLogin(e) {
-            e.preventDefault();
-            const input = document.getElementById("passwordInput").value;
-            const errorBadge = document.getElementById("loginError");
-            
-            if (input === DASHBOARD_PASSWORD) {
-                errorBadge.className = "hidden";
-                document.getElementById("loginOverlay").classList.add("opacity-0", "pointer-events-none");
-                document.getElementById("dashboardContainer").classList.remove("hidden");
-                
-                // Fire initial boot sequencer load
-                loadInitialCacheData();
-                showToast("Access Granted", "Aviation environment initialized. Loading fleet telemetry...", "success");
-            } else {
-                errorBadge.classList.remove("hidden");
-                document.getElementById("passwordInput").value = "";
-                showToast("Security Exception", "Unauthorized hardware signature connection refused.", "danger");
-            }
-        }
-
-        function handleLogout() {
-            document.getElementById("dashboardContainer").classList.add("hidden");
-            document.getElementById("loginOverlay").classList.remove("opacity-0", "pointer-events-none");
-            document.getElementById("passwordInput").value = "";
-            showToast("Session Terminated", "Security perimeter successfully established.", "info");
-        }
-
-        // ==================== TABS LAYOUT SWITCH MANAGER ====================
-        function switchToTab(targetTab) {
-            const tabs = ['fleet', 'certificates'];
-            tabs.forEach(t => {
-                const sec = document.getElementById(`tab-${t}`);
-                const btn = document.getElementById(`tabBtn-${t}`);
-                if (t === targetTab) {
-                    sec.classList.remove("hidden");
-                    btn.classList.add("border-accent-orange", "text-accent-orange");
-                    btn.classList.remove("border-transparent", "text-slate-400");
-                } else {
-                    sec.classList.add("hidden");
-                    btn.classList.remove("border-accent-orange", "text-accent-orange");
-                    btn.classList.add("border-transparent", "text-slate-400");
-                }
-            });
-        }
-
-        function scrollToCertTable() {
-            switchToTab('certificates');
-            document.getElementById("certificatesTable").scrollIntoView({ behavior: 'smooth' });
-        }
-
-        // ==================== ASYNC STREAM DATA INJECTORS ====================
-        function loadInitialCacheData() {
-            // Load localized fallbacks first to populate viewframes while network fetches run
-            fleet = [...mockFleet];
-            certificates = [...mockCertificates];
-            
-            initializeDashboardViews();
-            
-            // Attempt hot stream update against live Google Web App Deployment
-            syncWithGoogleSheets();
-        }
-
-        function syncWithGoogleSheets() {
-            const syncIcon = document.getElementById("syncIcon");
-            const syncText = document.getElementById("syncText");
-            
-            syncIcon.classList.add("fa-spin");
-            syncText.innerText = "Connecting Live System...";
-            
-            if (GOOGLE_SCRIPT_URL && GOOGLE_SCRIPT_URL !== "") {
-                fetch(GOOGLE_SCRIPT_URL)
-                .then(res => {
-                    if (!res.ok) throw new Error("Network connectivity degradation detected.");
-                    return res.json();
-                })
-                .then(data => {
-                    console.log("Telemetry Received: ", data);
-                    // Dynamically map incoming data payloads if sheets are populated
-                    if (data.fleet && data.fleet.length > 0) fleet = data.fleet;
-                    if (data.certificates && data.certificates.length > 0) certificates = data.certificates;
-                    
-                    initializeDashboardViews();
-                    showToast("Sync Structural Success", "Real-time fleet records parsed from central ledger.", "success");
-                })
-                .catch(err => {
-                    console.warn("Live API stream unreachable. Retaining active cache architecture.", err);
-                    showToast("Connection Bypass", "Google Endpoint returned 0 or null. Retaining localized framework caches.", "info");
-                })
-                .finally(() => {
-                    syncIcon.classList.remove("fa-spin");
-                    syncText.innerText = "Sync Live Data";
-                });
-            } else {
-                setTimeout(() => {
-                    syncIcon.classList.remove("fa-spin");
-                    syncText.innerText = "Sync Live Data";
-                    showToast("Mock Matrix Engaged", "Displaying structural local baseline records.", "info");
-                }, 1200);
-            }
-        }
-
-        // ==================== MAINTENANCE TRANSMISSION LOGIC ====================
-        function submitMaintenance(e) {
-            e.preventDefault();
-            const btn = document.getElementById("submitMaintBtn");
-            
-            const payload = {
-                balloon: document.getElementById("maintBalloon").value,
-                type: document.getElementById("maintType").value,
-                hours: parseFloat(document.getElementById("maintHours").value),
-                engineer: document.getElementById("maintEngineer").value,
-                notes: document.getElementById("maintNotes").value,
-                timestamp: new Date().toISOString()
-            };
-
-            btn.disabled = true;
-            btn.innerHTML = `<i class="fa-solid fa-circle-notch animate-spin"></i> <span>Transmitting Telemetry...</span>`;
-
-            if (GOOGLE_SCRIPT_URL && GOOGLE_SCRIPT_URL !== "") {
-                fetch(GOOGLE_SCRIPT_URL, {
-                    method: 'POST',
-                    mode: 'no-cors', // standard cross-origin bypass for Google Macros
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                })
-                .then(() => {
-                    showToast("Transmission Logged", "Record transmitted to Google Sheets deployment buffer.", "success");
-                    document.getElementById("maintenanceForm").reset();
-                    syncWithGoogleSheets();
-                })
-                .catch(err => {
-                    console.error(err);
-                    showToast("Log Failure", "Local socket pipeline could not deliver payload packet.", "danger");
-                })
-                .finally(() => {
-                    btn.disabled = false;
-                    btn.innerHTML = `<i class="fa-solid fa-paper-plane"></i> <span>Transmit Log to Google Sheets</span>`;
-                });
-            } else {
-                // Mock execution loop
-                setTimeout(() => {
-                    showToast("Simulation Successful", "Local array database updated (Mock environment execution mode).", "success");
-                    document.getElementById("maintenanceForm").reset();
-                    btn.disabled = false;
-                    btn.innerHTML = `<i class="fa-solid fa-paper-plane"></i> <span>Transmit Log to Google Sheets</span>`;
-                }, 1000);
-            }
-        }
-
-        // ==================== RENDERING & COMPUTATION ARCHITECTURE ====================
-        function initializeDashboardViews() {
-            // 1. Build Fleet Airframe Cards & Maintenance Dropdowns
-            buildFleetGridAndForms();
-
-            // 2. Build Regulatory Certificate Compliance Framework
-            buildCertificatesTable();
-        }
-
-        function buildFleetGridAndForms() {
-            const grid = document.getElementById("fleetCardGrid");
-            const select = document.getElementById("maintBalloon");
-            
-            grid.innerHTML = "";
-            select.innerHTML = "";
-            
-            fleet.forEach(b => {
-                // Build interactive operational selection choice options
-                const opt = document.createElement("option");
-                opt.value = b.registration;
-                opt.innerText = `${b.registration} (${b.shortName})`;
-                select.appendChild(opt);
-
-                // Build structural dashboard visualization metric elements
-                const currentAccumulated = parseFloat(b.hours) || 0;
-                const baselineInspected = parseFloat(b.lastServiceHours) || 0;
-                const frameHoursDelta = currentAccumulated - baselineInspected;
-                const structuralLimit = parseFloat(b.limit) || 100;
-                
-                // Safety remaining margins ratio metrics
-                let remainingMargin = structuralLimit - frameHoursDelta;
-                if (remainingMargin < 0) remainingMargin = 0;
-                const percentageUsed = Math.min(100, Math.round((frameHoursDelta / structuralLimit) * 100));
-                
-                let barColor = "bg-accent-orange";
-                let borderClass = "border-slate-800";
-                if (percentageUsed >= 85) { barColor = "bg-red-500"; borderClass = "border-red-900/60 glow-red"; }
-                else if (percentageUsed >= 65) { barColor = "bg-amber-500"; borderClass = "border-amber-900/40 glow-orange"; }
-
-                const card = document.createElement("div");
-                card.className = `glass-card p-6 rounded-2xl border ${borderClass} transition-all duration-300 hover:scale-[1.01] flex flex-col justify-between`;
-                card.innerHTML = `
-                    <div>
-                        <div class="flex justify-between items-start mb-4">
-                            <div>
-                                <span class="bg-slate-900 border border-slate-700 px-2.5 py-1 rounded text-xs font-black text-white tracking-wide mono">${b.registration}</span>
-                                <h4 class="text-lg font-black text-white mt-2">${b.shortName}</h4>
-                            </div>
-                            <div class="text-right">
-                                <p class="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">Total Airframe Time</p>
-                                <p class="text-xl font-bold text-white mono mt-0.5">${currentAccumulated.toFixed(1)} <span class="text-xs text-slate-500">Hrs</span></p>
-                            </div>
-                        </div>
-
-                        <div class="space-y-2 mt-6">
-                            <div class="flex justify-between text-xs">
-                                <span class="text-slate-400">Compulsory 100-Hr Interval Status</span>
-                                <span class="font-bold text-white mono">${percentageUsed}%</span>
-                            </div>
-                            <div class="w-full bg-slate-900 rounded-full h-2.5 overflow-hidden border border-slate-800">
-                                <div class="${barColor} h-full transition-all duration-500" style="width: ${percentageUsed}%"></div>
-                            </div>
-                            <div class="flex justify-between text-[11px] pt-1">
-                                <span class="text-slate-500">Logged at last audit: ${baselineInspected.toFixed(1)} Hrs</span>
-                                <span class="${percentageUsed >= 85 ? 'text-red-400 font-bold' : 'text-slate-400'} mono">Remaining: ${remainingMargin.toFixed(1)} Hrs</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="mt-6 pt-4 border-t border-slate-850/60 flex items-center justify-between text-xs bg-slate-900/-20 p-2 rounded-lg">
-                        <span class="text-slate-400"><i class="fa-solid fa-calendar-days text-slate-500 mr-1.5"></i>Projected Inspection:</span>
-                        <span class="font-bold text-slate-200 mono">${b.nextServiceEst || 'Evaluating...'}</span>
-                    </div>
-                `;
-                grid.appendChild(card);
-            });
-        }
-
-        function buildCertificatesTable() {
-            const tbody = document.getElementById("certTableBody");
-            tbody.innerHTML = "";
-            let riskCount = 0;
-
-            certificates.forEach(c => {
-                const tr = document.createElement("tr");
-                tr.className = "hover:bg-slate-900/40 transition-colors";
-                
-                let pClass = "bg-emerald-500/10 text-emerald-400 border-emerald-500/20";
-                if (c.permitStatus && c.permitStatus.toLowerCase() === 'critical') { pClass = "bg-red-500/10 text-red-400 border-red-500/20 animate-pulse"; riskCount++; }
-                else if (c.permitStatus && c.permitStatus.toLowerCase() === 'warning') { pClass = "bg-amber-500/10 text-accent-amber border-amber-500/20"; riskCount++; }
-
-                let rClass = "bg-emerald-500/10 text-emerald-400 border-emerald-500/20";
-                if (c.status && c.status.toLowerCase() === 'critical') rClass = "bg-red-500/10 text-red-400 border-red-500/20";
-                else if (c.status && c.status.toLowerCase() === 'action required') rClass = "bg-amber-500/10 text-accent-amber border-amber-500/20";
-
-                tr.innerHTML = `
-                    <td class="px-6 py-4 font-bold text-white mono uppercase">${c.registration}</td>
-                    <td class="px-6 py-4 text-slate-400 mono">${c.serial || 'N/A'}</td>
-                    <td class="px-6 py-4 font-semibold text-slate-200 mono">${c.permitExpiry || 'N/A'}</td>
-                    <td class="px-6 py-4">
-                        <span class="px-2 py-0.5 rounded text-[10px] font-bold border uppercase tracking-wider ${pClass}">${c.permitStatus || 'Active'}</span>
-                    </td>
-                    <td class="px-6 py-4 text-slate-200 mono">${c.cofrExpiry || 'N/A'}</td>
-                    <td class="px-6 py-4 text-right">
-                        <span class="px-2 py-0.5 rounded text-[10px] font-bold border uppercase tracking-wider ${rClass}">${c.status || 'Compliant'}</span>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-
-            // Update safety warning elements banner text counts
-            document.getElementById("bannerCount").innerText = riskCount;
-            const banner = document.getElementById("globalNoticeBanner");
-            const criticalBox = document.getElementById("criticalCertsAlertBox");
-            
-            if (riskCount > 0) {
-                banner.classList.remove("hidden");
-                criticalBox.classList.remove("hidden");
-            } else {
-                banner.classList.add("hidden");
-                criticalBox.classList.add("hidden");
-            }
-        }
-
-        function filterCertsTable() {
-            const q = document.getElementById("certSearch").value.toLowerCase();
-            const rows = document.getElementById("certTableBody").getElementsByTagName("tr");
-            
-            for (let row of rows) {
-                const text = row.textContent.toLowerCase();
-                row.style.display = text.includes(q) ? "" : "none";
-            }
-        }
-
-        // ==================== DYNAMIC ALERTS & TOAST ENGINE ====================
-        function showToast(title, body, variant = 'info') {
-            const toast = document.getElementById("toastNotification");
-            const tTitle = document.getElementById("toastTitle");
-            const tBody = document.getElementById("toastBody");
-            const iconContainer = document.getElementById("toastIconContainer");
-            
-            tTitle.innerText = title;
-            tBody.innerText = body;
-            
-            // Adjust visual formatting rules based on type properties
-            toast.className = "fixed bottom-5 right-5 z-50 transform transition-all duration-300 max-w-sm w-full p-4 rounded-xl border shadow-2xl flex items-start gap-3 bg-slate-900 text-slate-100";
-            
-            if (variant === 'success') {
-                toast.classList.add("border-emerald-500/30");
-                iconContainer.className = "p-2 rounded-lg text-lg bg-emerald-500/10 text-emerald-400";
-                iconContainer.innerHTML = `<i class="fa-solid fa-circle-check"></i>`;
-            } else if (variant === 'danger') {
-                toast.classList.add("border-red-500/30");
-                iconContainer.className = "p-2 rounded-lg text-lg bg-red-500/10 text-red-400";
-                iconContainer.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i>`;
-            } else {
-                toast.classList.add("border-slate-700");
-                iconContainer.className = "p-2 rounded-lg text-lg bg-accent-orange/10 text-accent-orange";
-                iconContainer.innerHTML = `<i class="fa-solid fa-circle-info"></i>`;
-            }
-
-            // Animate transition show state
-            toast.classList.remove("translate-y-24", "opacity-0");
-            
-            // Auto timeout dismiss loop
-            window.toastTimeout = setTimeout(() => { dismissToast(); }, 5000);
-        }
-
-        function dismissToast() {
-            const toast = document.getElementById("toastNotification");
-            toast.classList.add("translate-y-24", "opacity-0");
-            if (window.toastTimeout) clearTimeout(window.toastTimeout);
-        }
-    </script>
-</body>
-</html>
+function doPost(e) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var logSheet = ss.getSheetByName("Flight_Logs");
+  
+  var data = JSON.parse(e.postData.contents);
+  
+  var dateObj = new Date(data.date);
+  var months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+  var currentMonth = months[dateObj.getMonth()];
+  
+  // Append standard row schema to Flight_Logs
+  logSheet.appendRow([
+    currentMonth,
+    data.date,
+    data.company,
+    data.aircraft,
+    parseInt(data.hours) || 0,
+    parseInt(data.minutes) || 0,
+    data.pilot,
+    data.client,
+    data.remarks
+  ]);
+  
+  return ContentService.createTextOutput(JSON.stringify({ status: "Success" }))
+    .setMimeType(ContentService.MimeType.JSON);
+}
