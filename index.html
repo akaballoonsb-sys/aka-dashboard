@@ -34,7 +34,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
@@ -86,7 +85,7 @@
                     <i class="fa-solid fa-wind animate-pulse"></i>
                 </div>
                 <h1 class="text-2xl font-extrabold tracking-tight text-white">AKA DASHBOARD</h1>
-                <p class="text-xs text-slate-400 mt-2 uppercase tracking-widest">Aviation Flight Ops & Analytics Portal</p>
+                <p class="text-xs text-slate-400 mt-2 uppercase tracking-widest">Aviation Flight Ops & Fleet Portal</p>
             </div>
             
             <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-5">
@@ -127,14 +126,14 @@
                 
                 <div class="flex items-center gap-3">
                     <div class="h-10 w-10 rounded-lg bg-gradient-to-br from-accent-orange to-amber-500 flex items-center justify-center shadow-lg shadow-orange-900/20">
-                        <i class="fa-solid fa-plane-upflight text-white text-lg"></i>
+                        <i class="fa-solid fa-plane-up text-white text-lg"></i>
                     </div>
                     <div>
                         <h2 class="text-xl font-extrabold text-white tracking-tight flex items-center gap-2">
                             AKA DASHBOARD 
                             <span class="text-[10px] bg-accent-orange/10 border border-accent-orange/30 text-accent-orange px-2 py-0.5 rounded-full font-bold uppercase tracking-widest">Ops Portal</span>
                         </h2>
-                        <p class="text-xs text-slate-400">Integrated Balloon Operations, Billing & Maintenance Intelligence</p>
+                        <p class="text-xs text-slate-400">Integrated Balloon Operations, Maintenance Logs & Compliance Intelligence</p>
                     </div>
                 </div>
 
@@ -174,13 +173,8 @@
 
         <div class="bg-slate-950 border-b border-slate-850 px-6">
             <div class="max-w-7xl mx-auto flex gap-1 overflow-x-auto">
-                <button onclick="switchToTab('sales')" id="tabBtn-sales" 
-                        class="px-5 py-3.5 border-b-2 font-bold text-sm tracking-wide transition-all duration-200 flex items-center gap-2 shrink-0 border-accent-orange text-accent-orange">
-                    <i class="fa-solid fa-chart-line text-xs"></i>
-                    Sales & Invoices Analytics
-                </button>
                 <button onclick="switchToTab('fleet')" id="tabBtn-fleet" 
-                        class="px-5 py-3.5 border-b-2 font-bold text-sm tracking-wide transition-all duration-200 flex items-center gap-2 shrink-0 border-transparent text-slate-400 hover:text-slate-200">
+                        class="px-5 py-3.5 border-b-2 font-bold text-sm tracking-wide transition-all duration-200 flex items-center gap-2 shrink-0 border-accent-orange text-accent-orange">
                     <i class="fa-solid fa-helicopter text-xs"></i>
                     Fleet & Balloon Hours
                 </button>
@@ -204,174 +198,8 @@
         </div>
 
         <main class="flex-grow max-w-7xl w-full mx-auto px-6 py-8 space-y-8">
-            
-            <section id="tab-sales" class="space-y-8">
-                
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-                    
-                    <div class="glass-card rounded-2xl p-6 relative overflow-hidden group hover:border-slate-700 transition-all">
-                        <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-b from-accent-orange/10 to-transparent rounded-bl-full pointer-events-none transition-opacity"></div>
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <p class="text-xs font-semibold tracking-wider text-slate-400 uppercase">Total Revenue (YTD)</p>
-                                <h3 id="kpi-totalRevenue" class="text-2xl font-black text-white mt-2 tracking-tight mono">$0.00</h3>
-                            </div>
-                            <span class="w-10 h-10 rounded-xl bg-accent-orange/10 border border-accent-orange/20 text-accent-orange flex items-center justify-center">
-                                <i class="fa-solid fa-sack-dollar"></i>
-                            </span>
-                        </div>
-                        <div class="mt-4 flex items-center gap-1.5 text-xs text-emerald-400">
-                            <i class="fa-solid fa-circle-arrow-up"></i>
-                            <span id="kpi-revenueGrowth" class="font-semibold text-slate-300">Evaluating...</span>
-                        </div>
-                    </div>
 
-                    <div class="glass-card rounded-2xl p-6 relative overflow-hidden hover:border-slate-700 transition-all">
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <p class="text-xs font-semibold tracking-wider text-slate-400 uppercase">Outstanding Invoices</p>
-                                <h3 id="kpi-pendingRevenue" class="text-2xl font-black text-white mt-2 tracking-tight mono">$0.00</h3>
-                            </div>
-                            <span class="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 text-accent-amber flex items-center justify-center">
-                                <i class="fa-solid fa-clock-rotate-left"></i>
-                            </span>
-                        </div>
-                        <div class="mt-4 text-xs text-slate-400">
-                            Count: <span id="kpi-pendingCount" class="font-bold text-white">0</span> outstanding invoices
-                        </div>
-                    </div>
-
-                    <div class="glass-card rounded-2xl p-6 relative overflow-hidden hover:border-slate-700 transition-all">
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <p class="text-xs font-semibold tracking-wider text-slate-400 uppercase">Settled Transactions</p>
-                                <h3 id="kpi-paidCount" class="text-2xl font-black text-white mt-2 tracking-tight mono">0</h3>
-                            </div>
-                            <span class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center">
-                                <i class="fa-solid fa-circle-check"></i>
-                            </span>
-                        </div>
-                        <div class="mt-4 text-xs text-slate-400">
-                            Settled rate: <span id="kpi-settlementRate" class="font-bold text-emerald-400">0%</span> of invoicing
-                        </div>
-                    </div>
-
-                    <div class="glass-card rounded-2xl p-6 relative overflow-hidden hover:border-slate-700 transition-all">
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <p class="text-xs font-semibold tracking-wider text-slate-400 uppercase">Average Ticket Price</p>
-                                <h3 id="kpi-avgInvoice" class="text-2xl font-black text-white mt-2 tracking-tight mono">$0.00</h3>
-                            </div>
-                            <span class="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center">
-                                <i class="fa-solid fa-tag"></i>
-                            </span>
-                        </div>
-                        <div class="mt-4 text-xs text-slate-400">
-                            YTD Flights tracked: <span id="kpi-totalInvoices" class="font-bold text-white">0</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <div class="glass-card p-6 rounded-2xl lg:col-span-2 flex flex-col justify-between">
-                        <div>
-                            <div class="flex justify-between items-center mb-6">
-                                <div>
-                                    <h3 class="text-lg font-bold text-white tracking-tight">Financial Performance Trend</h3>
-                                    <p class="text-xs text-slate-400">Monthly billing vs collection comparison (YTD)</p>
-                                </div>
-                                <div class="flex items-center gap-2">
-                                    <span class="flex items-center gap-1.5 text-xs text-slate-400">
-                                        <span class="w-3 h-1.5 bg-accent-orange rounded-full"></span> Billed
-                                    </span>
-                                    <span class="flex items-center gap-1.5 text-xs text-slate-400">
-                                        <span class="w-3 h-1.5 bg-slate-400 rounded-full"></span> Forecast Trend
-                                    </span>
-                                </div>
-                            </div>
-                            <div class="h-80 w-full">
-                                <canvas id="salesTrendChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="glass-card p-6 rounded-2xl border-l-2 border-l-accent-orange flex flex-col justify-between">
-                        <div>
-                            <div class="flex items-center gap-2 mb-4">
-                                <span class="text-accent-orange text-lg">
-                                    <i class="fa-solid fa-brain"></i>
-                                </span>
-                                <h3 class="text-md font-extrabold text-white tracking-wider uppercase text-xs">Aero-Insights AI</h3>
-                            </div>
-                            
-                            <h4 class="text-lg font-bold text-white mb-4">Data Science Predictive Analytics</h4>
-                            
-                            <div class="space-y-4">
-                                <div class="bg-slate-900/60 p-3.5 rounded-xl border border-slate-800/80">
-                                    <div class="flex justify-between text-xs mb-1">
-                                        <span class="text-slate-400">MoM Growth Rate</span>
-                                        <span id="ds-momGrowth" class="font-bold text-emerald-400">+0.0%</span>
-                                    </div>
-                                    <p class="text-[11px] text-slate-400">Computed via rolling regression against preceding historical month intervals.</p>
-                                </div>
-
-                                <div class="bg-slate-900/60 p-3.5 rounded-xl border border-slate-800/80">
-                                    <div class="flex justify-between text-xs mb-1">
-                                        <span class="text-slate-400">Peak Booking Period</span>
-                                        <span id="ds-peakPeriod" class="font-bold text-accent-orange">Jul - Aug</span>
-                                    </div>
-                                    <p class="text-[11px] text-slate-400">Seasonal cluster analysis indicates highest occupancy rates align in peak summer windows.</p>
-                                </div>
-
-                                <div class="bg-slate-900/60 p-3.5 rounded-xl border border-slate-800/80">
-                                    <div class="flex justify-between items-center text-xs mb-1">
-                                        <span class="text-slate-400">Operational Anomaly Test</span>
-                                        <span id="ds-anomalyBadge" class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 uppercase tracking-widest">Normal</span>
-                                    </div>
-                                    <p id="ds-anomalyDesc" class="text-[11px] text-slate-400">All data falls inside standard statistical deviation boundaries.</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="mt-6 pt-4 border-t border-slate-800 flex items-center justify-between text-[11px] text-slate-500">
-                            <span>Analysis updated in real time</span>
-                            <span class="mono">p-value: 0.041 (Sig)</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="glass-card rounded-2xl overflow-hidden">
-                    <div class="px-6 py-5 border-b border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                        <div>
-                            <h3 class="text-lg font-bold text-white">Invoices Master Database</h3>
-                            <p class="text-xs text-slate-400">Financial records, flight logs, and payment statuses synced from Google Sheets</p>
-                        </div>
-                        <div class="flex gap-2">
-                            <input type="text" id="transactionSearch" onkeyup="filterInvoicesTable()" placeholder="Search transactions..." 
-                                   class="text-xs bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-accent-orange min-w-[200px]">
-                        </div>
-                    </div>
-
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left border-collapse">
-                            <thead>
-                                <tr class="bg-slate-950 text-slate-400 text-[10px] tracking-wider uppercase font-extrabold border-b border-slate-850">
-                                    <th class="px-6 py-4">Invoice ID</th>
-                                    <th class="px-6 py-4">Client / Booking</th>
-                                    <th class="px-6 py-4">Flight Date</th>
-                                    <th class="px-6 py-4">Billed Amount</th>
-                                    <th class="px-6 py-4">Linked Balloon</th>
-                                    <th class="px-6 py-4 text-right">Settlement Status</th>
-                                </tr>
-                            </thead>
-                            <tbody id="invoiceTableBody" class="divide-y divide-slate-850/60 text-xs">
-                                </tbody>
-                        </table>
-                    </div>
-                </div>
-            </section>
-
-            <section id="tab-fleet" class="space-y-8 hidden">
+            <section id="tab-fleet" class="space-y-8">
                 
                 <div>
                     <h3 class="text-lg font-bold text-white mb-1">Fleet Airworthiness & Diagnostics</h3>
@@ -454,7 +282,7 @@
                             <h4 class="text-xs font-semibold tracking-wider text-accent-orange uppercase">Maintenance Science</h4>
                             <h3 class="text-base font-bold text-white">Service Projection Mechanics</h3>
                             <p class="text-xs text-slate-400 leading-relaxed">
-                                Our platform runs predictive scheduling linear regression calculations. By mapping historical flight hour accrual over trailing 90-day segments, the software determines the precise estimated calendar date when the flight frame is anticipated to cross its maintenance boundary.
+                                Our platform runs predictive scheduling calculations. By mapping historical flight hour accrual metrics over trailing segments, the software determines the precise estimated calendar date when the flight frame is anticipated to cross its maintenance boundary.
                             </p>
                             <div class="bg-slate-900 p-4 rounded-xl space-y-3">
                                 <div class="flex items-center gap-2 text-xs">
@@ -466,7 +294,7 @@
                                 </div>
                             </div>
                             <p class="text-[11px] text-slate-400">
-                                This allows flight coordinators to forecast aircraft downtime, align engineering crews, and maximize booking utilization during peak seasonal summer weather.
+                                This allows flight coordinators to forecast aircraft downtime, align engineering crews, and maximize fleet availability during operational windows.
                             </p>
                         </div>
                         <div class="pt-4 border-t border-slate-850 flex items-center gap-2 text-[10px] text-slate-500">
@@ -557,19 +385,10 @@
         const DASHBOARD_PASSWORD = "Rudy56";
 
         // GLOBAL APPLICATION DATA CACHE STATE
-        let invoices = [];
         let fleet = [];
         let certificates = [];
-        let trendChartInstance = null;
 
         // LOCAL STATIC MOCK RECOVERY BUFFER (Used if live streaming endpoint returns blank/unconfigured state)
-        const mockInvoices = [
-            { id: "INV-2026-001", client: "Alpha Media Group", date: "2026-05-10", amount: 4500.00, balloon: "9M-AKA", status: "Paid" },
-            { id: "INV-2026-002", client: "SkyHigh Weddings Inc", date: "2026-05-12", amount: 2850.00, balloon: "9M-BFW", status: "Paid" },
-            { id: "INV-2026-003", client: "Gamuda Promotional Charter", date: "2026-05-18", amount: 6200.00, balloon: "9M-BGC", status: "Pending" },
-            { id: "INV-2026-004", client: "Luxury Escapes Malaysia", date: "2026-05-20", amount: 3900.00, balloon: "9M-RDY", status: "Pending" }
-        ];
-
         const mockFleet = [
             { registration: "9M-AKA", shortName: "AKA", hours: 363.3, limit: 100, lastServiceHours: 350, nextServiceEst: "2026-06-15" },
             { registration: "9M-BFW", shortName: "MOON", hours: 412.5, limit: 100, lastServiceHours: 390, nextServiceEst: "2026-07-02" },
@@ -595,13 +414,13 @@
             const errorBadge = document.getElementById("loginError");
             
             if (input === DASHBOARD_PASSWORD) {
-                errorBadge.classList.add("hidden");
+                errorBadge.className = "hidden";
                 document.getElementById("loginOverlay").classList.add("opacity-0", "pointer-events-none");
                 document.getElementById("dashboardContainer").classList.remove("hidden");
                 
                 // Fire initial boot sequencer load
                 loadInitialCacheData();
-                showToast("Access Granted", "Aviation environment initialized. Loading real-time logs...", "success");
+                showToast("Access Granted", "Aviation environment initialized. Loading fleet telemetry...", "success");
             } else {
                 errorBadge.classList.remove("hidden");
                 document.getElementById("passwordInput").value = "";
@@ -618,7 +437,7 @@
 
         // ==================== TABS LAYOUT SWITCH MANAGER ====================
         function switchToTab(targetTab) {
-            const tabs = ['sales', 'fleet', 'certificates'];
+            const tabs = ['fleet', 'certificates'];
             tabs.forEach(t => {
                 const sec = document.getElementById(`tab-${t}`);
                 const btn = document.getElementById(`tabBtn-${t}`);
@@ -632,11 +451,6 @@
                     btn.classList.add("border-transparent", "text-slate-400");
                 }
             });
-            
-            // Re-render chart frame if entering sales to handle layout scaling glitches
-            if (targetTab === 'sales' && invoices.length > 0) {
-                renderSalesTrendChart();
-            }
         }
 
         function scrollToCertTable() {
@@ -647,7 +461,6 @@
         // ==================== ASYNC STREAM DATA INJECTORS ====================
         function loadInitialCacheData() {
             // Load localized fallbacks first to populate viewframes while network fetches run
-            invoices = [...mockInvoices];
             fleet = [...mockFleet];
             certificates = [...mockCertificates];
             
@@ -673,12 +486,11 @@
                 .then(data => {
                     console.log("Telemetry Received: ", data);
                     // Dynamically map incoming data payloads if sheets are populated
-                    if (data.invoices && data.invoices.length > 0) invoices = data.invoices;
                     if (data.fleet && data.fleet.length > 0) fleet = data.fleet;
                     if (data.certificates && data.certificates.length > 0) certificates = data.certificates;
                     
                     initializeDashboardViews();
-                    showToast("Sync Structural Success", "Real-time records parsed directly from central ledger.", "success");
+                    showToast("Sync Structural Success", "Real-time fleet records parsed from central ledger.", "success");
                 })
                 .catch(err => {
                     console.warn("Live API stream unreachable. Retaining active cache architecture.", err);
@@ -747,121 +559,11 @@
 
         // ==================== RENDERING & COMPUTATION ARCHITECTURE ====================
         function initializeDashboardViews() {
-            // 1. Process Financial Metric Matrices
-            let totalRev = 0;
-            let pendingRev = 0;
-            let paidCount = 0;
-            let pendingCount = 0;
-            
-            invoices.forEach(inv => {
-                const amt = parseFloat(inv.amount) || 0;
-                if (inv.status && inv.status.toLowerCase() === 'paid') {
-                    totalRev += amt;
-                    paidCount++;
-                } else {
-                    pendingRev += amt;
-                    pendingCount++;
-                }
-            });
-
-            document.getElementById("kpi-totalRevenue").innerText = formatCurrency(totalRev);
-            document.getElementById("kpi-pendingRevenue").innerText = formatCurrency(pendingRev);
-            document.getElementById("kpi-paidCount").innerText = paidCount;
-            document.getElementById("kpi-pendingCount").innerText = pendingCount;
-            document.getElementById("kpi-totalInvoices").innerText = invoices.length;
-            
-            const rate = invoices.length > 0 ? Math.round((paidCount / invoices.length) * 100) : 0;
-            document.getElementById("kpi-settlementRate").innerText = `${rate}%`;
-            
-            const avg = paidCount > 0 ? totalRev / paidCount : 0;
-            document.getElementById("kpi-avgInvoice").innerText = formatCurrency(avg);
-
-            // Calculate mock data science parameters
-            document.getElementById("ds-momGrowth").innerText = `+${(rate / 12).toFixed(1)}%`;
-            
-            // 2. Build Invoices Data Table
-            buildInvoicesTable();
-
-            // 3. Render Trend Analysis Charts
-            renderSalesTrendChart();
-
-            // 4. Build Fleet Airframe Cards & Maintenance Dropdowns
+            // 1. Build Fleet Airframe Cards & Maintenance Dropdowns
             buildFleetGridAndForms();
 
-            // 5. Build Regulatory Certificate Compliance Framework
+            // 2. Build Regulatory Certificate Compliance Framework
             buildCertificatesTable();
-        }
-
-        function buildInvoicesTable() {
-            const tbody = document.getElementById("invoiceTableBody");
-            tbody.innerHTML = "";
-            
-            invoices.forEach(inv => {
-                const tr = document.createElement("tr");
-                tr.className = "hover:bg-slate-900/40 transition-colors";
-                
-                const statusClass = inv.status && inv.status.toLowerCase() === 'paid' 
-                    ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" 
-                    : "bg-amber-500/10 text-accent-amber border-amber-500/20";
-                
-                tr.innerHTML = `
-                    <td class="px-6 py-4 font-bold tracking-wider text-slate-300 mono uppercase">${inv.id || 'INV-REG'}</td>
-                    <td class="px-6 py-4 font-semibold text-white">${inv.client || 'Charter Passenger'}</td>
-                    <td class="px-6 py-4 text-slate-400 mono">${inv.date || 'Pending'}</td>
-                    <td class="px-6 py-4 font-bold text-white mono">${formatCurrency(inv.amount)}</td>
-                    <td class="px-6 py-4"><span class="bg-slate-900 px-2 py-1 rounded border border-slate-800 text-[11px] font-bold text-slate-300">${inv.balloon || 'FLT'}</span></td>
-                    <td class="px-6 py-4 text-right">
-                        <span class="px-2 py-0.5 rounded text-[10px] font-extrabold border uppercase tracking-wider ${statusClass}">${inv.status || 'Unsettled'}</span>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        function filterInvoicesTable() {
-            const q = document.getElementById("transactionSearch").value.toLowerCase();
-            const rows = document.getElementById("invoiceTableBody").getElementsByTagName("tr");
-            
-            for (let row of rows) {
-                const text = row.textContent.toLowerCase();
-                row.style.display = text.includes(q) ? "" : "none";
-            }
-        }
-
-        function renderSalesTrendChart() {
-            const ctx = document.getElementById('salesTrendChart').getContext('2d');
-            if (trendChartInstance) trendChartInstance.destroy();
-
-            // Compile dynamic values grouped by month or item distribution maps
-            const values = invoices.map(i => parseFloat(i.amount) || 0);
-            const labels = invoices.map(i => i.date);
-
-            trendChartInstance = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: labels.length > 0 ? labels : ["Jan", "Feb", "Mar", "Apr", "May"],
-                    datasets: [{
-                        label: 'Active Flight Ledger Valuation Stream',
-                        data: values.length > 0 ? values : [12000, 19000, 3000, 5000, 22000],
-                        borderColor: '#f97316',
-                        borderWidth: 3,
-                        backgroundColor: 'rgba(249, 115, 22, 0.04)',
-                        fill: true,
-                        tension: 0.35,
-                        pointBackgroundColor: '#f97316',
-                        pointHoverRadius: 7
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        y: { grid: { color: '#1e293b' }, ticks: { color: '#94a3b8', font: { size: 10 } } },
-                        x: { grid: { display: false }, ticks: { color: '#94a3b8', font: { size: 10 } } }
-                    }
-                }
-            });
         }
 
         function buildFleetGridAndForms() {
@@ -1027,11 +729,6 @@
             const toast = document.getElementById("toastNotification");
             toast.classList.add("translate-y-24", "opacity-0");
             if (window.toastTimeout) clearTimeout(window.toastTimeout);
-        }
-
-        // ==================== METRIC PARSER LOGISTICS HELPERS ====================
-        function formatCurrency(val) {
-            return new Intl.NumberFormat('en-MY', { style: 'currency', currency: 'MYR' }).format(val);
         }
     </script>
 </body>
