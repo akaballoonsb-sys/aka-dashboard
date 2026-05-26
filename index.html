@@ -7,11 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Inter', sans-serif;
             background: radial-gradient(circle at 20% 30%, #0a0f1c, #03060c);
@@ -19,10 +15,7 @@
             padding: 1.5rem;
             min-height: 100vh;
         }
-        .dashboard-container {
-            max-width: 1600px;
-            margin: 0 auto;
-        }
+        .dashboard-container { max-width: 1600px; margin: 0 auto; }
         .header {
             display: flex;
             justify-content: space-between;
@@ -44,10 +37,7 @@
             background-clip: text;
             color: transparent;
         }
-        .title p {
-            font-size: 0.85rem;
-            color: #9ca3af;
-        }
+        .title p { font-size: 0.85rem; color: #9ca3af; }
         .api-status {
             background: #1e293b;
             padding: 0.4rem 1rem;
@@ -57,13 +47,7 @@
             align-items: center;
             gap: 0.5rem;
         }
-        .status-led {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: #22c55e;
-            box-shadow: 0 0 6px #22c55e;
-        }
+        .status-led { width: 10px; height: 10px; border-radius: 50%; background: #22c55e; box-shadow: 0 0 6px #22c55e; }
         .kpi-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -78,25 +62,10 @@
             border: 1px solid rgba(255, 140, 0, 0.2);
             transition: 0.2s;
         }
-        .kpi-card:hover {
-            border-color: rgba(255, 140, 0, 0.6);
-            transform: translateY(-3px);
-        }
-        .kpi-label {
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: #94a3b8;
-        }
-        .kpi-value {
-            font-size: 2.2rem;
-            font-weight: 700;
-            margin: 0.5rem 0;
-        }
-        .kpi-trend {
-            font-size: 0.75rem;
-            color: #22c55e;
-        }
+        .kpi-card:hover { border-color: rgba(255, 140, 0, 0.6); transform: translateY(-3px); }
+        .kpi-label { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; color: #94a3b8; }
+        .kpi-value { font-size: 2.2rem; font-weight: 700; margin: 0.5rem 0; }
+        .kpi-trend { font-size: 0.75rem; color: #22c55e; }
         .charts-row {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
@@ -110,15 +79,8 @@
             padding: 1rem;
             border: 1px solid rgba(255,140,0,0.2);
         }
-        .chart-card h3 {
-            font-size: 1rem;
-            margin-bottom: 1rem;
-            font-weight: 500;
-        }
-        canvas {
-            max-height: 280px;
-            width: 100%;
-        }
+        .chart-card h3 { font-size: 1rem; margin-bottom: 1rem; font-weight: 500; }
+        canvas { max-height: 280px; width: 100%; }
         .section-title {
             font-size: 1.4rem;
             font-weight: 600;
@@ -138,41 +100,13 @@
             cursor: pointer;
             transition: 0.2s;
         }
-        .btn-add:hover {
-            background: #e66a00;
-            transform: scale(0.97);
-        }
-        .table-wrapper {
-            overflow-x: auto;
-            border-radius: 1.2rem;
-            background: rgba(0,0,0,0.3);
-            padding: 0.2rem;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.85rem;
-        }
-        th, td {
-            text-align: left;
-            padding: 0.9rem 0.8rem;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-        th {
-            background: rgba(255,140,0,0.2);
-            font-weight: 600;
-        }
-        .action-btn {
-            background: none;
-            border: none;
-            color: #facc15;
-            cursor: pointer;
-            margin: 0 4px;
-            font-size: 1rem;
-        }
-        .action-btn.delete {
-            color: #f87171;
-        }
+        .btn-add:hover { background: #e66a00; transform: scale(0.97); }
+        .table-wrapper { overflow-x: auto; border-radius: 1.2rem; background: rgba(0,0,0,0.3); padding: 0.2rem; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+        th, td { text-align: left; padding: 0.9rem 0.8rem; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        th { background: rgba(255,140,0,0.2); font-weight: 600; }
+        .action-btn { background: none; border: none; color: #facc15; cursor: pointer; margin: 0 4px; font-size: 1rem; }
+        .action-btn.delete { color: #f87171; }
         .modal {
             display: none;
             position: fixed;
@@ -201,24 +135,11 @@
             border-radius: 1rem;
             color: white;
         }
-        .modal-buttons {
-            display: flex;
-            justify-content: flex-end;
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-        .modal-buttons button {
-            padding: 0.5rem 1rem;
-            border-radius: 2rem;
-            border: none;
-            cursor: pointer;
-        }
+        .modal-buttons { display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1rem; }
+        .modal-buttons button { padding: 0.5rem 1rem; border-radius: 2rem; border: none; cursor: pointer; }
         .save-btn { background: #ff7e05; color: white; }
         .cancel-btn { background: #334155; color: white; }
-        @media (max-width: 700px) {
-            body { padding: 1rem; }
-            .kpi-value { font-size: 1.6rem; }
-        }
+        @media (max-width: 700px) { body { padding: 1rem; } .kpi-value { font-size: 1.6rem; } }
     </style>
 </head>
 <body>
@@ -234,7 +155,7 @@
         </div>
     </div>
 
-    <div class="kpi-grid" id="kpiGrid">
+    <div class="kpi-grid">
         <div class="kpi-card"><div class="kpi-label">Total Flights</div><div class="kpi-value" id="totalFlights">—</div></div>
         <div class="kpi-card"><div class="kpi-label">Total Flight Hours</div><div class="kpi-value" id="totalHours">—</div></div>
         <div class="kpi-card"><div class="kpi-label">Avg Hours / Flight</div><div class="kpi-value" id="avgHours">—</div></div>
@@ -252,10 +173,8 @@
         <button class="btn-add" id="openAddModalBtn">+ New Flight Entry</button>
     </div>
     <div class="table-wrapper">
-        <table id="logbookTable">
-            <thead>
-                <tr><th>Date</th><th>Pilot</th><th>Aircraft</th><th>Duration (hrs)</th><th>Route</th><th>Remarks</th><th>Actions</th></tr>
-            </thead>
+        <table>
+            <thead><tr><th>Date</th><th>Pilot</th><th>Aircraft</th><th>Duration (hrs)</th><th>Route</th><th>Remarks</th><th>Actions</th></tr></thead>
             <tbody id="logbookBody"><tr><td colspan="7">Loading data...</td></tr></tbody>
         </table>
     </div>
@@ -279,18 +198,14 @@
 
 <script>
     // =============================================================
-    // 🔧 STEP 1: PASTE YOUR APPS SCRIPT URL HERE (from your old site)
+    // 🔧 PASTE YOUR APPS SCRIPT URL HERE (exactly as in your old site)
     // =============================================================
-    const APPSCRIPT_URL = "https://script.google.com/macros/s/AKfycbzoh5_Zsu57MKjqN-EVc2eC-7bGAWBqDeVnH6TEhgQiHaEQ3JZc3pSdVk4TyvDe_SX-rQ/exec";   // <-- REPLACE THIS
+    const APPSCRIPT_URL = "https://script.google.com/macros/s/AKfycbzoh5_Zsu57MKjqN-EVc2eC-7bGAWBqDeVnH6TEhgQiHaEQ3JZc3pSdVk4TyvDe_SX-rQ/exec";
 
     // =============================================================
-    // The rest works automatically. No other changes needed.
-    // =============================================================
-
     let entries = [];
     let trendChart, pilotChart;
 
-    // Helper: update status
     function setStatus(connected, message) {
         const led = document.getElementById('statusLed');
         const textSpan = document.getElementById('statusText');
@@ -305,42 +220,47 @@
         }
     }
 
-    // Fetch data from Google Sheets via your Apps Script
+    // Fetch data exactly like your original site does (no extra parameters)
     async function fetchSheetData() {
         try {
             setStatus(false, "Loading...");
-            const response = await fetch(APPSCRIPT_URL + "?action=getData", {
-                method: 'GET',
-                mode: 'cors'
-            });
+            const response = await fetch(APPSCRIPT_URL, { method: 'GET', mode: 'cors' });
             const data = await response.json();
-            if (data && data.records) {
-                entries = data.records.map(row => ({
-                    date: row.date || "",
-                    pilot: row.pilot || "",
-                    aircraft: row.aircraft || "",
-                    duration: parseFloat(row.duration) || 0,
-                    route: row.route || "",
-                    remarks: row.remarks || ""
-                }));
-                renderLogbook();
-                updateKPIs();
-                updateCharts();
-                setStatus(true, "Live");
+            console.log("Raw response from Apps Script:", data); // ← Check browser console
+
+            // Your original script likely returns an array or object with 'records'
+            let records = [];
+            if (Array.isArray(data)) {
+                records = data;
+            } else if (data.records && Array.isArray(data.records)) {
+                records = data.records;
+            } else if (data.data && Array.isArray(data.data)) {
+                records = data.data;
             } else {
-                entries = [];
-                renderLogbook();
-                updateKPIs();
-                setStatus(true, "Connected (no data)");
+                // If none match, show error
+                throw new Error("Unexpected response format. Check console.");
             }
+
+            entries = records.map(row => ({
+                date: row.date || row[0] || "",
+                pilot: row.pilot || row[1] || "",
+                aircraft: row.aircraft || row[2] || "",
+                duration: parseFloat(row.duration || row[3]) || 0,
+                route: row.route || row[4] || "",
+                remarks: row.remarks || row[5] || ""
+            }));
+            renderLogbook();
+            updateKPIs();
+            updateCharts();
+            setStatus(true, `Loaded ${entries.length} flights`);
         } catch (err) {
-            console.error(err);
-            setStatus(false, "Check Apps Script URL");
-            document.getElementById('logbookBody').innerHTML = '<tr><td colspan="7">⚠️ Failed to load. Did you paste the correct Apps Script URL?</td></tr>';
+            console.error("Fetch error:", err);
+            setStatus(false, "Check Apps Script URL or CORS");
+            document.getElementById('logbookBody').innerHTML = '<tr><td colspan="7">⚠️ Failed to load. Open browser console (F12) for details.</td></tr>';
         }
     }
 
-    // Add new entry
+    // Add new entry (matching your original POST format)
     async function addEntry(entry) {
         try {
             const response = await fetch(APPSCRIPT_URL, {
@@ -358,7 +278,7 @@
                 })
             });
             const result = await response.json();
-            if (result.success) {
+            if (result.success === true || result.status === "success") {
                 await fetchSheetData();
                 return true;
             } else {
@@ -371,10 +291,7 @@
         }
     }
 
-    // Delete entry (requires your Apps Script to support delete by row index or ID)
-    // Since we don't know your exact backend structure, we'll implement a delete that sends the row data.
-    // For simplicity, we'll assume your script can delete by date+pilot+duration (or we send entire row).
-    // If delete fails, we'll show an alert. You can later adapt.
+    // Delete entry (send delete action)
     async function deleteEntry(index) {
         const entry = entries[index];
         if (!confirm(`Delete flight on ${entry.date} by ${entry.pilot}?`)) return;
@@ -391,7 +308,7 @@
                 })
             });
             const result = await response.json();
-            if (result.success) {
+            if (result.success === true || result.status === "success") {
                 await fetchSheetData();
             } else {
                 alert("Delete failed: " + (result.error || "Script may not support delete"));
@@ -432,7 +349,8 @@
         document.getElementById('totalHours').innerText = totalHours.toFixed(1);
         document.getElementById('avgHours').innerText = avgHours;
         document.getElementById('activePilots').innerText = uniquePilots;
-        document.getElementById('complianceRate').innerText = "98"; // mock, you can adapt
+        // Mock compliance rate (you can replace with real logic later)
+        document.getElementById('complianceRate').innerText = "98";
     }
 
     function updateCharts() {
