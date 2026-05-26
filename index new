@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AeroOps Intelligence | Flight Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: radial-gradient(circle at 20% 30%, #0a0f1c, #03060c);
+            color: #eef2ff;
+            padding: 1.5rem;
+            min-height: 100vh;
+        }
+        .dashboard-container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(12px);
+            background: rgba(15, 25, 45, 0.4);
+            border-radius: 2rem;
+            padding: 1rem 2rem;
+            border: 1px solid rgba(255, 140, 0, 0.3);
+        }
+        .title h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, #ffb347, #ff7e05);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .title p {
+            font-size: 0.85rem;
+            color: #9ca3af;
+        }
+        .api-status {
+            background: #1e293b;
+            padding: 0.4rem 1rem;
+            border-radius: 2rem;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .status-led {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #22c55e;
+            box-shadow: 0 0 6px #22c55e;
+        }
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.25rem;
+            margin-bottom: 2rem;
+        }
+        .kpi-card {
+            background: rgba(20, 30, 50, 0.6);
+            backdrop-filter: blur(10px);
+            border-radius: 1.5rem;
+            padding: 1.2rem;
+            border: 1px solid rgba(255, 140, 0, 0.2);
+            transition: 0.2s;
+        }
+        .kpi-card:hover {
+            border-color: rgba(255, 140, 0, 0.6);
+            transform: translateY(-3px);
+        }
+        .kpi-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #94a3b8;
+        }
+        .kpi-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin: 0.5rem 0;
+        }
+        .kpi-trend {
+            font-size: 0.75rem;
+            color: #22c55e;
+        }
+        .charts-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .chart-card {
+            background: rgba(15, 25, 45, 0.6);
+            backdrop-filter: blur(8px);
+            border-radius: 1.5rem;
+            padding: 1rem;
+            border: 1px solid rgba(255,140,0,0.2);
+        }
+        .chart-card h3 {
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+        canvas {
+            max-height: 280px;
+            width: 100%;
+        }
+        .section-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin: 1.5rem 0 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            flex-wrap: wrap;
+        }
+        .btn-add {
+            background: #ff7e05;
+            border: none;
+            padding: 0.5rem 1.2rem;
+            border-radius: 2rem;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn-add:hover {
+            background: #e66a00;
+            transform: scale(0.97);
+        }
+        .table-wrapper {
+            overflow-x: auto;
+            border-radius: 1.2rem;
+            background: rgba(0,0,0,0.3);
+            padding: 0.2rem;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+        th, td {
+            text-align: left;
+            padding: 0.9rem 0.8rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        th {
+            background: rgba(255,140,0,0.2);
+            font-weight: 600;
+        }
+        .action-btn {
+            background: none;
+            border: none;
+            color: #facc15;
+            cursor: pointer;
+            margin: 0 4px;
+            font-size: 1rem;
+        }
+        .action-btn.delete {
+            color: #f87171;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(4px);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: #0f172a;
+            border-radius: 1.5rem;
+            padding: 2rem;
+            width: 90%;
+            max-width: 500px;
+            border: 1px solid #ff7e05;
+        }
+        .modal-content input, .modal-content select, .modal-content textarea {
+            width: 100%;
+            padding: 0.7rem;
+            margin: 0.5rem 0 1rem;
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 1rem;
+            color: white;
+        }
+        .modal-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .modal-buttons button {
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            border: none;
+            cursor: pointer;
+        }
+        .save-btn { background: #ff7e05; color: white; }
+        .cancel-btn { background: #334155; color: white; }
+        @media (max-width: 700px) {
+            body { padding: 1rem; }
+            .kpi-value { font-size: 1.6rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="dashboard-container">
+    <div class="header">
+        <div class="title">
+            <h1>🪂 AeroOps Intelligence</h1>
+            <p>Real‑time flight analytics · Google Sheets sync</p>
+        </div>
+        <div class="api-status" id="apiStatus">
+            <span class="status-led" id="statusLed"></span>
+            <span id="statusText">Connecting...</span>
+        </div>
+    </div>
+
+    <div class="kpi-grid" id="kpiGrid">
+        <div class="kpi-card"><div class="kpi-label">Total Flights</div><div class="kpi-value" id="totalFlights">—</div></div>
+        <div class="kpi-card"><div class="kpi-label">Total Flight Hours</div><div class="kpi-value" id="totalHours">—</div></div>
+        <div class="kpi-card"><div class="kpi-label">Avg Hours / Flight</div><div class="kpi-value" id="avgHours">—</div></div>
+        <div class="kpi-card"><div class="kpi-label">Active Pilots</div><div class="kpi-value" id="activePilots">—</div></div>
+        <div class="kpi-card"><div class="kpi-label">Compliance Rate</div><div class="kpi-value" id="complianceRate">—%</div><div class="kpi-trend">⬆️ +2% vs last month</div></div>
+    </div>
+
+    <div class="charts-row">
+        <div class="chart-card"><h3>📅 Flight Hours Trend (Last 7 days)</h3><canvas id="trendChart"></canvas></div>
+        <div class="chart-card"><h3>👨‍✈️ Top Pilots by Hours</h3><canvas id="pilotChart"></canvas></div>
+    </div>
+
+    <div class="section-title">
+        <span>📋 Flight Logbook</span>
+        <button class="btn-add" id="openAddModalBtn">+ New Flight Entry</button>
+    </div>
+    <div class="table-wrapper">
+        <table id="logbookTable">
+            <thead>
+                <tr><th>Date</th><th>Pilot</th><th>Aircraft</th><th>Duration (hrs)</th><th>Route</th><th>Remarks</th><th>Actions</th></tr>
+            </thead>
+            <tbody id="logbookBody"><tr><td colspan="7">Loading data...</td></tr></tbody>
+        </table>
+    </div>
+</div>
+
+<div id="entryModal" class="modal">
+    <div class="modal-content">
+        <h3 id="modalTitle">New Flight Entry</h3>
+        <input type="date" id="flightDate">
+        <input type="text" id="pilotName" placeholder="Pilot name">
+        <input type="text" id="aircraftReg" placeholder="Aircraft registration">
+        <input type="number" id="flightHours" step="0.1" placeholder="Duration (hours)">
+        <input type="text" id="routeFromTo" placeholder="Route (e.g. KXYZ->KABC)">
+        <textarea id="remarks" rows="2" placeholder="Remarks / technical notes"></textarea>
+        <div class="modal-buttons">
+            <button class="cancel-btn" id="closeModalBtn">Cancel</button>
+            <button class="save-btn" id="saveEntryBtn">Save</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // =============================================================
+    // 🔧 STEP 1: PASTE YOUR APPS SCRIPT URL HERE (from your old site)
+    // =============================================================
+    const APPSCRIPT_URL = "https://script.google.com/macros/s/AKfycbzoh5_Zsu57MKjqN-EVc2eC-7bGAWBqDeVnH6TEhgQiHaEQ3JZc3pSdVk4TyvDe_SX-rQ/exec";   // <-- REPLACE THIS
+
+    // =============================================================
+    // The rest works automatically. No other changes needed.
+    // =============================================================
+
+    let entries = [];
+    let trendChart, pilotChart;
+
+    // Helper: update status
+    function setStatus(connected, message) {
+        const led = document.getElementById('statusLed');
+        const textSpan = document.getElementById('statusText');
+        if (connected) {
+            led.style.background = "#22c55e";
+            led.style.boxShadow = "0 0 6px #22c55e";
+            textSpan.innerText = message || "Connected to Sheets";
+        } else {
+            led.style.background = "#ef4444";
+            led.style.boxShadow = "none";
+            textSpan.innerText = message || "Connection error";
+        }
+    }
+
+    // Fetch data from Google Sheets via your Apps Script
+    async function fetchSheetData() {
+        try {
+            setStatus(false, "Loading...");
+            const response = await fetch(APPSCRIPT_URL + "?action=getData", {
+                method: 'GET',
+                mode: 'cors'
+            });
+            const data = await response.json();
+            if (data && data.records) {
+                entries = data.records.map(row => ({
+                    date: row.date || "",
+                    pilot: row.pilot || "",
+                    aircraft: row.aircraft || "",
+                    duration: parseFloat(row.duration) || 0,
+                    route: row.route || "",
+                    remarks: row.remarks || ""
+                }));
+                renderLogbook();
+                updateKPIs();
+                updateCharts();
+                setStatus(true, "Live");
+            } else {
+                entries = [];
+                renderLogbook();
+                updateKPIs();
+                setStatus(true, "Connected (no data)");
+            }
+        } catch (err) {
+            console.error(err);
+            setStatus(false, "Check Apps Script URL");
+            document.getElementById('logbookBody').innerHTML = '<tr><td colspan="7">⚠️ Failed to load. Did you paste the correct Apps Script URL?</td></tr>';
+        }
+    }
+
+    // Add new entry
+    async function addEntry(entry) {
+        try {
+            const response = await fetch(APPSCRIPT_URL, {
+                method: 'POST',
+                mode: 'cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    action: "add",
+                    date: entry.date,
+                    pilot: entry.pilot,
+                    aircraft: entry.aircraft,
+                    duration: entry.duration,
+                    route: entry.route,
+                    remarks: entry.remarks
+                })
+            });
+            const result = await response.json();
+            if (result.success) {
+                await fetchSheetData();
+                return true;
+            } else {
+                alert("Error: " + (result.error || "Unknown"));
+                return false;
+            }
+        } catch (err) {
+            alert("Network error: " + err.message);
+            return false;
+        }
+    }
+
+    // Delete entry (requires your Apps Script to support delete by row index or ID)
+    // Since we don't know your exact backend structure, we'll implement a delete that sends the row data.
+    // For simplicity, we'll assume your script can delete by date+pilot+duration (or we send entire row).
+    // If delete fails, we'll show an alert. You can later adapt.
+    async function deleteEntry(index) {
+        const entry = entries[index];
+        if (!confirm(`Delete flight on ${entry.date} by ${entry.pilot}?`)) return;
+        try {
+            const response = await fetch(APPSCRIPT_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    action: "delete",
+                    date: entry.date,
+                    pilot: entry.pilot,
+                    duration: entry.duration,
+                    route: entry.route
+                })
+            });
+            const result = await response.json();
+            if (result.success) {
+                await fetchSheetData();
+            } else {
+                alert("Delete failed: " + (result.error || "Script may not support delete"));
+            }
+        } catch (err) {
+            alert("Delete error: " + err.message);
+        }
+    }
+
+    function renderLogbook() {
+        const tbody = document.getElementById('logbookBody');
+        if (entries.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7">No flights logged yet. Add your first entry!</td></tr>';
+            return;
+        }
+        tbody.innerHTML = entries.map((e, idx) => `
+            <tr>
+                <td>${escapeHtml(e.date)}</td>
+                <td>${escapeHtml(e.pilot)}</td>
+                <td>${escapeHtml(e.aircraft)}</td>
+                <td>${e.duration.toFixed(1)}</td>
+                <td>${escapeHtml(e.route)}</td>
+                <td>${escapeHtml(e.remarks)}</td>
+                <td><button class="action-btn delete" data-idx="${idx}">🗑️</button></td>
+            </tr>
+        `).join('');
+        document.querySelectorAll('.delete').forEach(btn => {
+            btn.addEventListener('click', (e) => deleteEntry(parseInt(btn.dataset.idx)));
+        });
+    }
+
+    function updateKPIs() {
+        const totalFlights = entries.length;
+        const totalHours = entries.reduce((s, e) => s + e.duration, 0);
+        const avgHours = totalFlights ? (totalHours / totalFlights).toFixed(1) : 0;
+        const uniquePilots = new Set(entries.map(e => e.pilot)).size;
+        document.getElementById('totalFlights').innerText = totalFlights;
+        document.getElementById('totalHours').innerText = totalHours.toFixed(1);
+        document.getElementById('avgHours').innerText = avgHours;
+        document.getElementById('activePilots').innerText = uniquePilots;
+        document.getElementById('complianceRate').innerText = "98"; // mock, you can adapt
+    }
+
+    function updateCharts() {
+        const last7 = [...Array(7).keys()].map(i => {
+            const d = new Date(); d.setDate(d.getDate() - i); return d.toISOString().slice(0,10);
+        }).reverse();
+        const hoursByDay = last7.map(day => entries.filter(e => e.date === day).reduce((s,e)=>s+e.duration,0));
+        if (trendChart) trendChart.destroy();
+        trendChart = new Chart(document.getElementById('trendChart'), {
+            type: 'line', data: { labels: last7, datasets: [{ label: 'Flight hours', data: hoursByDay, borderColor: '#ff7e05', tension: 0.3 }] }
+        });
+        const pilotMap = new Map();
+        entries.forEach(e => pilotMap.set(e.pilot, (pilotMap.get(e.pilot)||0) + e.duration));
+        const sorted = Array.from(pilotMap.entries()).sort((a,b)=>b[1]-a[1]).slice(0,5);
+        if (pilotChart) pilotChart.destroy();
+        pilotChart = new Chart(document.getElementById('pilotChart'), {
+            type: 'bar', data: { labels: sorted.map(p=>p[0]), datasets: [{ label: 'Hours', data: sorted.map(p=>p[1]), backgroundColor: '#ffb347' }] }
+        });
+    }
+
+    function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, function(m){ if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
+
+    // Modal logic
+    const modal = document.getElementById('entryModal');
+    document.getElementById('openAddModalBtn').onclick = () => {
+        document.getElementById('flightDate').value = new Date().toISOString().slice(0,10);
+        document.getElementById('pilotName').value = '';
+        document.getElementById('aircraftReg').value = '';
+        document.getElementById('flightHours').value = '';
+        document.getElementById('routeFromTo').value = '';
+        document.getElementById('remarks').value = '';
+        modal.style.display = 'flex';
+    };
+    document.getElementById('closeModalBtn').onclick = () => modal.style.display = 'none';
+    document.getElementById('saveEntryBtn').onclick = async () => {
+        const newEntry = {
+            date: document.getElementById('flightDate').value,
+            pilot: document.getElementById('pilotName').value,
+            aircraft: document.getElementById('aircraftReg').value,
+            duration: parseFloat(document.getElementById('flightHours').value) || 0,
+            route: document.getElementById('routeFromTo').value,
+            remarks: document.getElementById('remarks').value
+        };
+        if (!newEntry.date || !newEntry.pilot || newEntry.duration <= 0) {
+            alert("Please fill date, pilot and valid hours");
+            return;
+        }
+        await addEntry(newEntry);
+        modal.style.display = 'none';
+    };
+    window.onclick = (e) => { if(e.target === modal) modal.style.display = 'none'; };
+
+    // Start
+    fetchSheetData();
+</script>
+</body>
+</html>
