@@ -48,6 +48,7 @@
             gap: 0.5rem;
         }
         .status-led { width: 10px; height: 10px; border-radius: 50%; background: #22c55e; box-shadow: 0 0 6px #22c55e; }
+        .status-led.off { background: #ef4444; box-shadow: none; }
         .kpi-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -174,8 +175,8 @@
     </div>
     <div class="table-wrapper">
         <table>
-            <thead><tr><th>Date</th><th>Pilot</th><th>Aircraft</th><th>Duration (hrs)</th><th>Route</th><th>Remarks</th><th>Actions</th></tr></thead>
-            <tbody id="logbookBody"><tr><td colspan="7">Loading data...</td></tr></tbody>
+            <thead><tr><th>Date</th><th>Pilot</th><th>Aircraft</th><th>Duration (hrs)</th><th>Route/Client</th><th>Remarks</th><th>Actions</th></tr></thead>
+            <tbody id="logbookBody"><tr><td colspan="7">Loading data......</td></tr></tbody>
         </table>
     </div>
 </div>
@@ -185,9 +186,9 @@
         <h3 id="modalTitle">New Flight Entry</h3>
         <input type="date" id="flightDate">
         <input type="text" id="pilotName" placeholder="Pilot name">
-        <input type="text" id="aircraftReg" placeholder="Aircraft registration">
-        <input type="number" id="flightHours" step="0.1" placeholder="Duration (hours)">
-        <input type="text" id="routeFromTo" placeholder="Route (e.g. KXYZ->KABC)">
+        <input type="text" id="aircraftReg" placeholder="Aircraft registration (e.g., 9M-AKA)">
+        <input type="number" id="flightHours" step="0.1" placeholder="Duration (hours, e.g., 1.5)">
+        <input type="text" id="routeClient" placeholder="Route or Client name">
         <textarea id="remarks" rows="2" placeholder="Remarks / technical notes"></textarea>
         <div class="modal-buttons">
             <button class="cancel-btn" id="closeModalBtn">Cancel</button>
@@ -198,70 +199,51 @@
 
 <script>
     // =============================================================
-    // 🔧 PASTE YOUR APPS SCRIPT URL HERE (exactly as in your old site)
+    // 🔧 PASTE YOUR NEW APPS SCRIPT DEPLOYMENT URL HERE
     // =============================================================
-    const APPSCRIPT_URL = "https://script.google.com/macros/s/AKfycbzoh5_Zsu57MKjqN-EVc2eC-7bGAWBqDeVnH6TEhgQiHaEQ3JZc3pSdVk4TyvDe_SX-rQ/exec";
+    const APPSCRIPT_URL = "https://script.google.com/macros/s/AKfycbyS9OPcPfnJ1fISmAyIVuZciX6cA-so2GX0LwOzhfT3WVC4D_fslAwj-X-SxUUqM1i_tA/exec";
 
     // =============================================================
-    let entries = [];
+    let flightLogs = [];      // will hold the flight entries
+    let fleetData = [];
+    let pilotInsights = [];
     let trendChart, pilotChart;
 
     function setStatus(connected, message) {
         const led = document.getElementById('statusLed');
         const textSpan = document.getElementById('statusText');
         if (connected) {
-            led.style.background = "#22c55e";
-            led.style.boxShadow = "0 0 6px #22c55e";
+            led.classList.remove('off');
             textSpan.innerText = message || "Connected to Sheets";
         } else {
-            led.style.background = "#ef4444";
-            led.style.boxShadow = "none";
+            led.classList.add('off');
             textSpan.innerText = message || "Connection error";
         }
     }
 
-    // Fetch data exactly like your original site does (no extra parameters)
-    async function fetchSheetData() {
+    async function fetchAllData() {
         try {
             setStatus(false, "Loading...");
             const response = await fetch(APPSCRIPT_URL, { method: 'GET', mode: 'cors' });
             const data = await response.json();
-            console.log("Raw response from Apps Script:", data); // ← Check browser console
+            console.log("Full response:", data);
 
-            // Your original script likely returns an array or object with 'records'
-            let records = [];
-            if (Array.isArray(data)) {
-                records = data;
-            } else if (data.records && Array.isArray(data.records)) {
-                records = data.records;
-            } else if (data.data && Array.isArray(data.data)) {
-                records = data.data;
-            } else {
-                // If none match, show error
-                throw new Error("Unexpected response format. Check console.");
-            }
+            // Extract the three main parts
+            flightLogs = data.flightLogs || [];
+            fleetData = data.fleet || [];
+            pilotInsights = data.insights || [];
 
-            entries = records.map(row => ({
-                date: row.date || row[0] || "",
-                pilot: row.pilot || row[1] || "",
-                aircraft: row.aircraft || row[2] || "",
-                duration: parseFloat(row.duration || row[3]) || 0,
-                route: row.route || row[4] || "",
-                remarks: row.remarks || row[5] || ""
-            }));
             renderLogbook();
-            updateKPIs();
-            updateCharts();
-            setStatus(true, `Loaded ${entries.length} flights`);
+            updateKPIsAndCharts();
+            setStatus(true, `Loaded ${flightLogs.length} flights`);
         } catch (err) {
-            console.error("Fetch error:", err);
+            console.error(err);
             setStatus(false, "Check Apps Script URL or CORS");
-            document.getElementById('logbookBody').innerHTML = '<tr><td colspan="7">⚠️ Failed to load. Open browser console (F12) for details.</td></tr>';
+            document.getElementById('logbookBody').innerHTML = '<tr><td colspan="7">⚠️ Failed to load. Open console (F12) for details.</td></tr>';
         }
     }
 
-    // Add new entry (matching your original POST format)
-    async function addEntry(entry) {
+    async function addNewEntry(entry) {
         try {
             const response = await fetch(APPSCRIPT_URL, {
                 method: 'POST',
@@ -270,19 +252,22 @@
                 body: JSON.stringify({
                     action: "add",
                     date: entry.date,
-                    pilot: entry.pilot,
                     aircraft: entry.aircraft,
-                    duration: entry.duration,
-                    route: entry.route,
-                    remarks: entry.remarks
+                    pilot: entry.pilot,
+                    duration: entry.duration,   // decimal hours
+                    company: "Flight",          // default company
+                    client: entry.routeClient,
+                    remarks: entry.remarks,
+                    hours: Math.floor(entry.duration),
+                    minutes: Math.round((entry.duration % 1) * 60)
                 })
             });
             const result = await response.json();
-            if (result.success === true || result.status === "success") {
-                await fetchSheetData();
+            if (result.success) {
+                await fetchAllData();
                 return true;
             } else {
-                alert("Error: " + (result.error || "Unknown"));
+                alert("Add error: " + (result.error || "Unknown"));
                 return false;
             }
         } catch (err) {
@@ -291,9 +276,8 @@
         }
     }
 
-    // Delete entry (send delete action)
     async function deleteEntry(index) {
-        const entry = entries[index];
+        const entry = flightLogs[index];
         if (!confirm(`Delete flight on ${entry.date} by ${entry.pilot}?`)) return;
         try {
             const response = await fetch(APPSCRIPT_URL, {
@@ -303,15 +287,14 @@
                     action: "delete",
                     date: entry.date,
                     pilot: entry.pilot,
-                    duration: entry.duration,
-                    route: entry.route
+                    duration: entry.duration
                 })
             });
             const result = await response.json();
-            if (result.success === true || result.status === "success") {
-                await fetchSheetData();
+            if (result.success) {
+                await fetchAllData();
             } else {
-                alert("Delete failed: " + (result.error || "Script may not support delete"));
+                alert("Delete failed: " + (result.error || "Not supported"));
             }
         } catch (err) {
             alert("Delete error: " + err.message);
@@ -320,11 +303,11 @@
 
     function renderLogbook() {
         const tbody = document.getElementById('logbookBody');
-        if (entries.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="7">No flights logged yet. Add your first entry!</td></tr>';
+        if (!flightLogs.length) {
+            tbody.innerHTML = '<tr><td colspan="7">No flights yet. Add your first entry!</td></tr>';
             return;
         }
-        tbody.innerHTML = entries.map((e, idx) => `
+        tbody.innerHTML = flightLogs.map((e, idx) => `
             <tr>
                 <td>${escapeHtml(e.date)}</td>
                 <td>${escapeHtml(e.pilot)}</td>
@@ -340,34 +323,48 @@
         });
     }
 
-    function updateKPIs() {
-        const totalFlights = entries.length;
-        const totalHours = entries.reduce((s, e) => s + e.duration, 0);
+    function updateKPIsAndCharts() {
+        // KPI from flightLogs
+        const totalFlights = flightLogs.length;
+        const totalHours = flightLogs.reduce((s, e) => s + e.duration, 0);
         const avgHours = totalFlights ? (totalHours / totalFlights).toFixed(1) : 0;
-        const uniquePilots = new Set(entries.map(e => e.pilot)).size;
+        const uniquePilots = new Set(flightLogs.map(e => e.pilot)).size;
         document.getElementById('totalFlights').innerText = totalFlights;
         document.getElementById('totalHours').innerText = totalHours.toFixed(1);
         document.getElementById('avgHours').innerText = avgHours;
         document.getElementById('activePilots').innerText = uniquePilots;
-        // Mock compliance rate (you can replace with real logic later)
-        document.getElementById('complianceRate').innerText = "98";
-    }
+        // Compliance rate from fleet data (example: percentage of aircraft within 100hr limit)
+        let compliant = 0;
+        if (fleetData.length) {
+            fleetData.forEach(a => { if (a.totalHours - a.lastServiceHours < a.limit) compliant++; });
+            document.getElementById('complianceRate').innerText = Math.round((compliant / fleetData.length) * 100);
+        } else {
+            document.getElementById('complianceRate').innerText = "98";
+        }
 
-    function updateCharts() {
+        // Trend chart (last 7 days)
         const last7 = [...Array(7).keys()].map(i => {
             const d = new Date(); d.setDate(d.getDate() - i); return d.toISOString().slice(0,10);
         }).reverse();
-        const hoursByDay = last7.map(day => entries.filter(e => e.date === day).reduce((s,e)=>s+e.duration,0));
+        const hoursByDay = last7.map(day => flightLogs.filter(e => e.date === day).reduce((s,e)=>s+e.duration,0));
         if (trendChart) trendChart.destroy();
         trendChart = new Chart(document.getElementById('trendChart'), {
             type: 'line', data: { labels: last7, datasets: [{ label: 'Flight hours', data: hoursByDay, borderColor: '#ff7e05', tension: 0.3 }] }
         });
-        const pilotMap = new Map();
-        entries.forEach(e => pilotMap.set(e.pilot, (pilotMap.get(e.pilot)||0) + e.duration));
-        const sorted = Array.from(pilotMap.entries()).sort((a,b)=>b[1]-a[1]).slice(0,5);
+
+        // Pilot chart using pilotInsights from script (more accurate)
+        let pilotHours = [];
+        if (pilotInsights.length) {
+            pilotHours = pilotInsights.map(p => ({ name: p.name, hours: parseFloat(p.hours) })).sort((a,b)=>b.hours-a.hours).slice(0,5);
+        } else {
+            // fallback: compute from flightLogs
+            const pilotMap = new Map();
+            flightLogs.forEach(e => pilotMap.set(e.pilot, (pilotMap.get(e.pilot)||0) + e.duration));
+            pilotHours = Array.from(pilotMap.entries()).map(([name, hours]) => ({ name, hours })).sort((a,b)=>b.hours-a.hours).slice(0,5);
+        }
         if (pilotChart) pilotChart.destroy();
         pilotChart = new Chart(document.getElementById('pilotChart'), {
-            type: 'bar', data: { labels: sorted.map(p=>p[0]), datasets: [{ label: 'Hours', data: sorted.map(p=>p[1]), backgroundColor: '#ffb347' }] }
+            type: 'bar', data: { labels: pilotHours.map(p=>p.name), datasets: [{ label: 'Hours', data: pilotHours.map(p=>p.hours), backgroundColor: '#ffb347' }] }
         });
     }
 
@@ -380,31 +377,36 @@
         document.getElementById('pilotName').value = '';
         document.getElementById('aircraftReg').value = '';
         document.getElementById('flightHours').value = '';
-        document.getElementById('routeFromTo').value = '';
+        document.getElementById('routeClient').value = '';
         document.getElementById('remarks').value = '';
         modal.style.display = 'flex';
     };
     document.getElementById('closeModalBtn').onclick = () => modal.style.display = 'none';
     document.getElementById('saveEntryBtn').onclick = async () => {
-        const newEntry = {
-            date: document.getElementById('flightDate').value,
-            pilot: document.getElementById('pilotName').value,
-            aircraft: document.getElementById('aircraftReg').value,
-            duration: parseFloat(document.getElementById('flightHours').value) || 0,
-            route: document.getElementById('routeFromTo').value,
-            remarks: document.getElementById('remarks').value
-        };
-        if (!newEntry.date || !newEntry.pilot || newEntry.duration <= 0) {
-            alert("Please fill date, pilot and valid hours");
+        const duration = parseFloat(document.getElementById('flightHours').value);
+        if (isNaN(duration) || duration <= 0) {
+            alert("Please enter a valid duration (hours)");
             return;
         }
-        await addEntry(newEntry);
+        const newEntry = {
+            date: document.getElementById('flightDate').value,
+            pilot: document.getElementById('pilotName').value.trim(),
+            aircraft: document.getElementById('aircraftReg').value.trim(),
+            duration: duration,
+            routeClient: document.getElementById('routeClient').value.trim(),
+            remarks: document.getElementById('remarks').value.trim()
+        };
+        if (!newEntry.date || !newEntry.pilot || !newEntry.aircraft) {
+            alert("Please fill date, pilot and aircraft");
+            return;
+        }
+        await addNewEntry(newEntry);
         modal.style.display = 'none';
     };
     window.onclick = (e) => { if(e.target === modal) modal.style.display = 'none'; };
 
     // Start
-    fetchSheetData();
+    fetchAllData();
 </script>
 </body>
 </html>
