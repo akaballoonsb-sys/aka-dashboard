@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>AKA & MBA • Fleet Operations</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: radial-gradient(ellipse at 20% 30%, #0a0f1c, #020408);
+            background-attachment: fixed;
+            color: #f0f3fa;
+        }
+        .glass-panel {
+            background: rgba(12, 18, 28, 0.65);
+            backdrop-filter: blur(14px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.2s ease;
+        }
+        .glass-panel:hover {
+            border-color: rgba(249, 115, 22, 0.35);
+            box-shadow: 0 15px 35px -15px rgba(0, 0, 0, 0.5);
+        }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #0f111a; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: #3b4a6b; border-radius: 10px; }
+        .card-hover-effect { transition: transform 0.2s ease, border-color 0.2s; }
+        .card-hover-effect:hover { transform: translateY(-3px); border-color: rgba(249, 115, 22, 0.6); }
+        input, select, textarea {
+            background: rgba(0, 0, 0, 0.55);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 16px;
+            color: white;
+            transition: all 0.2s;
+        }
+        input:focus, select:focus, textarea:focus {
+            border-color: #f97316;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.25);
+        }
+        button:active { transform: scale(0.97); }
+        .tab-active {
+            border-bottom: 2px solid #f97316;
+            color: #f97316;
+            background: rgba(249, 115, 22, 0.08);
+        }
+        @keyframes fadeSlideUp {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        .fade-slide-up {
+            animation: fadeSlideUp 0.5s ease-out forwards;
+        }
+        @keyframes gentleFadeOut {
+            0% { opacity: 1; backdrop-filter: blur(20px); }
+            100% { opacity: 0; backdrop-filter: blur(0px); visibility: hidden; }
+        }
+        .welcome-fade-out {
+            animation: gentleFadeOut 0.6s ease-out forwards;
+        }
+        .calendar-iframe {
+            width: 100%;
+            height: 700px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0,0,0,0.3);
+        }
+        @media (max-width: 768px) {
+            .calendar-iframe { height: 500px; }
+        }
+        .cert-card {
+            transition: all 0.2s;
+            background: rgba(12, 18, 28, 0.7);
+            backdrop-filter: blur(8px);
+        }
+        .cert-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(249,115,22,0.6);
+        }
+        .expiry-bar {
+            height: 6px;
+            border-radius: 10px;
+            background: #1e293b;
+            overflow: hidden;
+        }
+        .expiry-fill {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.3s;
+        }
+        .progress-ring__circle {
+            transition: stroke-dashoffset 0.35s;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+        }
+        .balloon-logo {
+            filter: drop-shadow(0 4px 8px rgba(249,115,22,0.3));
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased">
+
+    <!-- LOGIN OVERLAY -->
+    <div id="loginOverlay" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-xl transition-all duration-500">
+        <div class="glass-panel max-w-md w-full mx-4 p-8 rounded-3xl border border-white/15 shadow-2xl">
+            <div class="text-center mb-8">
+                <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-white/5 border border-white/10 text-3xl mb-4">
+                    <svg class="w-8 h-8 text-orange-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 2a8 8 0 0 0-8 8c0 3 2 5 4 7s2 4 2 5h4c0-1 0-3 2-5s4-4 4-7a8 8 0 0 0-8-8z" />
+                        <path d="M12 2v20" />
+                        <path d="M8 22h8" />
+                        <circle cx="12" cy="10" r="3" fill="rgba(249,115,22,0.2)" stroke="currentColor"/>
+                    </svg>
+                </div>
+                <h1 class="text-2xl font-extrabold tracking-tight bg-gradient-to-r from-white to-orange-300 bg-clip-text text-transparent">AKA & MBA</h1>
+                <p class="text-xs text-slate-400 mt-1 uppercase tracking-wider">FLEET OPERATIONS</p>
+            </div>
+            <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-5">
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-2">Your Name</label>
+                    <input type="text" id="operatorName" required class="w-full px-4 py-3 bg-slate-950/60 border border-slate-700 rounded-xl text-white focus:border-orange-500" placeholder="e.g. Captain Rudy">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-2">Access Passkey</label>
+                    <input type="password" id="passwordInput" required class="w-full px-4 py-3 bg-slate-950/60 border border-slate-700 rounded-xl text-white focus:border-orange-500" placeholder="••••••••">
+                </div>
+                <div id="loginError" class="hidden text-sm text-red-400 flex items-center gap-2 bg-red-950/30 p-3 rounded-xl"><i class="fa-solid fa-circle-exclamation"></i><span>Access Denied. Invalid credentials.</span></div>
+                <button type="submit" class="w-full py-3 bg-gradient-to-r from-orange-500 to-amber-600 text-white font-bold rounded-xl shadow-lg flex items-center justify-center gap-2 hover:shadow-orange-500/25 transition-all"><i class="fa-regular fa-keyboard"></i> Authorize session</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- WELCOME OVERLAY (hidden initially) -->
+    <div id="welcomeOverlay" class="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-xl hidden" style="transition: all 0.5s ease;">
+        <div class="text-center">
+            <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-white/5 border border-white/20 text-4xl mb-6">
+                <svg class="w-10 h-10 text-orange-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M12 2a8 8 0 0 0-8 8c0 3 2 5 4 7s2 4 2 5h4c0-1 0-3 2-5s4-4 4-7a8 8 0 0 0-8-8z" />
+                    <path d="M12 2v20" />
+                    <path d="M8 22h8" />
+                </svg>
+            </div>
+            <h1 id="welcomeMessage" class="text-3xl md:text-5xl font-extrabold tracking-tight bg-gradient-to-r from-white to-orange-300 bg-clip-text text-transparent">Welcome,</h1>
+            <p class="text-slate-400 text-sm mt-3 tracking-wide">accessing flight intelligence</p>
+        </div>
+    </div>
+
+    <!-- MAIN DASHBOARD -->
+    <div id="dashboardContainer" class="hidden flex-1 flex-col">
+
+        <!-- GLASS HEADER -->
+        <header class="glass-panel sticky top-0 z-40 mx-6 mt-4 rounded-2xl px-5 py-3 shadow-xl border-b-0">
+            <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="h-11 w-11 rounded-xl bg-gradient-to-br from-orange-500 to-amber-600 flex items-center justify-center shadow-lg balloon-logo">
+                        <svg class="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                            <path d="M12 2a8 8 0 0 0-8 8c0 3 2 5 4 7s2 4 2 5h4c0-1 0-3 2-5s4-4 4-7a8 8 0 0 0-8-8z" />
+                            <path d="M12 2v20" />
+                            <path d="M8 22h8" />
+                            <circle cx="12" cy="10" r="3" fill="rgba(255,255,255,0.2)" stroke="currentColor"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-extrabold tracking-tight text-white flex items-center gap-2">AKA & MBA FLEET OPERATIONS <span class="text-[11px] bg-orange-500/20 border border-orange-500/40 text-orange-300 px-2 py-0.5 rounded-full font-bold"><i class="fa-regular fa-bell"></i> LIVE</span></h2>
+                        <p class="text-xs text-slate-400">Balloon logs · Pilot intel · Maintenance registry · Flight schedule</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3 text-xs">
+                    <button onclick="syncWithGoogleSheets()" class="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-slate-200 hover:bg-orange-500/20 hover:border-orange-500/40 transition-all"><i id="syncIcon" class="fa-solid fa-rotate text-orange-400"></i><span id="syncText">Sync Live Data</span></button>
+                    <button onclick="handleLogout()" class="px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-slate-300 hover:text-white hover:border-red-500/50"><i class="fa-solid fa-lock"></i></button>
+                </div>
+            </div>
+        </header>
+
+        <!-- GLOBAL WARNING BANNER -->
+        <div id="globalNoticeBanner" class="bg-gradient-to-r from-red-950/40 via-slate-950/80 to-amber-950/40 border-b border-red-800/50 px-6 py-3 hidden mt-4 mx-6 rounded-xl">
+            <div class="max-w-7xl mx-auto flex items-center justify-between text-xs md:text-sm">
+                <p class="text-slate-200"><strong class="text-red-400"><i class="fa-solid fa-triangle-exclamation mr-1.5"></i> COMPLIANCE ALERT:</strong> <span id="bannerCount" class="font-bold text-white underline">0</span> registration(s) within 30‑day window!</p>
+                <button onclick="switchToTab('certificates')" class="text-orange-400 font-bold uppercase text-xs tracking-wider hover:underline flex items-center gap-1">Inspect fleet <i class="fa-solid fa-arrow-right"></i></button>
+            </div>
+        </div>
+
+        <!-- TABS -->
+        <div class="max-w-7xl mx-auto w-full px-6 pt-6">
+            <div class="flex gap-1 border-b border-white/10 overflow-x-auto">
+                <button onclick="switchToTab('fleet')" id="tabBtn-fleet" class="tab-active px-6 py-3 text-sm font-bold transition-all flex items-center gap-2 rounded-t-xl whitespace-nowrap"><i class="fa-solid fa-helicopter"></i> Flight Logger</button>
+                <button onclick="switchToTab('analysis')" id="tabBtn-analysis" class="px-6 py-3 text-sm font-bold text-slate-400 hover:text-white transition-all flex items-center gap-2 whitespace-nowrap"><i class="fa-solid fa-chart-pie"></i> Analytics</button>
+                <button onclick="switchToTab('certificates')" id="tabBtn-certificates" class="px-6 py-3 text-sm font-bold text-slate-400 hover:text-white transition-all flex items-center gap-2 whitespace-nowrap"><i class="fa-solid fa-id-card"></i> Renewals Registry</button>
+                <button onclick="switchToTab('schedule')" id="tabBtn-schedule" class="px-6 py-3 text-sm font-bold text-slate-400 hover:text-white transition-all flex items-center gap-2 whitespace-nowrap"><i class="fa-regular fa-calendar-alt"></i> Flight Schedule</button>
+            </div>
+        </div>
+
+        <!-- TOAST NOTIFICATION -->
+        <div id="toastNotification" class="fixed bottom-6 right-6 z-50 transform translate-y-24 opacity-0 transition-all duration-300 max-w-sm w-full p-4 rounded-2xl border shadow-2xl flex items-start gap-3 glass-panel"></div>
+
+        <main class="flex-grow max-w-7xl w-full mx-auto px-6 py-8 space-y-8">
+            
+            <!-- TAB 1: FLIGHT LOGGER -->
+            <section id="tab-fleet" class="space-y-8 fade-slide-up">
+                <div id="fleetCardGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+                <div class="glass-panel p-6 rounded-2xl card-hover-effect">
+                    <div class="flex items-center gap-3 mb-6">
+                        <span class="w-9 h-9 rounded-xl bg-orange-500/20 text-orange-400 flex items-center justify-center"><i class="fa-solid fa-pen-to-square"></i></span>
+                        <div><h3 class="text-md font-bold text-white">Logbook Input Terminal</h3><p class="text-xs text-slate-400">Push flight data, airworthiness audits, or technical repairs to master spreadsheet.</p></div>
+                    </div>
+                    <form id="logbookForm" onsubmit="submitLogbookEntry(event)" class="space-y-4 text-xs">
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <div><label class="block text-slate-400 mb-1.5 uppercase font-semibold">Entry Category</label><select id="formType" onchange="toggleFormMode()" class="w-full bg-slate-900/70 border border-slate-700 rounded-xl px-3 py-2.5"><option value="Flight">Standard Passenger Flight</option><option value="Audit">Annual Airworthiness Audit (100hr Reset)</option><option value="Repair">Unscheduled Technical Repair</option></select></div>
+                            <div><label class="block text-slate-400 mb-1.5 uppercase font-semibold">Target Aircraft</label><select id="formAircraft" required class="w-full bg-slate-900/70 border border-slate-700 rounded-xl px-3 py-2.5"></select></div>
+                            <div><label class="block text-slate-400 mb-1.5 uppercase font-semibold">Date of Operation</label><input type="date" id="formDate" required class="w-full bg-slate-900/70 border border-slate-700 rounded-xl px-3 py-2.5"></div>
+                        </div>
+                        <div id="flightDetailsContainer" class="grid grid-cols-1 sm:grid-cols-4 gap-4">
+                            <div><label class="block text-slate-400 mb-1.5 uppercase font-semibold">Operating Pilot</label><input type="text" id="formPilot" placeholder="e.g. Suhaidi Hadi" class="w-full bg-slate-900/70 border border-slate-700 rounded-xl px-3 py-2.5"></div>
+                            <div><label class="block text-slate-400 mb-1.5 uppercase font-semibold">Client / Event</label><input type="text" id="formClient" placeholder="e.g. HAVOC Brunei" class="w-full bg-slate-900/70 border border-slate-700 rounded-xl px-3 py-2.5"></div>
+                            <div><label class="block text-slate-400 mb-1.5 uppercase font-semibold">Hours</label><input type="number" id="formHours" min="0" placeholder="Hours" class="w-full bg-slate-900/70 border border-slate-700 rounded-xl px-3 py-2.5"></div>
+                            <div><label class="block text-slate-400 mb-1.5 uppercase font-semibold">Minutes</label><input type="number" id="formMinutes" min="0" max="59" placeholder="Minutes" class="w-full bg-slate-900/70 border border-slate-700 rounded-xl px-3 py-2.5"></div>
+                        </div>
+                        <div><label class="block text-slate-400 mb-1.5 uppercase font-semibold">Technical Remarks</label><textarea id="formRemarks" rows="3" placeholder="Envelope condition, panel checkups, burner service..." class="w-full bg-slate-900/70 border border-slate-700 rounded-xl px-3 py-2.5"></textarea></div>
+                        <div class="flex justify-end pt-2"><button type="submit" id="formSubmitBtn" class="px-5 py-3 bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white font-bold rounded-xl transition-all flex items-center gap-2 shadow-md"><i class="fa-solid fa-paper-plane"></i><span>Transmit to Google Sheet</span></button></div>
+                    </form>
+                </div>
+            </section>
+
+            <!-- TAB 2: ANALYTICS -->
+            <section id="tab-analysis" class="space-y-8 hidden fade-slide-up">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="glass-panel rounded-2xl p-5 card-hover-effect">
+                        <div class="flex items-center gap-2 mb-4"><i class="fa-solid fa-trophy text-orange-400 text-xl"></i><h3 class="font-bold text-white text-md">🏆 Balloon Utilization Leaderboard</h3></div>
+                        <div id="balloonLeaderboard" class="space-y-3 text-sm"></div>
+                    </div>
+                    <div class="glass-panel rounded-2xl p-5 card-hover-effect">
+                        <div class="flex items-center gap-2 mb-4"><i class="fa-solid fa-user-astronaut text-orange-400 text-xl"></i><h3 class="font-bold text-white text-md">👨‍✈️ Pilot Flight Leaderboard</h3></div>
+                        <div id="pilotLeaderboard" class="space-y-3 text-sm"></div>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="glass-panel rounded-2xl p-5 card-hover-effect">
+                        <h3 class="font-bold text-white mb-3 flex items-center gap-2"><i class="fa-solid fa-chart-simple"></i> Fleet Airworthiness Status</h3>
+                        <canvas id="fleetDonut" width="200" height="200" class="mx-auto w-40 h-40"></canvas>
+                        <div id="fleetStatusLegend" class="flex justify-center gap-4 mt-3 text-xs"></div>
+                    </div>
+                    <div class="glass-panel rounded-2xl p-5 card-hover-effect">
+                        <h3 class="font-bold text-white mb-3 flex items-center gap-2"><i class="fa-regular fa-clock"></i> Hours until next 100hr inspection</h3>
+                        <div id="inspectionGauges" class="space-y-4 max-h-80 overflow-y-auto pr-2"></div>
+                    </div>
+                </div>
+                <div class="glass-panel rounded-2xl p-5 card-hover-effect">
+                    <div class="flex items-center gap-2 mb-4"><i class="fa-solid fa-gauge-high text-orange-400"></i><h3 class="font-bold text-white">Fleet Health Index</h3></div>
+                    <div class="flex flex-col items-center">
+                        <div class="relative w-32 h-32"><canvas id="fleetHealthGauge" width="128" height="128" class="w-32 h-32"></canvas></div>
+                        <p class="text-sm text-slate-300 mt-2 text-center">Average remaining hours before 100hr service</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 3: RENEWALS REGISTRY -->
+            <section id="tab-certificates" class="space-y-6 hidden fade-slide-up">
+                <div class="flex justify-between items-center mb-2 flex-wrap gap-3">
+                    <div><h3 class="text-lg font-bold text-white">✈️ Permit & CoFR Expiry Timeline</h3><p class="text-xs text-slate-400">Card‑based registry with days‑left counters</p></div>
+                    <input type="text" id="certSearch" onkeyup="filterCertCards()" placeholder="Filter by registration..." class="text-xs bg-slate-900/60 border border-slate-700 rounded-xl px-3 py-2 text-white placeholder-slate-400 focus:border-orange-500 w-64">
+                </div>
+                <div id="certCardsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"></div>
+            </section>
+
+            <!-- TAB 4: SCHEDULE -->
+            <section id="tab-schedule" class="space-y-6 hidden fade-slide-up">
+                <div class="glass-panel rounded-2xl overflow-hidden p-1">
+                    <div class="px-5 pt-5 pb-2 flex justify-between items-center flex-wrap gap-3"><div><h3 class="text-lg font-bold text-white flex items-center gap-2"><i class="fa-regular fa-calendar-circle-plus text-orange-400"></i> Fleet & Event Calendar</h3><p class="text-xs text-slate-400">Integrated Google Calendar — operational flights, maintenance windows & corporate events</p></div><a href="https://calendar.google.com/calendar/u/0/r" target="_blank" class="text-xs bg-white/5 border border-white/15 rounded-xl px-3 py-2 text-slate-300 hover:text-white hover:border-orange-500 transition flex items-center gap-2"><i class="fa-solid fa-arrow-up-right-from-square"></i> Open in Google</a></div>
+                    <div class="p-1"><iframe class="calendar-iframe" src="https://calendar.google.com/calendar/embed?showCalendars=1&mode=MONTH&src=akaballoonsb%40gmail.com&src=gff8tq53eren4hloo7rdgiv7b4%40group.calendar.google.com&src=g16ndapjat4lholjhkdu6c0ogs%40group.calendar.google.com&ctz=Asia%2FKuala_Lumpur" frameborder="0" scrolling="no" style="width:100%; height:700px; border-radius: 20px; background: rgba(0,0,0,0.2);"></iframe></div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="glass-panel mx-6 mb-4 rounded-2xl px-6 py-3 text-center text-[10px] text-slate-400 uppercase tracking-widest">&copy; 2026 AKA & MBA Balloon Operations • Live Analytics Engine v5.0</footer>
+    </div>
+
+    <script>
+        // ---------- ORIGINAL BACKEND (fully preserved) ----------
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwdV1e8lRFovMwbtwGLR43nfpW2y-LtIsXiIzxP-6qKIiJngGYfWgp4hAdQzZqZ_nFS/exec";
+        const DASHBOARD_PASSWORD = "Rudy56";
+
+        let fleet = [];
+        let certificates = [];
+        let insights = [];
+
+        let fleetDonutChart = null, fleetHealthGauge = null;
+
+        // ---------- LOGIN (with welcome screen) ----------
+        function handleLogin(e) {
+            e.preventDefault();
+            const pwd = document.getElementById("passwordInput").value;
+            const operatorName = document.getElementById("operatorName").value.trim() || "Officer";
+            if (pwd === DASHBOARD_PASSWORD) {
+                // Hide login overlay with fade
+                const loginOverlay = document.getElementById("loginOverlay");
+                loginOverlay.style.transition = "opacity 0.4s ease";
+                loginOverlay.style.opacity = "0";
+                setTimeout(() => {
+                    loginOverlay.style.display = "none";
+                    // Show welcome overlay
+                    const welcomeOverlay = document.getElementById("welcomeOverlay");
+                    const welcomeMsg = document.getElementById("welcomeMessage");
+                    welcomeMsg.innerHTML = `Welcome, ${operatorName}`;
+                    welcomeOverlay.classList.remove("hidden");
+                    welcomeOverlay.style.opacity = "1";
+                    // After 1 second, fade out welcome and show dashboard
+                    setTimeout(() => {
+                        welcomeOverlay.classList.add("welcome-fade-out");
+                        setTimeout(() => {
+                            welcomeOverlay.classList.add("hidden");
+                            welcomeOverlay.classList.remove("welcome-fade-out");
+                            // Now show dashboard with animation
+                            const dashboard = document.getElementById("dashboardContainer");
+                            dashboard.classList.remove("hidden");
+                            dashboard.classList.add("fade-slide-up");
+                            // Initialize dashboard
+                            document.getElementById("formDate").valueAsDate = new Date();
+                            syncWithGoogleSheets();
+                        }, 600);
+                    }, 1000);
+                }, 400);
+            } else {
+                document.getElementById("loginError").classList.remove("hidden");
+                document.getElementById("passwordInput").value = "";
+            }
+        }
+
+        function handleLogout() {
+            // Reset everything
+            document.getElementById("dashboardContainer").classList.add("hidden");
+            const loginOverlay = document.getElementById("loginOverlay");
+            loginOverlay.style.display = "flex";
+            loginOverlay.style.opacity = "1";
+            document.getElementById("passwordInput").value = "";
+            document.getElementById("operatorName").value = "";
+            document.getElementById("loginError").classList.add("hidden");
+            // Clear any stale welcome overlay
+            const welcomeOverlay = document.getElementById("welcomeOverlay");
+            welcomeOverlay.classList.add("hidden");
+            welcomeOverlay.classList.remove("welcome-fade-out");
+        }
+
+        // ---------- TAB SWITCHING ----------
+        function switchToTab(targetTab) {
+            ['fleet', 'analysis', 'certificates', 'schedule'].forEach(t => {
+                const section = document.getElementById(`tab-${t}`);
+                if (section) section.classList.toggle("hidden", t !== targetTab);
+                const btn = document.getElementById(`tabBtn-${t}`);
+                if (btn) {
+                    if (t === targetTab) { btn.classList.add("tab-active"); btn.classList.remove("text-slate-400"); }
+                    else { btn.classList.remove("tab-active"); btn.classList.add("text-slate-400"); }
+                }
+            });
+        }
+
+        function toggleFormMode() {
+            const mode = document.getElementById("formType").value;
+            const container = document.getElementById("flightDetailsContainer");
+            if (mode === "Audit") {
+                container.classList.add("hidden");
+                document.getElementById("formRemarks").value = "Annual structural safety check — resetting 100hr cycle.";
+            } else {
+                container.classList.remove("hidden");
+                document.getElementById("formRemarks").value = "";
+            }
+        }
+
+        // ---------- SYNC (unchanged) ----------
+        function syncWithGoogleSheets() {
+            const syncIcon = document.getElementById("syncIcon");
+            const syncText = document.getElementById("syncText");
+            syncIcon.classList.add("fa-spin");
+            syncText.innerText = "Synchronizing...";
+            fetch(GOOGLE_SCRIPT_URL)
+            .then(res => res.json())
+            .then(data => {
+                if(data.fleet) fleet = data.fleet;
+                if(data.certificates) certificates = data.certificates;
+                if(data.insights) insights = data.insights;
+                renderDashboard();
+                showToast("Sync Success", "Real-time aviation data processed.", "success");
+            })
+            .catch(err => {
+                console.error(err);
+                showToast("Connection Error", "Could not reach web app. Check CORS/script deployment.", "danger");
+            })
+            .finally(() => {
+                syncIcon.classList.remove("fa-spin");
+                syncText.innerText = "Sync Live Data";
+            });
+        }
+
+        // ---------- SUBMIT LOGBOOK (unchanged) ----------
+        function submitLogbookEntry(e) {
+            e.preventDefault();
+            const btn = document.getElementById("formSubmitBtn");
+            const mode = document.getElementById("formType").value;
+            let companyField = "AKA Balloon";
+            if (mode === "Audit") companyField = "Annual Structural Airworthiness Audit";
+            else if (mode === "Repair") companyField = "Maintenance Repair Service";
+
+            const payload = {
+                date: document.getElementById("formDate").value,
+                company: companyField,
+                aircraft: document.getElementById("formAircraft").value,
+                hours: mode === "Audit" ? 0 : (document.getElementById("formHours").value || 0),
+                minutes: mode === "Audit" ? 0 : (document.getElementById("formMinutes").value || 0),
+                pilot: mode === "Audit" ? "" : (document.getElementById("formPilot").value || "Engineering Crew"),
+                client: mode === "Audit" ? "" : (document.getElementById("formClient").value || "N/A"),
+                remarks: document.getElementById("formRemarks").value
+            };
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> <span>Transmitting...</span>`;
+            fetch(GOOGLE_SCRIPT_URL, {
+                method: "POST",
+                mode: "no-cors",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            })
+            .then(() => {
+                showToast("Transmission Safe", "Logbook entry recorded successfully.", "success");
+                document.getElementById("logbookForm").reset();
+                document.getElementById("formDate").valueAsDate = new Date();
+                toggleFormMode();
+                setTimeout(() => { syncWithGoogleSheets(); }, 1500);
+            })
+            .catch(err => {
+                console.error(err);
+                showToast("Write Protocol Alert", "Packet drop — please retry.", "danger");
+            })
+            .finally(() => {
+                btn.disabled = false;
+                btn.innerHTML = `<i class="fa-solid fa-paper-plane"></i><span>Transmit to Google Sheet</span>`;
+            });
+        }
+
+        // ---------- RENDER DASHBOARD (unchanged logic) ----------
+        function renderDashboard() {
+            const grid = document.getElementById("fleetCardGrid");
+            const select = document.getElementById("formAircraft");
+            grid.innerHTML = "";
+            select.innerHTML = "";
+            if (fleet.length === 0) {
+                grid.innerHTML = '<div class="col-span-full text-center text-slate-400 glass-panel p-6 rounded-2xl">No fleet data synced yet. Click "Sync Live Data".</div>';
+                select.innerHTML = '<option>No aircraft available</option>';
+            } else {
+                fleet.forEach(b => {
+                    const opt = document.createElement("option");
+                    opt.value = b.registration;
+                    opt.innerText = `${b.registration} (${b.shortName})`;
+                    select.appendChild(opt);
+
+                    const currentHrs = parseFloat(b.totalHours) || 0;
+                    const baselineHrs = parseFloat(b.lastServiceHours) || 0;
+                    const accumulatedDelta = currentHrs - baselineHrs;
+                    let percentageUsed = Math.min(100, Math.round((accumulatedDelta / 100) * 100));
+                    if (percentageUsed < 0) percentageUsed = 0;
+                    let remainingMargin = Math.max(0, 100 - accumulatedDelta).toFixed(1);
+                    let barColor = "bg-gradient-to-r from-orange-500 to-amber-500";
+                    let borderGlow = "";
+                    if (percentageUsed >= 85) { barColor = "bg-gradient-to-r from-red-500 to-rose-600"; borderGlow = "glow-red"; }
+                    else if (percentageUsed >= 65) { barColor = "bg-gradient-to-r from-amber-500 to-orange-500"; borderGlow = "glow-orange"; }
+
+                    const card = document.createElement("div");
+                    card.className = `glass-panel p-6 rounded-2xl border transition-all card-hover-effect ${borderGlow}`;
+                    card.innerHTML = `
+                        <div>
+                            <div class="flex justify-between items-start">
+                                <div><span class="bg-black/40 border border-white/10 px-2.5 py-1 rounded text-xs font-black text-white mono">${b.registration}</span><h4 class="text-lg font-black text-white mt-2">${b.shortName}</h4></div>
+                                <div class="text-right"><p class="text-[10px] text-slate-400 uppercase tracking-wider">Total Airtime</p><p class="text-xl font-bold text-white mono">${currentHrs.toFixed(1)} <span class="text-xs text-slate-400">Hrs</span></p></div>
+                            </div>
+                            <div class="space-y-2 mt-6">
+                                <div class="flex justify-between text-xs"><span class="text-slate-400">100‑Hr Airworthiness Status</span><span class="font-bold text-white mono">${percentageUsed}%</span></div>
+                                <div class="w-full bg-slate-800 rounded-full h-2.5 overflow-hidden"><div class="${barColor} h-full" style="width: ${percentageUsed}%"></div></div>
+                                <div class="flex justify-between text-[11px]"><span class="text-slate-500">Reset base: ${baselineHrs.toFixed(1)} hrs</span><span class="${percentageUsed >= 85 ? 'text-red-400 font-bold' : 'text-slate-300'} mono">Remaining: ${remainingMargin} hrs</span></div>
+                            </div>
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                });
+            }
+
+            let riskCount = 0;
+            certificates.forEach(c => {
+                if (c.permitStatus === "Critical" || c.permitStatus === "Warning") riskCount++;
+            });
+            document.getElementById("bannerCount").innerText = riskCount;
+            document.getElementById("globalNoticeBanner").classList.toggle("hidden", riskCount === 0);
+
+            if (fleet.length === 0) return;
+
+            // Balloon leaderboard
+            const balloonDiv = document.getElementById("balloonLeaderboard");
+            const sortedBalloons = [...fleet].sort((a,b) => (parseFloat(b.totalHours)||0) - (parseFloat(a.totalHours)||0));
+            balloonDiv.innerHTML = sortedBalloons.map((b, idx) => `
+                <div class="flex justify-between items-center border-b border-white/10 pb-2">
+                    <div class="flex items-center gap-2"><span class="text-orange-400 font-mono w-5">${idx+1}</span><span class="font-bold">${b.registration} (${b.shortName})</span></div>
+                    <span class="mono text-slate-300">${(parseFloat(b.totalHours)||0).toFixed(1)} hrs</span>
+                </div>
+            `).join('');
+
+            // Pilot leaderboard
+            const pilotDiv = document.getElementById("pilotLeaderboard");
+            if (insights && insights.length) {
+                const sortedPilots = [...insights].sort((a,b) => (b.flights||0) - (a.flights||0));
+                pilotDiv.innerHTML = sortedPilots.map((p, idx) => `
+                    <div class="flex justify-between items-center border-b border-white/10 pb-2">
+                        <div class="flex items-center gap-2"><span class="text-orange-400 font-mono w-5">${idx+1}</span><span class="font-bold">${p.name}</span></div>
+                        <span class="mono text-slate-300">${p.flights} flights · ${p.hours} hrs</span>
+                    </div>
+                `).join('');
+            } else {
+                pilotDiv.innerHTML = '<div class="text-slate-400 text-center py-4">No pilot data synced yet.</div>';
+            }
+
+            // Donut
+            let critical=0, warning=0, good=0;
+            fleet.forEach(b => {
+                const current = parseFloat(b.totalHours)||0;
+                const base = parseFloat(b.lastServiceHours)||0;
+                const remaining = 100 - (current - base);
+                if (remaining <= 0) critical++;
+                else if (remaining < 20) warning++;
+                else good++;
+            });
+            const donutCtx = document.getElementById('fleetDonut')?.getContext('2d');
+            if (donutCtx) {
+                if (fleetDonutChart) fleetDonutChart.destroy();
+                fleetDonutChart = new Chart(donutCtx, {
+                    type: 'doughnut',
+                    data: { labels: ['Airworthy (>20hrs left)', 'Due Soon (<20hrs)', 'Critical (Overdue)'], datasets: [{ data: [good, warning, critical], backgroundColor: ['#10b981', '#f59e0b', '#ef4444'], borderWidth: 0 }] },
+                    options: { cutout: '65%', plugins: { legend: { position: 'bottom', labels: { color: '#cbd5e1', font: { size: 10 } } } } }
+                });
+            }
+            document.getElementById("fleetStatusLegend").innerHTML = `<span class="text-emerald-400">● Airworthy: ${good}</span> <span class="text-amber-400">● Due soon: ${warning}</span> <span class="text-red-400">● Critical: ${critical}</span>`;
+
+            // Gauges
+            const gaugesContainer = document.getElementById("inspectionGauges");
+            gaugesContainer.innerHTML = fleet.map(b => {
+                const current = parseFloat(b.totalHours)||0;
+                const base = parseFloat(b.lastServiceHours)||0;
+                const used = Math.min(100, Math.max(0, current - base));
+                const remaining = Math.max(0, 100 - used);
+                const percent = (used / 100) * 100;
+                const color = remaining <= 0 ? '#ef4444' : (remaining < 20 ? '#f59e0b' : '#10b981');
+                return `
+                    <div class="flex items-center gap-4">
+                        <div class="relative w-12 h-12">
+                            <svg class="w-12 h-12 transform -rotate-90">
+                                <circle cx="24" cy="24" r="20" stroke="#2d3748" stroke-width="4" fill="none" />
+                                <circle class="progress-ring__circle" cx="24" cy="24" r="20" stroke="${color}" stroke-width="4" fill="none" stroke-dasharray="${2 * Math.PI * 20}" stroke-dashoffset="${2 * Math.PI * 20 * (1 - percent/100)}" />
+                            </svg>
+                            <div class="absolute inset-0 flex items-center justify-center text-[10px] font-bold">${Math.round(percent)}%</div>
+                        </div>
+                        <div class="flex-1"><span class="font-bold">${b.registration}</span><span class="text-slate-400 text-xs ml-2">${remaining.toFixed(1)} hrs left</span></div>
+                    </div>
+                `;
+            }).join('');
+
+            // Health gauge
+            let totalRemaining = 0;
+            fleet.forEach(b => {
+                const current = parseFloat(b.totalHours)||0;
+                const base = parseFloat(b.lastServiceHours)||0;
+                totalRemaining += Math.max(0, 100 - (current - base));
+            });
+            const avgRemaining = totalRemaining / fleet.length;
+            const healthPercent = Math.min(100, (avgRemaining / 100) * 100);
+            const healthCtx = document.getElementById('fleetHealthGauge')?.getContext('2d');
+            if (healthCtx) {
+                if (fleetHealthGauge) fleetHealthGauge.destroy();
+                fleetHealthGauge = new Chart(healthCtx, {
+                    type: 'doughnut',
+                    data: { datasets: [{ data: [healthPercent, 100-healthPercent], backgroundColor: ['#f97316', '#2d3748'], borderWidth: 0, cutout: '70%' }] },
+                    options: { plugins: { tooltip: { callbacks: { label: () => `Average remaining: ${avgRemaining.toFixed(1)} hrs` } }, legend: { display: false } } }
+                });
+                const parent = document.getElementById('fleetHealthGauge')?.parentNode;
+                if (parent) {
+                    let labelSpan = parent.querySelector('.health-label-custom');
+                    if (!labelSpan) { labelSpan = document.createElement('div'); labelSpan.className = "text-center mt-2 health-label-custom"; parent.appendChild(labelSpan); }
+                    labelSpan.innerHTML = `<span class="text-xl font-bold text-orange-400">${avgRemaining.toFixed(1)}</span><span class="text-xs text-slate-400"> hrs average</span>`;
+                }
+            }
+
+            // Certificates cards
+            renderCertCards();
+        }
+
+        function renderCertCards() {
+            const container = document.getElementById("certCardsContainer");
+            if (!certificates.length) { container.innerHTML = '<div class="col-span-full text-center text-slate-400">No certificate data loaded.</div>'; return; }
+            const today = new Date();
+            container.innerHTML = certificates.map(cert => {
+                const permitDate = new Date(cert.permitExpiry || cert["Permit Expiry"]);
+                const cofrDate = new Date(cert.cofrExpiry || cert["CofR Expiry"]);
+                const daysToPermit = Math.ceil((permitDate - today) / (1000*3600*24));
+                const daysToCofr = Math.ceil((cofrDate - today) / (1000*3600*24));
+                const permitFill = Math.min(100, Math.max(0, (daysToPermit / 365) * 100));
+                const cofrFill = Math.min(100, Math.max(0, (daysToCofr / 730) * 100));
+                const permitColor = daysToPermit < 30 ? '#ef4444' : (daysToPermit < 90 ? '#f59e0b' : '#10b981');
+                const cofrColor = daysToCofr < 30 ? '#ef4444' : (daysToCofr < 90 ? '#f59e0b' : '#10b981');
+                return `
+                    <div class="cert-card glass-panel rounded-2xl p-5 border border-white/10">
+                        <div class="flex justify-between items-start mb-3">
+                            <div><span class="text-2xl font-black">${cert.registration}</span><span class="text-xs text-slate-400 ml-2">${cert.shortName || cert["Short Name"]}</span></div>
+                            <span class="text-[10px] bg-emerald-500/20 text-emerald-300 px-2 py-1 rounded-full">Active</span>
+                        </div>
+                        <div class="space-y-4">
+                            <div><div class="flex justify-between text-xs mb-1"><span>Permit to Fly</span><span class="mono">${permitDate.toLocaleDateString()}</span><span class="${daysToPermit<0?'text-red-400':'text-slate-300'}">${daysToPermit<0?'Expired':daysToPermit+' days left'}</span></div><div class="expiry-bar"><div class="expiry-fill" style="width: ${permitFill}%; background: ${permitColor};"></div></div></div>
+                            <div><div class="flex justify-between text-xs mb-1"><span>CoFR (2-Year)</span><span class="mono">${cofrDate.toLocaleDateString()}</span><span class="${daysToCofr<0?'text-red-400':'text-slate-300'}">${daysToCofr<0?'Expired':daysToCofr+' days left'}</span></div><div class="expiry-bar"><div class="expiry-fill" style="width: ${cofrFill}%; background: ${cofrColor};"></div></div></div>
+                        </div>
+                        <div class="mt-4 pt-3 border-t border-white/10 text-center text-[11px] text-slate-400"><i class="fa-regular fa-circle-check text-emerald-400"></i> Fully compliant</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function filterCertCards() {
+            const query = document.getElementById("certSearch").value.toLowerCase();
+            const cards = document.querySelectorAll("#certCardsContainer .cert-card");
+            cards.forEach(card => {
+                const text = card.innerText.toLowerCase();
+                card.style.display = text.includes(query) ? "" : "none";
+            });
+        }
+
+        function showToast(title, body, variant = 'info') {
+            const toast = document.getElementById("toastNotification");
+            toast.innerHTML = "";
+            const iconContainer = document.createElement("div");
+            iconContainer.className = "p-2 rounded-xl text-lg";
+            let iconHtml = "", borderClass = "border-white/15";
+            if (variant === 'success') { borderClass = "border-emerald-500/40"; iconHtml = `<i class="fa-solid fa-circle-check text-emerald-400"></i>`; }
+            else if (variant === 'danger') { borderClass = "border-red-500/40"; iconHtml = `<i class="fa-solid fa-triangle-exclamation text-red-400"></i>`; }
+            else { borderClass = "border-orange-500/30"; iconHtml = `<i class="fa-solid fa-circle-info text-orange-400"></i>`; }
+            iconContainer.innerHTML = iconHtml;
+            const textDiv = document.createElement("div");
+            textDiv.className = "flex-1";
+            textDiv.innerHTML = `<h4 class="font-bold text-sm text-white">${title}</h4><p class="text-xs text-slate-300 mt-1">${body}</p>`;
+            toast.appendChild(iconContainer); toast.appendChild(textDiv);
+            toast.classList.add(borderClass);
+            toast.classList.remove("translate-y-24", "opacity-0");
+            setTimeout(() => toast.classList.add("translate-y-24", "opacity-0"), 4000);
+        }
+
+        window.toggleFormMode = toggleFormMode;
+        window.switchToTab = switchToTab;
+        window.submitLogbookEntry = submitLogbookEntry;
+        window.syncWithGoogleSheets = syncWithGoogleSheets;
+        window.filterCertCards = filterCertCards;
+        window.handleLogin = handleLogin;
+        window.handleLogout = handleLogout;
+    </script>
+</body>
+</html>
