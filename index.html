@@ -74,20 +74,9 @@
         .expiry-fill { height: 100%; border-radius: 10px; transition: width 0.3s; }
         .progress-ring__circle { transition: stroke-dashoffset 0.35s; transform: rotate(-90deg); transform-origin: 50% 50%; }
         .balloon-logo { filter: drop-shadow(0 4px 8px rgba(249,115,22,0.3)); }
-        /* Logbook table */
-        .sortable-header {
-            cursor: pointer;
-            user-select: none;
-            transition: background 0.2s;
-        }
-        .sortable-header:hover {
-            background: rgba(255,255,255,0.1);
-        }
-        .sort-icon {
-            margin-left: 0.25rem;
-            font-size: 0.7rem;
-            opacity: 0.6;
-        }
+        .sortable-header { cursor: pointer; user-select: none; transition: background 0.2s; }
+        .sortable-header:hover { background: rgba(255,255,255,0.1); }
+        .sort-icon { margin-left: 0.25rem; font-size: 0.7rem; opacity: 0.6; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col antialiased">
@@ -172,7 +161,7 @@
             </div>
         </div>
 
-        <!-- TABS (added Logbook) -->
+        <!-- TABS -->
         <div class="max-w-7xl mx-auto w-full px-6 pt-6">
             <div class="flex gap-1 border-b border-white/10 overflow-x-auto">
                 <button onclick="switchToTab('fleet')" id="tabBtn-fleet" class="tab-active px-6 py-3 text-sm font-bold transition-all flex items-center gap-2 rounded-t-xl whitespace-nowrap"><i class="fa-solid fa-helicopter"></i> Flight Logger</button>
@@ -187,7 +176,7 @@
 
         <main class="flex-grow max-w-7xl w-full mx-auto px-6 py-8 space-y-8">
             
-            <!-- TAB 1: FLIGHT LOGGER (unchanged, except no clickable cards) -->
+            <!-- TAB 1: FLIGHT LOGGER (modified to submit sheet-friendly names) -->
             <section id="tab-fleet" class="space-y-8 fade-slide-up">
                 <div id="fleetCardGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
                 <div class="glass-panel p-6 rounded-2xl">
@@ -213,43 +202,20 @@
                 </div>
             </section>
 
-            <!-- TAB 2: ANALYTICS (enhanced with new charts) -->
+            <!-- TAB 2: ANALYTICS (no changes needed here) -->
             <section id="tab-analysis" class="space-y-8 hidden fade-slide-up">
-                <!-- Existing leaderboards row -->
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div class="glass-panel rounded-2xl p-5">
-                        <div class="flex items-center gap-2 mb-4"><i class="fa-solid fa-trophy text-orange-400 text-xl"></i><h3 class="font-bold text-white text-md">🏆 Balloon Utilization Leaderboard</h3></div>
-                        <div id="balloonLeaderboard" class="space-y-3 text-sm"></div>
-                    </div>
-                    <div class="glass-panel rounded-2xl p-5">
-                        <div class="flex items-center gap-2 mb-4"><i class="fa-solid fa-user-astronaut text-orange-400 text-xl"></i><h3 class="font-bold text-white text-md">👨‍✈️ Pilot Flight Leaderboard</h3></div>
-                        <div id="pilotLeaderboard" class="space-y-3 text-sm"></div>
-                    </div>
+                    <div class="glass-panel rounded-2xl p-5"><div class="flex items-center gap-2 mb-4"><i class="fa-solid fa-trophy text-orange-400 text-xl"></i><h3 class="font-bold text-white text-md">🏆 Balloon Utilization Leaderboard</h3></div><div id="balloonLeaderboard" class="space-y-3 text-sm"></div></div>
+                    <div class="glass-panel rounded-2xl p-5"><div class="flex items-center gap-2 mb-4"><i class="fa-solid fa-user-astronaut text-orange-400 text-xl"></i><h3 class="font-bold text-white text-md">👨‍✈️ Pilot Flight Leaderboard</h3></div><div id="pilotLeaderboard" class="space-y-3 text-sm"></div></div>
                 </div>
-                <!-- Existing fleet health row -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="glass-panel rounded-2xl p-5"><h3 class="font-bold text-white mb-3 flex items-center gap-2"><i class="fa-solid fa-chart-simple"></i> Fleet Airworthiness Status</h3><div class="flex flex-col items-center"><canvas id="fleetDonut" width="200" height="200" class="w-40 h-40"></canvas><div id="fleetStatusLegend" class="flex justify-center gap-4 mt-3 text-xs flex-wrap"></div></div></div>
                     <div class="glass-panel rounded-2xl p-5"><h3 class="font-bold text-white mb-3 flex items-center gap-2"><i class="fa-regular fa-clock"></i> Hours until next 100hr inspection</h3><div id="inspectionGauges" class="space-y-4 max-h-80 overflow-y-auto pr-2"></div></div>
                 </div>
                 <div class="glass-panel rounded-2xl p-5"><div class="flex items-center gap-2 mb-4"><i class="fa-solid fa-gauge-high text-orange-400"></i><h3 class="font-bold text-white">Fleet Health Index</h3></div><div class="flex flex-col items-center"><div class="relative w-32 h-32"><canvas id="fleetHealthGauge" width="128" height="128" class="w-32 h-32"></canvas></div><p class="text-sm text-slate-300 mt-3 text-center">Average remaining hours before 100hr service</p><div id="healthIndexValue" class="text-center mt-1 text-orange-400 font-bold text-lg"></div></div></div>
-                
-                <!-- NEW: Monthly Flight Activity (multi-balloon line chart) -->
-                <div class="glass-panel rounded-2xl p-5">
-                    <h3 class="font-bold text-white mb-4 flex items-center gap-2"><i class="fa-solid fa-chart-line text-orange-400"></i> Monthly Flight Activity</h3>
-                    <canvas id="monthlyFlightsChart" width="800" height="300" style="max-height: 300px; width: 100%;"></canvas>
-                </div>
-                
-                <!-- NEW: Unscheduled Repairs Heatmap (cards) -->
-                <div class="glass-panel rounded-2xl p-5">
-                    <div class="flex items-center gap-2 mb-4"><i class="fa-solid fa-fire-flame-curved text-red-400"></i><h3 class="font-bold text-white">🛠️ Unscheduled Technical Repairs</h3></div>
-                    <div id="repairHeatmap" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
-                </div>
-                
-                <!-- NEW: Top Clients Leaderboard -->
-                <div class="glass-panel rounded-2xl p-5">
-                    <div class="flex items-center gap-2 mb-4"><i class="fa-solid fa-handshake text-orange-400"></i><h3 class="font-bold text-white">🏆 Top Clients / Events</h3></div>
-                    <div id="topClientsList" class="space-y-2 text-sm"></div>
-                </div>
+                <div class="glass-panel rounded-2xl p-5"><h3 class="font-bold text-white mb-4 flex items-center gap-2"><i class="fa-solid fa-chart-line text-orange-400"></i> Monthly Flight Activity</h3><canvas id="monthlyFlightsChart" width="800" height="300" style="max-height: 300px; width: 100%;"></canvas></div>
+                <div class="glass-panel rounded-2xl p-5"><div class="flex items-center gap-2 mb-4"><i class="fa-solid fa-fire-flame-curved text-red-400"></i><h3 class="font-bold text-white">🛠️ Unscheduled Technical Repairs</h3></div><div id="repairHeatmap" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div></div>
+                <div class="glass-panel rounded-2xl p-5"><div class="flex items-center gap-2 mb-4"><i class="fa-solid fa-handshake text-orange-400"></i><h3 class="font-bold text-white">🏆 Top Clients / Events</h3></div><div id="topClientsList" class="space-y-2 text-sm"></div></div>
             </section>
 
             <!-- TAB 3: RENEWALS REGISTRY (unchanged) -->
@@ -263,7 +229,7 @@
                 <div class="glass-panel rounded-2xl overflow-hidden p-1"><div class="px-5 pt-5 pb-2 flex justify-between items-center flex-wrap gap-3"><div><h3 class="text-lg font-bold text-white flex items-center gap-2"><i class="fa-regular fa-calendar-circle-plus text-orange-400"></i> Fleet & Event Calendar</h3><p class="text-xs text-slate-400">Integrated Google Calendar — operational flights, maintenance windows & corporate events</p></div><a href="https://calendar.google.com/calendar/u/0/r" target="_blank" class="text-xs bg-white/5 border border-white/15 rounded-xl px-3 py-2 text-slate-300 hover:text-white hover:border-orange-500 transition flex items-center gap-2"><i class="fa-solid fa-arrow-up-right-from-square"></i> Open in Google</a></div><div class="p-1"><iframe class="calendar-iframe" src="https://calendar.google.com/calendar/embed?showCalendars=1&mode=MONTH&src=akaballoonsb%40gmail.com&src=gff8tq53eren4hloo7rdgiv7b4%40group.calendar.google.com&src=g16ndapjat4lholjhkdu6c0ogs%40group.calendar.google.com&ctz=Asia%2FKuala_Lumpur" frameborder="0" scrolling="no" style="width:100%; height:700px; border-radius: 20px; background: rgba(0,0,0,0.2);"></iframe></div></div>
             </section>
 
-            <!-- TAB 5: LOGBOOK (new) -->
+            <!-- TAB 5: LOGBOOK (with fixed aircraft name matching) -->
             <section id="tab-logbook" class="space-y-6 hidden fade-slide-up">
                 <div class="glass-panel rounded-2xl p-5">
                     <h3 class="font-bold text-white mb-4 flex items-center gap-2"><i class="fa-solid fa-book-open text-orange-400"></i> Aircraft Flight Logs</h3>
@@ -276,18 +242,8 @@
                     <div class="overflow-x-auto">
                         <table class="logs-table w-full text-left text-sm" id="logbookTable">
                             <thead class="bg-slate-900/80 text-slate-300 text-[10px] uppercase sticky top-0">
-                                <tr>
-                                    <th class="px-4 py-3 sortable-header" data-sort="date">Date <span class="sort-icon"><i class="fa-solid fa-sort"></i></span></th>
-                                    <th class="px-4 py-3 sortable-header" data-sort="company">Company <span class="sort-icon"><i class="fa-solid fa-sort"></i></span></th>
-                                    <th class="px-4 py-3 sortable-header" data-sort="pilot">Pilot <span class="sort-icon"><i class="fa-solid fa-sort"></i></span></th>
-                                    <th class="px-4 py-3 sortable-header" data-sort="client">Client / Event <span class="sort-icon"><i class="fa-solid fa-sort"></i></span></th>
-                                    <th class="px-4 py-3 sortable-header" data-sort="flightTime">Flight Time <span class="sort-icon"><i class="fa-solid fa-sort"></i></span></th>
-                                    <th class="px-4 py-3 sortable-header" data-sort="remarks">Technical Remarks <span class="sort-icon"><i class="fa-solid fa-sort"></i></span></th>
-                                </tr>
-                            </thead>
-                            <tbody id="logbookTableBody" class="divide-y divide-white/10">
-                                <tr><td colspan="6" class="px-4 py-8 text-center text-slate-400">Select an aircraft to view logs.</td></tr>
-                            </tbody>
+                                <tr><th class="px-4 py-3 sortable-header" data-sort="date">Date <span class="sort-icon"><i class="fa-solid fa-sort"></i></span></th><th class="px-4 py-3 sortable-header" data-sort="company">Company <span class="sort-icon"><i class="fa-solid fa-sort"></i></span></th><th class="px-4 py-3 sortable-header" data-sort="pilot">Pilot <span class="sort-icon"><i class="fa-solid fa-sort"></i></span></th><th class="px-4 py-3 sortable-header" data-sort="client">Client / Event <span class="sort-icon"><i class="fa-solid fa-sort"></i></span></th><th class="px-4 py-3 sortable-header" data-sort="flightTime">Flight Time <span class="sort-icon"><i class="fa-solid fa-sort"></i></span></th><th class="px-4 py-3 sortable-header" data-sort="remarks">Technical Remarks <span class="sort-icon"><i class="fa-solid fa-sort"></i></span></th></tr></thead>
+                            <tbody id="logbookTableBody" class="divide-y divide-white/10"><tr><td colspan="6" class="px-4 py-8 text-center text-slate-400">Select an aircraft to view logs.</td></tr></tbody>
                         </table>
                     </div>
                 </div>
@@ -302,8 +258,43 @@
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzyq9GFuGnFde4dw5KhuA1oM8Jn5mVKX8H9vySgdIUdpJbfYeJpOlo3ujA0RMfSPR0/exec";
         const DASHBOARD_PASSWORD = "Rudy56";
 
+        // Mapping from registration (or short name) to the exact sheet string
+        const SHEET_AIRCRAFT_NAMES = {
+            "9M-AKA": "AKA",
+            "AKA": "AKA",
+            "9M-BFW": "Moon",
+            "MOON": "Moon",
+            "Moon": "Moon",
+            "9M-BFV": "Patch",
+            "PATCH": "Patch",
+            "Patch": "Patch",
+            "9M-BGE": "Bowie",
+            "BOWIE": "Bowie",
+            "Bowie": "Bowie",
+            "9M-BGC": "Gamuda",
+            "GAMUDA": "Gamuda",
+            "Gamuda": "Gamuda",
+            "9M-RDY": "Rudy",
+            "RUDY": "Rudy",
+            "Rudy": "Rudy"
+        };
+
         let fleet = [], certificates = [], insights = [], allLogs = [], currentOperatorName = "";
         let fleetDonutChart = null, fleetHealthGauge = null, monthlyChart = null;
+
+        // Helper: Convert any aircraft identifier (registration, short name) to sheet‑friendly name
+        function toSheetAircraftName(input) {
+            if (!input) return "";
+            let key = input.toString().trim();
+            // Try direct mapping
+            if (SHEET_AIRCRAFT_NAMES[key]) return SHEET_AIRCRAFT_NAMES[key];
+            // Try lowercased matching for flexibility
+            const lower = key.toLowerCase();
+            for (let [k, v] of Object.entries(SHEET_AIRCRAFT_NAMES)) {
+                if (k.toLowerCase() === lower) return v;
+            }
+            return key; // fallback
+        }
 
         // ---------- LOGIN / LOGOUT ----------
         function handleLogin(e) {
@@ -387,7 +378,7 @@
             .finally(() => { icon.classList.remove("fa-spin"); text.innerText = "Sync Live Data"; });
         }
 
-        // ---------- SUBMIT LOGBOOK ----------
+        // ---------- SUBMIT LOGBOOK (using sheet‑friendly aircraft name) ----------
         function submitLogbookEntry(e) {
             e.preventDefault();
             const btn = document.getElementById("formSubmitBtn");
@@ -396,10 +387,14 @@
             if (mode === "Audit") companyField = "Annual Structural Airworthiness Audit";
             else if (mode === "Repair") companyField = "Maintenance Repair Service";
 
+            // Get the selected aircraft option value (which now stores the sheet name)
+            const selectedOption = document.getElementById("formAircraft");
+            const sheetAircraft = selectedOption.options[selectedOption.selectedIndex]?.getAttribute("data-sheetname") || selectedOption.value;
+
             const payload = {
                 date: document.getElementById("formDate").value,
                 company: companyField,
-                aircraft: document.getElementById("formAircraft").value,
+                aircraft: sheetAircraft,
                 hours: mode === "Audit" ? 0 : (parseFloat(document.getElementById("formHours").value) || 0),
                 minutes: mode === "Audit" ? 0 : (parseFloat(document.getElementById("formMinutes").value) || 0),
                 pilot: mode === "Audit" ? "" : (document.getElementById("formPilot").value || "Engineering Crew"),
@@ -434,9 +429,9 @@
             });
         }
 
-        // ---------- RENDER DASHBOARD (including new analytics & logbook) ----------
+        // ---------- RENDER DASHBOARD (all sections) ----------
         function renderDashboard() {
-            // 1. Fleet cards (non-clickable) + aircraft dropdown
+            // 1. Fleet cards + populate aircraft dropdown (store sheet name in data attribute)
             const grid = document.getElementById("fleetCardGrid");
             const select = document.getElementById("formAircraft");
             grid.innerHTML = "";
@@ -446,10 +441,13 @@
                 select.innerHTML = '<option>No aircraft available</option>';
             } else {
                 fleet.forEach(b => {
+                    const sheetName = toSheetAircraftName(b.shortName) || toSheetAircraftName(b.registration);
                     const opt = document.createElement("option");
                     opt.value = b.registration;
+                    opt.setAttribute("data-sheetname", sheetName);
                     opt.innerText = `${b.registration} (${b.shortName})`;
                     select.appendChild(opt);
+
                     const currentHrs = parseFloat(b.totalHours) || 0;
                     const baseHrs = parseFloat(b.lastServiceHours) || 0;
                     const delta = currentHrs - baseHrs;
@@ -474,7 +472,7 @@
             document.getElementById("globalNoticeBanner").classList.toggle("hidden", risk === 0);
             if (fleet.length === 0) return;
 
-            // 3. Existing analytics (leaderboards, donut, gauges, health)
+            // 3. Existing analytics
             const balloonDiv = document.getElementById("balloonLeaderboard");
             const sortedB = [...fleet].sort((a,b) => (parseFloat(b.totalHours)||0) - (parseFloat(a.totalHours)||0));
             balloonDiv.innerHTML = sortedB.map((b, i) => `<div class="flex justify-between items-center border-b border-white/10 pb-2"><div class="flex items-center gap-2"><span class="text-orange-400 font-mono w-5">${i+1}</span><span class="font-bold">${b.registration} (${b.shortName})</span></div><span class="mono text-slate-300">${(parseFloat(b.totalHours)||0).toFixed(1)} hrs</span></div>`).join('');
@@ -504,63 +502,31 @@
             if (healthCtx) { if (fleetHealthGauge) fleetHealthGauge.destroy(); fleetHealthGauge = new Chart(healthCtx, { type: 'doughnut', data: { datasets: [{ data: [Math.min(100, (avgRem/100)*100), 100-Math.min(100, (avgRem/100)*100)], backgroundColor: ['#f97316', '#2d3748'], borderWidth: 0, cutout: '70%' }] }, options: { plugins: { tooltip: { callbacks: { label: () => `Average remaining: ${avgRem.toFixed(1)} hrs` } }, legend: { display: false } } } }); }
             document.getElementById("healthIndexValue").innerHTML = `<span class="text-2xl font-bold">${avgRem.toFixed(1)}</span> <span class="text-xs text-slate-400">hrs average</span>`;
 
-            // 4. NEW ANALYTICS: Monthly flights (line chart)
+            // NEW analytics
             renderMonthlyFlightsChart();
-            
-            // 5. NEW ANALYTICS: Repairs heatmap
             renderRepairHeatmap();
-            
-            // 6. NEW ANALYTICS: Top clients leaderboard
             renderTopClients();
-            
-            // 7. Certificates cards (unchanged)
             renderCertCards();
-            
-            // 8. LOGBOOK TAB: populate dropdown and setup event
             populateLogbookDropdown();
             attachLogbookSorting();
         }
         
-        // --- Monthly flights chart (multi-balloon line chart) ---
+        // --- Monthly flights chart (uses sheet names for matching) ---
         function renderMonthlyFlightsChart() {
             if (!allLogs.length) return;
-            // Group logs by month and aircraft
             const months = [];
-            const monthMap = new Map(); // "YYYY-MM" -> index
+            const monthMap = new Map();
             const aircraftSet = new Set();
-            // Prepare aircraft mapping (normalize names)
-            const aircraftMap = {};
-            fleet.forEach(b => {
-                aircraftMap[b.registration] = b.shortName;
-                aircraftMap[b.shortName] = b.registration;
-            });
-            // Normalize aircraft name to registration key
-            function normalizeAircraft(name) {
-                let up = name.trim().toUpperCase();
-                if (up === "AKA") return "9M-AKA";
-                if (up === "MOON") return "9M-BFW";
-                if (up === "PATCH") return "9M-BFV";
-                if (up === "BOWIE") return "9M-BGE";
-                if (up === "GAMUDA") return "9M-BGC";
-                if (up === "RUDY") return "9M-RDY";
-                if (up === "9M-AKA" || up === "9M-BFW" || up === "9M-BFV" || up === "9M-BGE" || up === "9M-BGC" || up === "9M-RDY") return up;
-                return name;
-            }
-            // Process logs
             allLogs.forEach(log => {
                 const date = new Date(log.date);
                 if (isNaN(date)) return;
                 const yearMonth = `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}`;
-                if (!monthMap.has(yearMonth)) {
-                    monthMap.set(yearMonth, months.length);
-                    months.push(yearMonth);
-                }
-                const aircraftRaw = normalizeAircraft(log.aircraft);
-                if (!aircraftSet.has(aircraftRaw)) aircraftSet.add(aircraftRaw);
+                if (!monthMap.has(yearMonth)) { monthMap.set(yearMonth, months.length); months.push(yearMonth); }
+                const ac = toSheetAircraftName(log.aircraft);
+                if (ac) aircraftSet.add(ac);
             });
-            months.sort(); // chronological
+            months.sort();
             const aircrafts = Array.from(aircraftSet).sort();
-            // Build datasets: one per aircraft
             const datasets = aircrafts.map(ac => {
                 const data = new Array(months.length).fill(0);
                 allLogs.forEach(log => {
@@ -568,84 +534,45 @@
                     if (isNaN(date)) return;
                     const ym = `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}`;
                     const idx = monthMap.get(ym);
-                    if (idx !== undefined && normalizeAircraft(log.aircraft) === ac) {
-                        data[idx] += 1; // count flights
-                    }
+                    if (idx !== undefined && toSheetAircraftName(log.aircraft) === ac) data[idx] += 1;
                 });
-                // assign a color
                 const colors = ['#3b82f6', '#f97316', '#10b981', '#8b5cf6', '#ef4444', '#f59e0b'];
                 const color = colors[aircrafts.indexOf(ac) % colors.length];
-                return {
-                    label: ac,
-                    data: data,
-                    borderColor: color,
-                    backgroundColor: color + '20',
-                    tension: 0.2,
-                    fill: false,
-                    pointRadius: 3,
-                    pointHoverRadius: 5
-                };
+                return { label: ac, data: data, borderColor: color, backgroundColor: color+'20', tension: 0.2, fill: false, pointRadius: 3, pointHoverRadius: 5 };
             });
             const ctx = document.getElementById('monthlyFlightsChart')?.getContext('2d');
             if (ctx) {
                 if (monthlyChart) monthlyChart.destroy();
-                monthlyChart = new Chart(ctx, {
-                    type: 'line',
-                    data: { labels: months.map(m => m.substring(5) + '/' + m.substring(0,4)), datasets: datasets },
-                    options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'top', labels: { color: '#cbd5e1', font: { size: 10 } } }, tooltip: { mode: 'index', intersect: false } }, scales: { y: { title: { display: true, text: 'Number of Flights', color: '#94a3b8' }, grid: { color: '#1e293b' }, ticks: { color: '#cbd5e1' } }, x: { ticks: { color: '#cbd5e1', rotate: 45, autoSkip: true, maxRotation: 45 } } } }
-                });
+                monthlyChart = new Chart(ctx, { type: 'line', data: { labels: months.map(m => m.substring(5)+'/'+m.substring(0,4)), datasets: datasets }, options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'top', labels: { color: '#cbd5e1', font: { size: 10 } } } }, scales: { y: { title: { display: true, text: 'Number of Flights', color: '#94a3b8' }, grid: { color: '#1e293b' }, ticks: { color: '#cbd5e1' } }, x: { ticks: { color: '#cbd5e1', rotate: 45, autoSkip: true, maxRotation: 45 } } } } });
             }
         }
         
-        // --- Repair heatmap (cards) ---
+        // --- Repair heatmap ---
         function renderRepairHeatmap() {
             const repairCounts = {};
             allLogs.forEach(log => {
                 const company = (log.company || "").toLowerCase();
                 if (company.includes("repair") || company.includes("maintenance repair")) {
-                    let ac = log.aircraft;
-                    // normalize
-                    if (ac === "AKA") ac = "9M-AKA";
-                    if (ac === "MOON") ac = "9M-BFW";
-                    if (ac === "PATCH") ac = "9M-BFV";
-                    if (ac === "BOWIE") ac = "9M-BGE";
-                    if (ac === "GAMUDA") ac = "9M-BGC";
-                    if (ac === "RUDY") ac = "9M-RDY";
-                    repairCounts[ac] = (repairCounts[ac] || 0) + 1;
+                    let ac = toSheetAircraftName(log.aircraft);
+                    if (ac) repairCounts[ac] = (repairCounts[ac] || 0) + 1;
                 }
             });
             const container = document.getElementById("repairHeatmap");
-            if (Object.keys(repairCounts).length === 0) {
-                container.innerHTML = '<div class="col-span-full text-center text-slate-400 py-4">No unscheduled repairs logged yet.</div>';
-                return;
-            }
-            container.innerHTML = Object.entries(repairCounts).map(([ac, count]) => {
-                let short = fleet.find(b => b.registration === ac)?.shortName || ac;
-                return `<div class="bg-slate-900/40 rounded-xl p-3 text-center border border-white/5"><div class="font-mono text-orange-400 font-bold">${ac} (${short})</div><div class="text-2xl font-black mt-1">${count}</div><div class="text-[10px] text-slate-400">unscheduled repair(s)</div></div>`;
-            }).join('');
+            if (Object.keys(repairCounts).length === 0) { container.innerHTML = '<div class="col-span-full text-center text-slate-400 py-4">No unscheduled repairs logged yet.</div>'; return; }
+            container.innerHTML = Object.entries(repairCounts).map(([ac, count]) => `<div class="bg-slate-900/40 rounded-xl p-3 text-center border border-white/5"><div class="font-mono text-orange-400 font-bold">${ac}</div><div class="text-2xl font-black mt-1">${count}</div><div class="text-[10px] text-slate-400">unscheduled repair(s)</div></div>`).join('');
         }
         
-        // --- Top clients leaderboard ---
+        // --- Top clients ---
         function renderTopClients() {
             const clientCount = {};
             allLogs.forEach(log => {
                 const client = (log.client || "").trim();
-                if (client && client !== "" && client !== "N/A") {
-                    clientCount[client] = (clientCount[client] || 0) + 1;
-                }
+                if (client && client !== "" && client !== "N/A") clientCount[client] = (clientCount[client] || 0) + 1;
             });
             const sorted = Object.entries(clientCount).sort((a,b) => b[1] - a[1]).slice(0,10);
             const container = document.getElementById("topClientsList");
-            if (sorted.length === 0) {
-                container.innerHTML = '<div class="text-slate-400 text-center py-4">No client data available.</div>';
-                return;
-            }
-            container.innerHTML = sorted.map(([client, count], idx) => `
-                <div class="flex justify-between items-center border-b border-white/10 pb-2">
-                    <div class="flex items-center gap-2"><span class="text-orange-400 font-mono w-6">${idx+1}</span><span class="font-medium">${client}</span></div>
-                    <span class="mono text-slate-300">${count} flights</span>
-                </div>
-            `).join('');
+            if (sorted.length === 0) { container.innerHTML = '<div class="text-slate-400 text-center py-4">No client data available.</div>'; return; }
+            container.innerHTML = sorted.map(([client, count], idx) => `<div class="flex justify-between items-center border-b border-white/10 pb-2"><div class="flex items-center gap-2"><span class="text-orange-400 font-mono w-6">${idx+1}</span><span class="font-medium">${client}</span></div><span class="mono text-slate-300">${count} flights</span></div>`).join('');
         }
         
         // --- Certificates cards ---
@@ -665,23 +592,22 @@
             }).join('');
         }
         
-        // --- LOGBOOK TAB: populate dropdown from fleet ---
+        // --- LOGBOOK TAB: populate dropdown with sheet names for matching ---
         function populateLogbookDropdown() {
             const select = document.getElementById("logbookAircraftSelect");
             select.innerHTML = '<option value="">-- Choose an aircraft --</option>';
             if (fleet.length) {
                 fleet.forEach(b => {
+                    const sheetName = toSheetAircraftName(b.shortName) || toSheetAircraftName(b.registration);
                     const option = document.createElement("option");
-                    option.value = b.registration;
+                    option.value = sheetName;
                     option.textContent = `${b.registration} (${b.shortName})`;
                     select.appendChild(option);
                 });
                 select.onchange = () => {
-                    const selected = select.value;
-                    if (selected) renderLogbookTable(selected);
-                    else {
-                        document.getElementById("logbookTableBody").innerHTML = '<tr><td colspan="6" class="px-4 py-8 text-center text-slate-400">Select an aircraft to view logs.</td></tr>';
-                    }
+                    const selectedSheetName = select.value;
+                    if (selectedSheetName) renderLogbookTable(selectedSheetName);
+                    else document.getElementById("logbookTableBody").innerHTML = '<tr><td colspan="6" class="px-4 py-8 text-center text-slate-400">Select an aircraft to view logs.</td></tr>';
                 };
             }
         }
@@ -689,18 +615,8 @@
         let currentSort = { column: 'date', direction: 'desc' };
         let currentLogsData = [];
         
-        function renderLogbookTable(aircraftReg) {
-            // normalize logs aircraft names to match registration
-            const filtered = allLogs.filter(log => {
-                let ac = log.aircraft;
-                if (ac === "AKA") ac = "9M-AKA";
-                if (ac === "MOON") ac = "9M-BFW";
-                if (ac === "PATCH") ac = "9M-BFV";
-                if (ac === "BOWIE") ac = "9M-BGE";
-                if (ac === "GAMUDA") ac = "9M-BGC";
-                if (ac === "RUDY") ac = "9M-RDY";
-                return ac === aircraftReg;
-            }).map(log => ({
+        function renderLogbookTable(sheetName) {
+            const filtered = allLogs.filter(log => toSheetAircraftName(log.aircraft) === sheetName).map(log => ({
                 date: log.date,
                 company: log.company || "-",
                 pilot: log.pilot || "-",
@@ -728,29 +644,14 @@
                 return 0;
             });
             const tbody = document.getElementById("logbookTableBody");
-            if (sorted.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" class="px-4 py-8 text-center text-slate-400">No flight logs found for this aircraft.</td></tr>';
-                return;
-            }
-            tbody.innerHTML = sorted.map(row => `
-                <tr class="hover:bg-white/5">
-                    <td class="px-4 py-3 font-mono text-xs">${row.date ? new Date(row.date).toLocaleDateString('en-GB') : "N/A"}</td>
-                    <td class="px-4 py-3 text-xs">${row.company}</td>
-                    <td class="px-4 py-3 text-xs">${row.pilot}</td>
-                    <td class="px-4 py-3 text-xs">${row.client}</td>
-                    <td class="px-4 py-3 text-xs font-mono">${row.flightTime}</td>
-                    <td class="px-4 py-3 text-xs max-w-xs truncate" title="${row.remarks}">${row.remarks}</td>
-                </tr>
-            `).join('');
+            if (sorted.length === 0) { tbody.innerHTML = '<tr><td colspan="6" class="px-4 py-8 text-center text-slate-400">No flight logs found for this aircraft.</td></tr>'; return; }
+            tbody.innerHTML = sorted.map(row => `<tr class="hover:bg-white/5"><td class="px-4 py-3 font-mono text-xs">${row.date ? new Date(row.date).toLocaleDateString('en-GB') : "N/A"}<\/td><td class="px-4 py-3 text-xs">${row.company}<\/td><td class="px-4 py-3 text-xs">${row.pilot}<\/td><td class="px-4 py-3 text-xs">${row.client}<\/td><td class="px-4 py-3 text-xs font-mono">${row.flightTime}<\/td><td class="px-4 py-3 text-xs max-w-xs truncate" title="${row.remarks}">${row.remarks}<\/td><\/tr>`).join('');
             // update sort icons
             document.querySelectorAll("#logbookTable .sortable-header").forEach(th => {
                 const colName = th.getAttribute("data-sort");
                 const icon = th.querySelector(".sort-icon i");
-                if (colName === currentSort.column) {
-                    icon.className = currentSort.direction === 'asc' ? "fa-solid fa-arrow-up-wide-short" : "fa-solid fa-arrow-down-wide-short";
-                } else {
-                    icon.className = "fa-solid fa-sort";
-                }
+                if (colName === currentSort.column) icon.className = currentSort.direction === 'asc' ? "fa-solid fa-arrow-up-wide-short" : "fa-solid fa-arrow-down-wide-short";
+                else icon.className = "fa-solid fa-sort";
             });
         }
         
@@ -759,12 +660,8 @@
             headers.forEach(th => {
                 th.addEventListener("click", () => {
                     const col = th.getAttribute("data-sort");
-                    if (currentSort.column === col) {
-                        currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
-                    } else {
-                        currentSort.column = col;
-                        currentSort.direction = 'desc';
-                    }
+                    if (currentSort.column === col) currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+                    else { currentSort.column = col; currentSort.direction = 'desc'; }
                     applySortingAndRender();
                 });
             });
@@ -794,7 +691,6 @@
             setTimeout(() => toast.classList.add("translate-y-24", "opacity-0"), 4000);
         }
 
-        // Expose globals
         window.toggleFormMode = toggleFormMode;
         window.switchToTab = switchToTab;
         window.submitLogbookEntry = submitLogbookEntry;
