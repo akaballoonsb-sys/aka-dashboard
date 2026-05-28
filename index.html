@@ -78,7 +78,6 @@
         .sortable-header:hover { background: rgba(255,255,255,0.1); }
         .sort-icon { margin-left: 0.25rem; font-size: 0.7rem; opacity: 0.6; }
         
-        /* Collapsible sidebar */
         .sidebar {
             position: fixed;
             top: 0;
@@ -120,7 +119,6 @@
             background: rgba(249, 115, 22, 1);
             padding-right: 10px;
         }
-        /* message status badge */
         .status-badge {
             font-size: 0.7rem;
             padding: 0.2rem 0.6rem;
@@ -164,166 +162,308 @@
                     <label class="block text-xs font-semibold uppercase tracking-wider text-slate-300 mb-2">Access Passkey</label>
                     <input type="password" id="passwordInput" required class="w-full px-4 py-3 bg-slate-950/60 border border-slate-700 rounded-xl text-white focus:border-orange-500" placeholder="••••••••">
                 </div>
-                <div id="loginError" class="hidden text-sm text-red-400 flex items-center gap-2 bg-red-950/30 p-3 rounded-xl"><i class="fa-solid fa-circle-exclamation"></i><span>Access Denied. Invalid credentials.</span></div>
-                <button type="submit" class="w-full py-3 bg-gradient-to-r from-orange-500 to-amber-600 text-white font-bold rounded-xl shadow-lg flex items-center justify-center gap-2 hover:shadow-orange-500/25 transition-all"><i class="fa-regular fa-keyboard"></i> Authorize session</button>
+                <div id="loginError" class="hidden text-sm text-red-400 flex items-center gap-2 bg-red-950/40 border border-red-500/30 p-3 rounded-xl">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    <span>Incorrect passkey. Please try again.</span>
+                </div>
+                <button type="submit" class="w-full py-3.5 bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white font-semibold rounded-xl tracking-wide shadow-lg shadow-orange-500/10 transition duration-200">
+                    Authenticate Operator
+                </button>
             </form>
         </div>
     </div>
 
-    <div id="welcomeOverlay" class="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-xl hidden">
-        <div class="text-center">
-            <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-white/5 border border-white/20 text-4xl mb-6">
-                <svg class="w-10 h-10 text-orange-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                    <path d="M12 2a8 8 0 0 0-8 8c0 3 2 5 4 7s2 4 2 5h4c0-1 0-3 2-5s4-4 4-7a8 8 0 0 0-8-8z" />
-                    <path d="M12 2v20" />
-                    <path d="M8 22h8" />
-                </svg>
-            </div>
-            <h1 id="welcomeMessage" class="text-3xl md:text-5xl font-extrabold tracking-tight bg-gradient-to-r from-white to-orange-300 bg-clip-text text-transparent">Welcome,</h1>
-            <p class="text-slate-400 text-sm mt-3 tracking-wide">accessing flight intelligence</p>
-        </div>
-    </div>
+    <div id="mainDashboard" class="hidden flex-1 flex flex-col md:flex-row relative">
 
-    <div id="teamSidebar" class="sidebar">
-        <div class="flex flex-col h-full p-4">
-            <div class="flex justify-between items-center border-b border-white/10 pb-3 mb-4">
-                <h2 class="text-lg font-bold text-white"><i class="fa-regular fa-message text-orange-400 mr-2"></i> Team Comms</h2>
-                <button id="closeSidebarBtn" class="text-slate-400 hover:text-white text-xl">&times;</button>
-            </div>
-            <div id="messagesContainer" class="flex-1 overflow-y-auto space-y-4 pr-1" style="max-height: calc(100vh - 200px);">
-                <div class="text-center text-slate-400 py-8">Loading messages...</div>
-            </div>
-            <div class="border-t border-white/10 pt-4 mt-4">
-                <textarea id="newMessageText" rows="2" placeholder="What's on your mind?" class="w-full bg-slate-900/70 border border-slate-700 rounded-xl px-3 py-2 text-sm resize-none"></textarea>
-                <button id="postMessageBtn" class="mt-2 w-full py-2 bg-orange-500/80 hover:bg-orange-500 text-white font-bold rounded-xl transition-all">Post</button>
-            </div>
+        <div class="sidebar-toggle text-white" id="sidebarToggle" onclick="toggleSidebar()">
+            <i class="fa-solid fa-angles-right mr-1" id="toggleChevron"></i> Operations Log
         </div>
-    </div>
-    <div id="sidebarToggle" class="sidebar-toggle">
-        <i class="fa-regular fa-comments"></i> TEAM
-    </div>
 
-    <div id="dashboardContainer" class="hidden flex-1 flex-col">
-        <header class="glass-panel sticky top-0 z-40 mx-6 mt-4 rounded-2xl px-5 py-3 shadow-xl border-b-0">
-            <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
-                <div class="flex items-center gap-3">
-                    <div class="h-11 w-11 rounded-xl bg-gradient-to-br from-orange-500 to-amber-600 flex items-center justify-center shadow-lg balloon-logo">
-                        <svg class="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-                            <path d="M12 2a8 8 0 0 0-8 8c0 3 2 5 4 7s2 4 2 5h4c0-1 0-3 2-5s4-4 4-7a8 8 0 0 0-8-8z" />
-                            <path d="M12 2v20" />
-                            <path d="M8 22h8" />
-                            <circle cx="12" cy="10" r="3" fill="rgba(255,255,255,0.2)" stroke="currentColor"/>
-                        </svg>
-                    </div>
+        <aside class="sidebar p-6 flex flex-col justify-between shadow-2xl" id="opsSidebar">
+            <div class="flex-1 overflow-y-auto pr-1">
+                <div class="flex justify-between items-center mb-6 pb-4 border-b border-white/5">
                     <div>
-                        <h2 class="text-xl font-extrabold tracking-tight text-white flex items-center gap-2">AKA & MBA FLEET OPERATIONS <span class="text-[11px] bg-orange-500/20 border border-orange-500/40 text-orange-300 px-2 py-0.5 rounded-full font-bold"><i class="fa-regular fa-bell"></i> LIVE</span></h2>
-                        <p class="text-xs text-slate-400">Balloon logs · Pilot intel · Maintenance registry · Flight schedule</p>
+                        <h2 class="text-lg font-bold text-orange-400 tracking-tight">Logbook Submission</h2>
+                        <p class="text-xs text-slate-400 mt-0.5">Submit operational & maintenance records</p>
                     </div>
+                    <button class="md:hidden text-slate-400 hover:text-white p-2" onclick="toggleSidebar()">
+                        <i class="fa-solid fa-xmark text-xl"></i>
+                    </button>
                 </div>
-                <div class="flex items-center gap-4 text-xs">
-                    <div id="loggedAsLabel" class="text-slate-300 bg-white/5 px-3 py-1.5 rounded-full border border-white/10 hidden md:block">
-                        <i class="fa-regular fa-user text-orange-400 mr-1"></i> Logged as <span id="loggedAsName">---</span>
-                    </div>
-                    <button onclick="syncWithGoogleSheets()" class="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-slate-200 hover:bg-orange-500/20 hover:border-orange-500/40 transition-all"><i id="syncIcon" class="fa-solid fa-rotate text-orange-400"></i><span id="syncText">Sync Live Data</span></button>
-                    <button onclick="handleLogout()" class="px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-slate-300 hover:text-white hover:border-red-500/50"><i class="fa-solid fa-lock"></i></button>
-                </div>
-            </div>
-        </header>
 
-        <div id="globalNoticeBanner" class="bg-gradient-to-r from-red-950/40 via-slate-950/80 to-amber-950/40 border-b border-red-800/50 px-6 py-3 hidden mt-4 mx-6 rounded-xl">
-            <div class="max-w-7xl mx-auto flex items-center justify-between text-xs md:text-sm">
-                <p class="text-slate-200"><strong class="text-red-400"><i class="fa-solid fa-triangle-exclamation mr-1.5"></i> COMPLIANCE ALERT:</strong> <span id="bannerCount" class="font-bold text-white underline">0</span> registration(s) within 30‑day window!</p>
-                <button onclick="switchToTab('certificates')" class="text-orange-400 font-bold uppercase text-xs tracking-wider hover:underline flex items-center gap-1">Inspect fleet <i class="fa-solid fa-arrow-right"></i></button>
-            </div>
-        </div>
-
-        <div class="max-w-7xl mx-auto w-full px-6 pt-6">
-            <div class="flex gap-1 border-b border-white/10 overflow-x-auto">
-                <button onclick="switchToTab('fleet')" id="tabBtn-fleet" class="tab-active px-6 py-3 text-sm font-bold transition-all flex items-center gap-2 rounded-t-xl whitespace-nowrap"><i class="fa-solid fa-helicopter"></i> Flight Logger</button>
-                <button onclick="switchToTab('analysis')" id="tabBtn-analysis" class="px-6 py-3 text-sm font-bold text-slate-400 hover:text-white transition-all flex items-center gap-2 whitespace-nowrap"><i class="fa-solid fa-chart-pie"></i> Analytics</button>
-                <button onclick="switchToTab('certificates')" id="tabBtn-certificates" class="px-6 py-3 text-sm font-bold text-slate-400 hover:text-white transition-all flex items-center gap-2 whitespace-nowrap"><i class="fa-solid fa-id-card"></i> Renewals Registry</button>
-                <button onclick="switchToTab('schedule')" id="tabBtn-schedule" class="px-6 py-3 text-sm font-bold text-slate-400 hover:text-white transition-all flex items-center gap-2 whitespace-nowrap"><i class="fa-regular fa-calendar-alt"></i> Flight Schedule</button>
-                <button onclick="switchToTab('logbook')" id="tabBtn-logbook" class="px-6 py-3 text-sm font-bold text-slate-400 hover:text-white transition-all flex items-center gap-2 whitespace-nowrap"><i class="fa-solid fa-book-open"></i> Logbook</button>
-            </div>
-        </div>
-
-        <div id="toastNotification" class="fixed bottom-6 right-6 z-50 transform translate-y-24 opacity-0 transition-all duration-300 max-w-sm w-full p-4 rounded-2xl border shadow-2xl flex items-start gap-3 glass-panel"></div>
-
-        <main class="flex-grow max-w-7xl w-full mx-auto px-6 py-8 space-y-8">
-            <section id="tab-fleet" class="space-y-8 fade-slide-up">
-                <div id="fleetCardGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
-                <div class="glass-panel p-6 rounded-2xl">
-                    <div class="flex items-center gap-3 mb-6">
-                        <span class="w-9 h-9 rounded-xl bg-orange-500/20 text-orange-400 flex items-center justify-center"><i class="fa-solid fa-pen-to-square"></i></span>
-                        <div><h3 class="text-md font-bold text-white">Logbook Input Terminal</h3><p class="text-xs text-slate-400">Push flight data, airworthiness audits, or technical repairs to master spreadsheet.</p></div>
-                    </div>
-                    <form id="logbookForm" onsubmit="submitLogbookEntry(event)" class="space-y-4 text-xs">
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                            <div><label class="block text-slate-400 mb-1.5 uppercase font-semibold">Entry Category</label><select id="formType" onchange="toggleFormMode()" class="w-full bg-slate-900/70 border border-slate-700 rounded-xl px-3 py-2.5"><option value="Flight">Standard Passenger Flight</option><option value="Audit">Annual Airworthiness Audit (100hr Reset)</option><option value="Repair">Unscheduled Technical Repair</option></select></div>
-                            <div><label class="block text-slate-400 mb-1.5 uppercase font-semibold">Target Aircraft</label><select id="formAircraft" required class="w-full bg-slate-900/70 border border-slate-700 rounded-xl px-3 py-2.5"></select></div>
-                            <div><label class="block text-slate-400 mb-1.5 uppercase font-semibold">Date of Operation</label><input type="date" id="formDate" required class="w-full bg-slate-900/70 border border-slate-700 rounded-xl px-3 py-2.5"></div>
-                        </div>
-                        <div id="flightDetailsContainer" class="grid grid-cols-1 sm:grid-cols-4 gap-4">
-                            <div><label class="block text-slate-400 mb-1.5 uppercase font-semibold">Operating Pilot</label><input type="text" id="formPilot" placeholder="e.g. Suhaidi Hadi" class="w-full bg-slate-900/70 border border-slate-700 rounded-xl px-3 py-2.5"></div>
-                            <div><label class="block text-slate-400 mb-1.5 uppercase font-semibold">Client / Event</label><input type="text" id="formClient" placeholder="e.g. HAVOC Brunei" class="w-full bg-slate-900/70 border border-slate-700 rounded-xl px-3 py-2.5"></div>
-                            <div><label class="block text-slate-400 mb-1.5 uppercase font-semibold">Hours</label><input type="number" id="formHours" min="0" placeholder="Hours" class="w-full bg-slate-900/70 border border-slate-700 rounded-xl px-3 py-2.5"></div>
-                            <div><label class="block text-slate-400 mb-1.5 uppercase font-semibold">Minutes</label><input type="number" id="formMinutes" min="0" max="59" placeholder="Minutes" class="w-full bg-slate-900/70 border border-slate-700 rounded-xl px-3 py-2.5"></div>
-                        </div>
-                        <div><label class="block text-slate-400 mb-1.5 uppercase font-semibold">Technical Remarks</label><textarea id="formRemarks" rows="3" placeholder="Envelope condition, panel checkups, burner service..." class="w-full bg-slate-900/70 border border-slate-700 rounded-xl px-3 py-2.5"></textarea></div>
-                        <div class="flex justify-end pt-2"><button type="submit" id="formSubmitBtn" class="px-5 py-3 bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white font-bold rounded-xl transition-all flex items-center gap-2 shadow-md"><i class="fa-solid fa-paper-plane"></i><span>Transmit to Google Sheet</span></button></div>
-                    </form>
-                </div>
-            </section>
-
-            <section id="tab-analysis" class="space-y-8 hidden fade-slide-up">
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div class="glass-panel rounded-2xl p-5"><div class="flex items-center gap-2 mb-4"><i class="fa-solid fa-trophy text-orange-400 text-xl"></i><h3 class="font-bold text-white text-md">🏆 Balloon Utilization Leaderboard</h3></div><div id="balloonLeaderboard" class="space-y-3 text-sm"></div></div>
-                    <div class="glass-panel rounded-2xl p-5"><div class="flex items-center gap-2 mb-4"><i class="fa-solid fa-user-astronaut text-orange-400 text-xl"></i><h3 class="font-bold text-white text-md">👨‍✈️ Pilot Flight Leaderboard</h3></div><div id="pilotLeaderboard" class="space-y-3 text-sm"></div></div>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="glass-panel rounded-2xl p-5"><h3 class="font-bold text-white mb-3 flex items-center gap-2"><i class="fa-solid fa-chart-simple"></i> Fleet Airworthiness Status</h3><div class="flex flex-col items-center"><canvas id="fleetDonut" width="200" height="200" class="w-40 h-40"></canvas><div id="fleetStatusLegend" class="flex justify-center gap-4 mt-3 text-xs flex-wrap"></div></div></div>
-                    <div class="glass-panel rounded-2xl p-5"><h3 class="font-bold text-white mb-3 flex items-center gap-2"><i class="fa-regular fa-clock"></i> Hours until next 100hr inspection</h3><div id="inspectionGauges" class="space-y-4 max-h-80 overflow-y-auto pr-2"></div></div>
-                </div>
-                <div class="glass-panel rounded-2xl p-5"><div class="flex items-center gap-2 mb-4"><i class="fa-solid fa-gauge-high text-orange-400"></i><h3 class="font-bold text-white">Fleet Health Index</h3></div><div class="flex flex-col items-center"><div class="relative w-32 h-32"><canvas id="fleetHealthGauge" width="128" height="128" class="w-32 h-32"></canvas></div><p class="text-sm text-slate-300 mt-3 text-center">Average remaining hours before 100hr service</p><div id="healthIndexValue" class="text-center mt-1 text-orange-400 font-bold text-lg"></div></div></div>
-                <div class="glass-panel rounded-2xl p-5"><h3 class="font-bold text-white mb-4 flex items-center gap-2"><i class="fa-solid fa-chart-line text-orange-400"></i> Monthly Flight Activity</h3><canvas id="monthlyFlightsChart" width="800" height="300" style="max-height: 300px; width: 100%;"></canvas></div>
-                <div class="glass-panel rounded-2xl p-5"><div class="flex items-center gap-2 mb-4"><i class="fa-solid fa-fire-flame-curved text-red-400"></i><h3 class="font-bold text-white">🛠️ Unscheduled Technical Repairs</h3></div><div id="repairHeatmap" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div></div>
-                <div class="glass-panel rounded-2xl p-5"><div class="flex items-center gap-2 mb-4"><i class="fa-solid fa-handshake text-orange-400"></i><h3 class="font-bold text-white">🏆 Top Clients / Events</h3></div><div id="topClientsList" class="space-y-2 text-sm"></div></div>
-            </section>
-
-            <section id="tab-certificates" class="space-y-6 hidden fade-slide-up">
-                <div class="flex justify-between items-center mb-2 flex-wrap gap-3"><div><h3 class="text-lg font-bold text-white">✈️ Permit & CoFR Expiry Timeline</h3><p class="text-xs text-slate-400">Card‑based registry with days‑left counters</p></div><input type="text" id="certSearch" onkeyup="filterCertCards()" placeholder="Filter by registration..." class="text-xs bg-slate-900/60 border border-slate-700 rounded-xl px-3 py-2 text-white placeholder-slate-400 focus:border-orange-500 w-64"></div>
-                <div id="certCardsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"></div>
-            </section>
-
-            <section id="tab-schedule" class="space-y-6 hidden fade-slide-up">
-                <div class="glass-panel rounded-2xl overflow-hidden p-1"><div class="px-5 pt-5 pb-2 flex justify-between items-center flex-wrap gap-3"><div><h3 class="text-lg font-bold text-white flex items-center gap-2"><i class="fa-regular fa-calendar-circle-plus text-orange-400"></i> Fleet & Event Calendar</h3><p class="text-xs text-slate-400">Integrated Google Calendar — operational flights, maintenance windows & corporate events</p></div><a href="https://calendar.google.com/calendar/u/0/r" target="_blank" class="text-xs bg-white/5 border border-white/15 rounded-xl px-3 py-2 text-slate-300 hover:text-white hover:border-orange-500 transition flex items-center gap-2"><i class="fa-solid fa-arrow-up-right-from-square"></i> Open in Google</a></div><div class="p-1"><iframe class="calendar-iframe" src="https://calendar.google.com/calendar/embed?showCalendars=1&mode=MONTH&src=akaballoonsb%40gmail.com&src=gff8tq53eren4hloo7rdgiv7b4%40group.calendar.google.com&src=g16ndapjat4lholjhkdu6c0ogs%40group.calendar.google.com&ctz=Asia%2FKuala_Lumpur" frameborder="0" scrolling="no" style="width:100%; height:700px; border-radius: 20px; background: rgba(0,0,0,0.2);"></iframe></div></div>
-            </section>
-
-            <section id="tab-logbook" class="space-y-6 hidden fade-slide-up">
-                <div class="glass-panel rounded-2xl p-5">
-                    <h3 class="font-bold text-white mb-4 flex items-center gap-2"><i class="fa-solid fa-book-open text-orange-400"></i> Aircraft Flight Logs</h3>
-                    <div class="mb-5">
-                        <label class="block text-xs uppercase font-semibold text-slate-400 mb-2">Select Balloon</label>
-                        <select id="logbookAircraftSelect" class="w-full md:w-64 bg-slate-900/70 border border-slate-700 rounded-xl px-3 py-2">
-                            <option value="">-- Choose an aircraft --</option>
+                <form id="logbookForm" onsubmit="submitLogbookEntry(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-300 mb-1.5 uppercase tracking-wider">Record Class</label>
+                        <select id="formType" onchange="toggleFormMode()" class="w-full px-3 py-2.5 bg-slate-950/80 border border-slate-800 rounded-xl text-white text-sm">
+                            <option value="Flight">Standard Hot Air Balloon Flight</option>
+                            <option value="Repair">Maintenance Repair / Inspection</option>
+                            <option value="Audit">Annual Structural Airworthiness Audit</option>
                         </select>
                     </div>
-                    <div class="overflow-x-auto">
-                        <table class="logs-table w-full text-left text-sm" id="logbookTable">
-                            <thead class="bg-slate-900/80 text-slate-300 text-[10px] uppercase sticky top-0"><tr><th class="px-4 py-3 sortable-header" data-sort="date">Date <span class="sort-icon"><i class="fa-solid fa-sort"></i></span></th><th class="px-4 py-3 sortable-header" data-sort="company">Company <span class="sort-icon"><i class="fa-solid fa-sort"></i></span></th><th class="px-4 py-3 sortable-header" data-sort="pilot">Pilot <span class="sort-icon"><i class="fa-solid fa-sort"></i></span></th><th class="px-4 py-3 sortable-header" data-sort="client">Client / Event <span class="sort-icon"><i class="fa-solid fa-sort"></i></span></th><th class="px-4 py-3 sortable-header" data-sort="flightTime">Flight Time <span class="sort-icon"><i class="fa-solid fa-sort"></i></span></th><th class="px-4 py-3 sortable-header" data-sort="remarks">Technical Remarks <span class="sort-icon"><i class="fa-solid fa-sort"></i></span></th></tr></thead>
-                            <tbody id="logbookTableBody" class="divide-y divide-white/10"><tr><td colspan="6" class="px-4 py-8 text-center text-slate-400">Select an aircraft to view logs.</td></tr></tbody>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1.5 uppercase tracking-wider">Log Date</label>
+                            <input type="date" id="formDate" required class="w-full px-3 py-2.5 bg-slate-950/80 border border-slate-800 rounded-xl text-white text-sm [color-scheme:dark]">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1.5 uppercase tracking-wider">Aircraft</label>
+                            <select id="formAircraft" required class="w-full px-3 py-2.5 bg-slate-950/80 border border-slate-800 rounded-xl text-white text-sm">
+                                <option value="9M-AKA" data-sheetname="AKA">9M-AKA (AKA)</option>
+                                <option value="9M-BFW" data-sheetname="Moon">9M-BFW (MOON)</option>
+                                <option value="9M-BFV" data-sheetname="Patch">9M-BFV (PATCH)</option>
+                                <option value="9M-BGE" data-sheetname="Bowie">9M-BGE (BOWIE)</option>
+                                <option value="9M-BGC" data-sheetname="Gamuda">9M-BGC (GAMUDA)</option>
+                                <option value="9M-RDY" data-sheetname="Rudy">9M-RDY (RUDY)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div id="flightMetricsFields" class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1.5 uppercase tracking-wider">Hours</label>
+                            <input type="number" id="formHours" min="0" value="0" class="w-full px-3 py-2.5 bg-slate-950/80 border border-slate-800 rounded-xl text-white text-sm text-center">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1.5 uppercase tracking-wider">Minutes</label>
+                            <input type="number" id="formMinutes" min="0" max="59" value="0" class="w-full px-3 py-2.5 bg-slate-950/80 border border-slate-800 rounded-xl text-white text-sm text-center">
+                        </div>
+                    </div>
+
+                    <div id="personnelFields" class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1.5 uppercase tracking-wider">Pilot-In-Command</label>
+                            <input type="text" id="formPilot" placeholder="Captain Name" class="w-full px-3 py-2.5 bg-slate-950/80 border border-slate-800 rounded-xl text-white text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1.5 uppercase tracking-wider">Client / Operation Group</label>
+                            <input type="text" id="formClient" placeholder="Corporate Client or Passenger" class="w-full px-3 py-2.5 bg-slate-950/80 border border-slate-800 rounded-xl text-white text-sm">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-medium text-slate-300 mb-1.5 uppercase tracking-wider">Remarks & Operational Notes</label>
+                        <textarea id="formRemarks" rows="3" placeholder="Weather limits, inflight parameters, or technical adjustments..." class="w-full px-3 py-2.5 bg-slate-950/80 border border-slate-800 rounded-xl text-white text-sm resize-none"></textarea>
+                    </div>
+
+                    <button type="submit" id="formSubmitBtn" class="w-full py-3 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-medium text-sm rounded-xl tracking-wide flex items-center justify-center gap-2 transition shadow-lg shadow-orange-500/5">
+                        <i class="fa-solid fa-paper-plane"></i>
+                        <span>Transmit to Google Sheet</span>
+                    </button>
+                </form>
+            </div>
+            
+            <div class="mt-4 pt-4 border-t border-white/5 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                    <span id="activeUserBadge" class="text-xs text-slate-400 font-medium">Operator Connected</span>
+                </div>
+                <button onclick="handleLogout()" class="text-xs text-red-400 hover:text-red-300 flex items-center gap-1 transition">
+                    <i class="fa-solid fa-power-off"></i> Disconnect
+                </button>
+            </div>
+        </aside>
+
+        <main class="flex-1 p-4 md:p-8 overflow-y-auto max-w-7xl mx-auto w-full transition-all duration-300" id="mainViewport">
+            <header class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-8">
+                <div>
+                    <div class="flex items-center gap-3">
+                        <svg class="w-9 h-9 text-orange-500 balloon-logo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M12 2a8 8 0 0 0-8 8c0 3 2 5 4 7s2 4 2 5h4c0-1 0-3 2-5s4-4 4-7a8 8 0 0 0-8-8z" />
+                            <path d="M12 2v20" />
+                            <path d="M9 6c2 1 4 1 6 0" />
+                            <path d="M7 10c3 1.5 7 1.5 10 0" />
+                            <path d="M8 14c2.5 1 5.5 1 8 0" />
+                        </svg>
+                        <div>
+                            <h1 class="text-2xl md:text-3xl font-black tracking-tight text-white flex items-center gap-2">
+                                Fleet Operations Control
+                            </h1>
+                            <p class="text-xs text-slate-400 tracking-wider uppercase font-medium">Integration Airworthiness & Fleet Logistics Engine</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-3 w-full lg:w-auto">
+                    <button onclick="syncWithGoogleSheets()" class="flex-1 lg:flex-none px-5 py-3 bg-white/5 hover:bg-white/10 text-white font-medium text-sm rounded-xl border border-white/10 flex items-center justify-center gap-2 transition">
+                        <i id="syncIcon" class="fa-solid fa-arrow-rotate-right text-orange-400"></i>
+                        <span id="syncText">Sync Live Data</span>
+                    </button>
+                    <div class="flex border border-white/10 bg-slate-950/60 p-1 rounded-xl">
+                        <button onclick="switchToTab('fleet')" id="tabBtn-fleet" class="px-4 py-2 text-xs font-semibold uppercase tracking-wider rounded-lg text-slate-400 transition">Fleet Status</button>
+                        <button onclick="switchToTab('certificates')" id="tabBtn-certificates" class="px-4 py-2 text-xs font-semibold uppercase tracking-wider rounded-lg text-slate-400 transition">Compliance</button>
+                        <button onclick="switchToTab('comms')" id="tabBtn-comms" class="px-4 py-2 text-xs font-semibold uppercase tracking-wider rounded-lg text-slate-400 transition">Team Comms</button>
+                        <button onclick="switchToTab('logs')" id="tabBtn-logs" class="px-4 py-2 text-xs font-semibold uppercase tracking-wider rounded-lg text-slate-400 transition">History</button>
+                    </button>
+                </div>
+            </header>
+
+            <section id="tab-fleet" class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="glass-panel p-6 rounded-3xl flex items-center justify-between">
+                        <div>
+                            <span class="text-xs text-slate-400 uppercase font-semibold tracking-wider block">Fleet Cumulative Airtime</span>
+                            <span class="text-3xl font-extrabold text-white mt-1 block mono" id="stat-total-hours">0.00</span>
+                        </div>
+                        <div class="w-12 h-12 rounded-2xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center text-xl text-orange-400">
+                            <i class="fa-solid fa-hourglass-half"></i>
+                        </div>
+                    </div>
+                    <div class="glass-panel p-6 rounded-3xl flex items-center justify-between">
+                        <div>
+                            <span class="text-xs text-slate-400 uppercase font-semibold tracking-wider block">Operational Airworthiness</span>
+                            <span class="text-3xl font-extrabold text-emerald-400 mt-1 block mono" id="stat-airworthy-count">0/0</span>
+                        </div>
+                        <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-xl text-emerald-400">
+                            <i class="fa-solid fa-shield-cat"></i>
+                        </div>
+                    </div>
+                    <div class="glass-panel p-6 rounded-3xl flex items-center justify-between">
+                        <div>
+                            <span class="text-xs text-slate-400 uppercase font-semibold tracking-wider block">Total Flights Logged</span>
+                            <span class="text-3xl font-extrabold text-amber-400 mt-1 block mono" id="stat-flight-count">0</span>
+                        </div>
+                        <div class="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-xl text-amber-400">
+                            <i class="fa-solid fa-gauge"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+                    <div class="glass-panel p-6 rounded-3xl xl:col-span-1 flex flex-col justify-between">
+                        <div>
+                            <h3 class="text-sm font-bold uppercase tracking-wider text-slate-300 mb-1">Fleet Airtime Allocation</h3>
+                            <p class="text-xs text-slate-400 mb-6">Total flight breakdown metric per asset</p>
+                        </div>
+                        <div class="relative flex items-center justify-center py-4 flex-1">
+                            <canvas id="fleetDonutChart" style="max-height: 220px; max-width: 220px;"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="glass-panel p-6 rounded-3xl xl:col-span-2">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-6">
+                            <div>
+                                <h3 class="text-sm font-bold uppercase tracking-wider text-slate-300 mb-1">Asset Status Matrices</h3>
+                                <p class="text-xs text-slate-400">Calculated airtime relative to 100-hour structural mandatory inspections</p>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4" id="fleetGridContainer">
+                            </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="glass-panel p-6 rounded-3xl lg:col-span-1">
+                        <h3 class="text-sm font-bold uppercase tracking-wider text-slate-300 mb-4">Pilot Fleet Analytics</h3>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs">
+                                <thead>
+                                    <tr class="text-slate-400 border-b border-white/5 uppercase tracking-wider">
+                                        <th class="pb-2 font-medium">Pilot</th>
+                                        <th class="pb-2 font-medium text-center">Flights</th>
+                                        <th class="pb-2 font-medium text-right">Hours</th>
+                                        <th class="pb-2 font-medium text-right">Preferred</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="insightTableBody" class="divide-y divide-white/5 text-slate-300">
+                                    </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div class="glass-panel p-6 rounded-3xl lg:col-span-2">
+                        <h3 class="text-sm font-bold uppercase tracking-wider text-slate-300 mb-4">Monthly Deployment Summary</h3>
+                        <div class="w-full relative h-[180px]">
+                            <canvas id="monthlyChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="tab-certificates" class="space-y-6 hidden">
+                <div class="glass-panel p-6 rounded-3xl">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                        <div>
+                            <h3 class="text-lg font-bold text-white">Regulatory Airworthiness Monitoring</h3>
+                            <p class="text-xs text-slate-400">Civil Aviation Authority compliance and flight tracking expiration status</p>
+                        </div>
+                        <div class="flex gap-2 w-full sm:w-auto">
+                            <button onclick="filterCertCards('all')" id="certFilter-all" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-orange-500 text-white transition">All Statuses</button>
+                            <button onclick="filterCertCards('Critical')" id="certFilter-Critical" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-white/5 text-slate-400 hover:bg-white/10 transition">Critical</button>
+                            <button onclick="filterCertCards('Warning')" id="certFilter-Warning" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-white/5 text-slate-400 hover:bg-white/10 transition">Warning</button>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="certGridContainer">
+                        </div>
+                </div>
+            </section>
+
+            <section id="tab-comms" class="space-y-6 hidden">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="glass-panel p-6 rounded-3xl lg:col-span-1 h-fit">
+                        <h3 class="text-sm font-bold uppercase tracking-wider text-slate-300 mb-2">Publish Message</h3>
+                        <p class="text-xs text-slate-400 mb-4">Broadcast general notifications or asset alerts to all operators</p>
+                        <form id="teamCommsForm" onsubmit="postTeamMessage(event)" class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-medium text-slate-400 mb-1">Message Content</label>
+                                <textarea id="commMessage" rows="4" required placeholder="Write clear alert notes, schedule updates, or system flags here..." class="w-full px-3 py-2 bg-slate-950/80 border border-slate-800 rounded-xl text-white text-sm resize-none"></textarea>
+                            </div>
+                            <button type="submit" id="commSubmitBtn" class="w-full py-3 bg-orange-500 hover:bg-orange-600 text-white font-medium text-sm rounded-xl tracking-wide flex items-center justify-center gap-2 transition">
+                                <i class="fa-solid fa-bullhorn"></i>
+                                <span>Broadcast Alert</span>
+                            </button>
+                        </form>
+                    </div>
+
+                    <div class="glass-panel p-6 rounded-3xl lg:col-span-2 flex flex-col">
+                        <h3 class="text-sm font-bold uppercase tracking-wider text-slate-300 mb-1">Operations Bulletin</h3>
+                        <p class="text-xs text-slate-400 mb-4">Live updates from management and on-site engineering teams</p>
+                        <div class="space-y-3 max-h-[450px] overflow-y-auto pr-2" id="commsLogContainer">
+                            </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="tab-logs" class="space-y-6 hidden">
+                <div class="glass-panel p-6 rounded-3xl">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
+                        <div>
+                            <h3 class="text-sm font-bold uppercase tracking-wider text-slate-300">Historical Operational Logs</h3>
+                            <p class="text-xs text-slate-400">Complete immutable record of logs pulled directly from the core master engine</p>
+                        </div>
+                        <div class="w-full sm:w-64 relative">
+                            <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-500 text-xs"></i>
+                            <input type="text" id="logSearchInput" onkeyup="filterHistoryLogs()" placeholder="Search pilot, registration, client..." class="w-full pl-9 pr-4 py-2 bg-slate-950/60 border border-slate-800 rounded-xl text-xs text-white focus:border-orange-500">
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto border border-white/5 rounded-2xl">
+                        <table class="w-full text-left text-xs" id="historyTable">
+                            <thead>
+                                <tr class="bg-slate-950/80 text-slate-400 border-b border-white/10 uppercase tracking-wider">
+                                    <th class="p-3.5 font-semibold sortable-header" onclick="sortHistoryTable(0)">Date <span class="sort-icon" id="sort-icon-0"><i class="fa-solid fa-sort"></i></span></th>
+                                    <th class="p-3.5 font-semibold sortable-header" onclick="sortHistoryTable(1)">Asset <span class="sort-icon" id="sort-icon-1"><i class="fa-solid fa-sort"></i></span></th>
+                                    <th class="p-3.5 font-semibold sortable-header" onclick="sortHistoryTable(2)">Pilot-In-Command <span class="sort-icon" id="sort-icon-2"><i class="fa-solid fa-sort"></i></span></th>
+                                    <th class="p-3.5 font-semibold sortable-header" onclick="sortHistoryTable(3)">Record Classification <span class="sort-icon" id="sort-icon-3"><i class="fa-solid fa-sort"></i></span></th>
+                                    <th class="p-3.5 font-semibold text-center sortable-header" onclick="sortHistoryTable(4)">Duration <span class="sort-icon" id="sort-icon-4"><i class="fa-solid fa-sort"></i></span></th>
+                                    <th class="p-3.5 font-semibold">Client Group</th>
+                                    <th class="p-3.5 font-semibold max-w-xs">Remarks / Operational Details</th>
+                                </tr>
+                            </thead>
+                            <tbody id="historyTableBody" class="divide-y divide-white/5 text-slate-300 bg-slate-900/10">
+                                </tbody>
                         </table>
                     </div>
                 </div>
             </section>
         </main>
-
-        <footer class="glass-panel mx-6 mb-4 rounded-2xl px-6 py-3 text-center text-[10px] text-slate-400 uppercase tracking-widest">&copy; 2026 AKA & MBA Balloon Operations • Live Analytics Engine v8.0</footer>
     </div>
+
+    <div id="toastNotification" class="fixed bottom-6 right-6 z-50 glass-panel border p-4 rounded-2xl shadow-xl flex items-start gap-3 max-w-sm w-full translate-y-24 opacity-0 transition-all duration-300">
+        </div>
 
     <script>
         // ---------- CONFIGURATION ----------
-        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby2mHVT1burcZYDpyeShNDRt7dZcdJkFmD-Shse8U5CTyrRKDSe3Bl20JrEPZuE25ZwTA/exec";
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx2guxVeYF9AZym8-e-wGH1ukGqOj-8SwosQmN1BFUCIqLDBFqMjv70JaQILdtXC53i/exec";
         const DASHBOARD_PASSWORD = "Rudy56";
 
         let fleet = [], certificates = [], insights = [], allLogs = [], teamMessages = [], currentOperatorName = "";
@@ -351,65 +491,70 @@
         function handleLogin(e) {
             e.preventDefault();
             const pwd = document.getElementById("passwordInput").value;
-            const name = document.getElementById("operatorName").value;
-            if (!name) { alert("Please select your name."); return; }
-            if (pwd === DASHBOARD_PASSWORD) {
-                currentOperatorName = name;
-                const loginOverlay = document.getElementById("loginOverlay");
-                loginOverlay.style.transition = "opacity 0.4s ease";
-                loginOverlay.style.opacity = "0";
-                setTimeout(() => {
-                    loginOverlay.style.display = "none";
-                    const welcome = document.getElementById("welcomeOverlay");
-                    document.getElementById("welcomeMessage").innerHTML = `Welcome, ${name}`;
-                    welcome.classList.remove("hidden");
-                    welcome.style.opacity = "1";
-                    setTimeout(() => {
-                        welcome.classList.add("welcome-fade-out");
-                        setTimeout(() => {
-                            welcome.classList.add("hidden");
-                            welcome.classList.remove("welcome-fade-out");
-                            document.getElementById("dashboardContainer").classList.remove("hidden");
-                            document.getElementById("dashboardContainer").classList.add("fade-slide-up");
-                            document.getElementById("loggedAsName").innerText = name;
-                            document.getElementById("loggedAsLabel").classList.remove("hidden");
-                            document.getElementById("formDate").valueAsDate = new Date();
-                            syncWithGoogleSheets();
-                            fetchTeamMessages();
-                        }, 600);
-                    }, 1000);
-                }, 400);
+            const user = document.getElementById("operatorName").value;
+            if (pwd === DASHBOARD_PASSWORD && user !== "") {
+                currentOperatorName = user;
+                document.getElementById("activeUserBadge").innerText = `Ops: ${user}`;
+                document.getElementById("loginOverlay").classList.add("hidden");
+                document.getElementById("mainDashboard").classList.remove("hidden");
+                document.getElementById("formDate").valueAsDate = new Date();
+                syncWithGoogleSheets();
+                fetchTeamMessages();
             } else {
-                document.getElementById("loginError").classList.remove("hidden");
-                document.getElementById("passwordInput").value = "";
+                const err = document.getElementById("loginError");
+                err.classList.remove("hidden");
+                setTimeout(() => err.classList.add("hidden"), 4000);
             }
         }
+
         function handleLogout() {
-            document.getElementById("dashboardContainer").classList.add("hidden");
-            const loginOverlay = document.getElementById("loginOverlay");
-            loginOverlay.style.display = "flex";
-            loginOverlay.style.opacity = "1";
+            currentOperatorName = "";
             document.getElementById("passwordInput").value = "";
-            document.getElementById("operatorName").value = "";
-            document.getElementById("loginError").classList.add("hidden");
-            document.getElementById("welcomeOverlay").classList.add("hidden");
-            document.getElementById("loggedAsLabel").classList.add("hidden");
+            document.getElementById("loginOverlay").classList.remove("hidden");
+            document.getElementById("mainDashboard").classList.add("hidden");
         }
-        function switchToTab(tab) {
-            ['fleet', 'analysis', 'certificates', 'schedule', 'logbook'].forEach(t => {
-                document.getElementById(`tab-${t}`).classList.toggle("hidden", t !== tab);
-                const btn = document.getElementById(`tabBtn-${t}`);
-                if (btn) {
-                    if (t === tab) { btn.classList.add("tab-active"); btn.classList.remove("text-slate-400"); }
-                    else { btn.classList.remove("tab-active"); btn.classList.add("text-slate-400"); }
-                }
+
+        // ---------- INTERFACE NAVIGATION CONTROLS ----------
+        function switchToTab(tabId) {
+            ["fleet", "certificates", "comms", "logs"].forEach(t => {
+                document.getElementById(`tab-${t}`).classList.add("hidden");
+                document.getElementById(`tabBtn-${t}`).classList.remove("tab-active");
             });
+            document.getElementById(`tab-${tabId}`).classList.remove("hidden");
+            document.getElementById(`tabBtn-${tabId}`).classList.add("tab-active");
+            if (tabId === "fleet") {
+                setTimeout(() => renderCharts(), 50);
+            }
         }
+
+        function toggleSidebar() {
+            const side = document.getElementById("opsSidebar");
+            const icon = document.getElementById("toggleChevron");
+            side.classList.toggle("open");
+            if (side.classList.contains("open")) {
+                icon.className = "fa-solid fa-angles-left mr-1";
+            } else {
+                icon.className = "fa-solid fa-angles-right mr-1";
+            }
+        }
+
         function toggleFormMode() {
             const mode = document.getElementById("formType").value;
-            const container = document.getElementById("flightDetailsContainer");
-            if (mode === "Audit") { container.classList.add("hidden"); document.getElementById("formRemarks").value = "Annual structural safety check — resetting 100hr cycle."; }
-            else { container.classList.remove("hidden"); document.getElementById("formRemarks").value = ""; }
+            const container = document.getElementById("flightMetricsFields");
+            const personnel = document.getElementById("personnelFields");
+            if (mode === "Audit") {
+                container.classList.add("hidden");
+                personnel.classList.add("hidden");
+                document.getElementById("formRemarks").value = "Annual structural safety check — resetting 100hr cycle.";
+            } else if (mode === "Repair") {
+                container.classList.remove("hidden");
+                personnel.classList.add("hidden");
+                document.getElementById("formRemarks").value = "";
+            } else {
+                container.classList.remove("hidden");
+                personnel.classList.remove("hidden");
+                document.getElementById("formRemarks").value = "";
+            }
         }
 
         // ---------- SYNC MAIN DATA ----------
@@ -442,8 +587,7 @@
             const selectedOption = document.getElementById("formAircraft");
             const sheetAircraft = selectedOption.options[selectedOption.selectedIndex]?.getAttribute("data-sheetname") || selectedOption.value;
             
-            // Re-routed parameters safely into URL string configuration to pass standard CORS gate
-            const queryParams = new URLSearchParams({
+            const payload = {
                 action: "submitLogbook",
                 date: document.getElementById("formDate").value,
                 company: companyField,
@@ -453,25 +597,23 @@
                 pilot: mode === "Audit" ? "" : (document.getElementById("formPilot").value || "Engineering Crew"),
                 client: mode === "Audit" ? "" : (document.getElementById("formClient").value || "N/A"),
                 remarks: document.getElementById("formRemarks").value
-            });
-
+            };
             btn.disabled = true;
             btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> <span>Transmitting...</span>`;
             
-            fetch(`${GOOGLE_SCRIPT_URL}?${queryParams.toString()}`, {
-                method: "GET"
-            })
-            .then(async response => {
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                const data = await response.json();
-                if (data.success) {
+            // Send request parameters explicitly appended in GET string to sidestep strict CORS checks on App Script endpoints
+            const getQueryUrl = `${GOOGLE_SCRIPT_URL}?${new URLSearchParams(payload).toString()}`;
+            fetch(getQueryUrl, { method: "GET" })
+            .then(res => res.json())
+            .then(data => {
+                if(data.success) {
                     showToast("Transmission Safe", "Logbook entry recorded.", "success");
                     document.getElementById("logbookForm").reset();
                     document.getElementById("formDate").valueAsDate = new Date();
                     toggleFormMode();
                     setTimeout(() => syncWithGoogleSheets(), 1500);
                 } else {
-                    showToast("Write Error", "Data refused by sheets connection engine.", "danger");
+                    throw new Error("Server error message returned");
                 }
             })
             .catch(err => { console.error(err); showToast("Write Error", "Could not save to sheet.", "danger"); })
@@ -482,293 +624,343 @@
         async function fetchTeamMessages() {
             try {
                 const res = await fetch(`${GOOGLE_SCRIPT_URL}?action=getMessages`);
-                const msgs = await res.json();
-                teamMessages = Array.isArray(msgs.messages) ? msgs.messages : [];
+                const data = await res.json();
+                teamMessages = data.messages || [];
                 renderTeamMessages();
-            } catch (err) { console.error("Failed to load messages", err); }
+            } catch (err) { console.error("Comms load failed", err); }
         }
-        
-        async function postMessage() {
-            const textarea = document.getElementById("newMessageText");
-            const message = textarea.value.trim();
-            if (!message) return;
-            
-            const btn = document.getElementById("postMessageBtn");
-            btn.disabled = true;
 
-            const queryParams = new URLSearchParams({
+        function postTeamMessage(e) {
+            e.preventDefault();
+            const btn = document.getElementById("commSubmitBtn");
+            const msgInput = document.getElementById("commMessage");
+            const payload = {
                 action: "postMessage",
                 author: currentOperatorName,
-                message: message
-            });
-
-            try {
-                const res = await fetch(`${GOOGLE_SCRIPT_URL}?${queryParams.toString()}`, {
-                    method: "GET"
-                });
-                const data = await res.json();
-                if (data.success) {
-                    textarea.value = "";
-                    await fetchTeamMessages();
-                    showToast("Posted", "Message sent to Team Comms.", "success");
-                } else throw new Error();
-            } catch (err) { showToast("Error", "Could not post message.", "danger"); }
-            finally { btn.disabled = false; }
+                message: msgInput.value
+            };
+            btn.disabled = true;
+            const getQueryUrl = `${GOOGLE_SCRIPT_URL}?${new URLSearchParams(payload).toString()}`;
+            fetch(getQueryUrl, { method: "GET" })
+            .then(res => res.json())
+            .then(() => {
+                msgInput.value = "";
+                fetchTeamMessages();
+                showToast("Alert Posted", "Broadcast update live.", "success");
+            })
+            .catch(err => console.error(err))
+            .finally(() => btn.disabled = false);
         }
-        
-        async function toggleStatus(msgId) {
-            const queryParams = new URLSearchParams({
-                action: "toggleStatus",
-                id: msgId
-            });
 
-            try {
-                const res = await fetch(`${GOOGLE_SCRIPT_URL}?${queryParams.toString()}`, {
-                    method: "GET"
-                });
-                const data = await res.json();
-                if (data.success) {
-                    await fetchTeamMessages();
-                }
-            } catch (err) { showToast("Error", "Could not update status.", "danger"); }
+        function toggleMessageStatus(msgId) {
+            const payload = { action: "toggleStatus", id: msgId };
+            const getQueryUrl = `${GOOGLE_SCRIPT_URL}?${new URLSearchParams(payload).toString()}`;
+            fetch(getQueryUrl, { method: "GET" })
+            .then(res => res.json())
+            .then(() => fetchTeamMessages())
+            .catch(err => console.error(err));
         }
-        
+
         function renderTeamMessages() {
-            const container = document.getElementById("messagesContainer");
-            if (!teamMessages.length) { container.innerHTML = '<div class="text-center text-slate-400 py-8">No messages yet. Be the first to post!</div>'; return; }
-            container.innerHTML = teamMessages.map(msg => {
-                const isAuthor = msg.author === currentOperatorName;
-                const statusClass = msg.status === "Ongoing" ? "status-Ongoing" : "status-Resolved";
-                const timestamp = new Date(msg.timestamp).toLocaleString();
-                return `
-                    <div class="glass-panel rounded-xl p-3 border border-white/10">
-                        <div class="flex justify-between items-start">
-                            <div class="font-bold text-orange-400">${msg.author}</div>
-                            <div class="flex items-center gap-2">
-                                <span class="status-badge ${statusClass}">${msg.status}</span>
-                                ${isAuthor ? `<button class="toggle-status-btn text-xs text-slate-400 hover:text-white" data-msgid="${msg.id}"><i class="fa-solid fa-arrows-spin"></i> Toggle</button>` : ''}
-                            </div>
+            const container = document.getElementById("commsLogContainer");
+            container.innerHTML = "";
+            if (teamMessages.length === 0) {
+                container.innerHTML = `<div class="text-center py-8 text-xs text-slate-500">No communications or alerts found.</div>`;
+                return;
+            }
+            teamMessages.slice().reverse().forEach(m => {
+                const card = document.createElement("div");
+                card.className = "p-4 bg-slate-950/40 border border-white/5 rounded-2xl relative flex flex-col justify-between gap-2";
+                const d = new Date(m.timestamp);
+                const dateStr = d.toLocaleDateString("en-GB", {day:"2-digit", month:"short", hour:"2-digit", minute:"2-digit"});
+                card.innerHTML = `
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <span class="text-xs font-bold text-orange-400">${m.author}</span>
+                            <span class="text-[10px] text-slate-500 ml-2 mono">${dateStr}</span>
                         </div>
-                        <div class="text-sm text-slate-200 mt-1">${msg.message}</div>
-                        <div class="text-[10px] text-slate-500 mt-2">${timestamp}</div>
+                        <button onclick="toggleMessageStatus(${m.id})" class="status-badge status-${m.status}">${m.status}</button>
+                    </div>
+                    <p class="text-xs text-slate-200 leading-relaxed mt-1">${m.message}</p>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // ---------- DASHBOARD RENDER FRAMEWORK ----------
+        function renderDashboard() {
+            // Stats Calculations
+            let cumulHours = fleet.reduce((acc, b) => acc + b.totalHours, 0);
+            document.getElementById("stat-total-hours").innerText = cumulHours.toFixed(2);
+            document.getElementById("stat-flight-count").innerText = allLogs.length;
+
+            let airworthyCount = 0;
+            const gridContainer = document.getElementById("fleetGridContainer");
+            gridContainer.innerHTML = "";
+
+            fleet.forEach(b => {
+                let cyclesUsed = b.totalHours - b.lastServiceHours;
+                let remaining = Math.max(0, b.limit - cyclesUsed);
+                let pct = Math.min(100, (remaining / b.limit) * 100);
+                
+                let ringColor = "stroke-emerald-500";
+                let bgIndicator = "bg-emerald-500/10 border-emerald-500/30";
+                let textClass = "text-emerald-400";
+                
+                if (remaining <= 15) { ringColor = "stroke-red-500"; bgIndicator = "bg-red-500/10 border-red-500/30"; textClass = "text-red-400"; }
+                else if (remaining <= 35) { ringColor = "stroke-orange-500"; bgIndicator = "bg-orange-500/10 border-orange-500/30"; textClass = "text-orange-400"; }
+                else { airworthyCount++; }
+
+                const radius = 32;
+                const circ = 2 * Math.PI * radius;
+                const offset = circ - (pct / 100) * circ;
+
+                const card = document.createElement("div");
+                card.className = `p-4 rounded-2xl border flex items-center justify-between ${bgIndicator}`;
+                card.innerHTML = `
+                    <div class="flex-1 min-w-0">
+                        <span class="text-[10px] uppercase font-bold tracking-wider opacity-60 block text-slate-300">${b.shortName}</span>
+                        <h4 class="text-base font-black tracking-tight text-white mt-0.5">${b.registration}</h4>
+                        <div class="mt-2 text-xs text-slate-300">
+                            <span class="mono font-bold">${b.totalHours.toFixed(1)}</span> <span class="opacity-60 text-[10px]">TOTM</span>
+                        </div>
+                    </div>
+                    <div class="relative w-16 h-16 flex items-center justify-center">
+                        <svg class="w-full h-full transform -rotate-90" viewBox="0 0 80 80">
+                            <circle cx="40" cy="40" r="${radius}" stroke="rgba(255,255,255,0.05)" stroke-width="6" fill="transparent" />
+                            <circle cx="40" cy="40" r="${radius}" class="${ringColor} transition-all duration-300" stroke-width="6" fill="transparent" stroke-dasharray="${circ}" stroke-dashoffset="${offset}" stroke-linecap="round" />
+                        </svg>
+                        <div class="absolute inset-0 flex flex-col items-center justify-center text-center">
+                            <span class="text-[11px] font-extrabold text-white mono">${Math.round(remaining)}</span>
+                            <span class="text-[7px] uppercase font-bold opacity-60 text-slate-400">HRS</span>
+                        </div>
                     </div>
                 `;
-            }).join('');
+                gridContainer.appendChild(card);
+            });
+
+            document.getElementById("stat-airworthy-count").innerText = `${airworthyCount}/${fleet.length}`;
             
-            // attach toggle event listeners
-            document.querySelectorAll('.toggle-status-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const msgId = btn.getAttribute('data-msgid');
-                    toggleStatus(msgId);
-                });
+            // Build Certificates Layout
+            renderCertificates();
+
+            // Populate Analytics Pilot Matrix
+            const iBody = document.getElementById("insightTableBody");
+            iBody.innerHTML = "";
+            insights.forEach(p => {
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+                    <td class="py-2.5 font-semibold text-white">${p.name}</td>
+                    <td class="py-2.5 text-center mono font-medium text-slate-400">${p.flights}</td>
+                    <td class="py-2.5 text-right mono font-bold text-orange-400">${p.hours}</td>
+                    <td class="py-2.5 text-right text-slate-400"><span class="bg-white/5 border border-white/5 px-2 py-0.5 rounded text-[10px] uppercase font-bold">${p.favorite}</span></td>
+                `;
+                iBody.appendChild(tr);
+            });
+
+            // Build History Logs Table Layout
+            renderHistoryTable();
+            renderCharts();
+        }
+
+        function renderCertificates() {
+            const container = document.getElementById("certGridContainer");
+            container.innerHTML = "";
+            certificates.forEach(c => {
+                let badgeClass = "bg-emerald-500/10 text-emerald-400 border-emerald-500/20";
+                if(c.status === "Critical") badgeClass = "bg-red-500/10 text-red-400 border-red-500/20";
+                else if (c.status === "Action Required") badgeClass = "bg-orange-500/10 text-orange-400 border-orange-500/20";
+
+                const card = document.createElement("div");
+                card.className = "cert-card p-5 rounded-2xl border border-white/5 flex flex-col justify-between gap-4";
+                card.setAttribute("data-status", c.permitStatus);
+                card.innerHTML = `
+                    <div>
+                        <div class="flex justify-between items-start mb-2">
+                            <div>
+                                <h4 class="text-base font-black tracking-tight text-white">${c.registration}</h4>
+                                <p class="text-[10px] text-slate-400 uppercase tracking-wider font-bold">${c.shortName} • S/N ${c.serial}</p>
+                            </div>
+                            <span class="text-[9px] font-bold uppercase tracking-wider border px-2 py-0.5 rounded-full ${badgeClass}">${c.status}</span>
+                        </div>
+                        <div class="space-y-2 mt-4 text-xs">
+                            <div class="flex justify-between">
+                                <span class="text-slate-400">Permit to Fly Expiry:</span>
+                                <span class="mono font-bold text-slate-200">${c.permitExpiry}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-slate-400">COFR Expiry:</span>
+                                <span class="mono font-bold text-slate-200">${c.cofrExpiry}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
             });
         }
 
-        // ---------- RENDER DASHBOARD (all tabs) ----------
-        function renderDashboard() {
-            // Fleet cards & dropdown
-            const grid = document.getElementById("fleetCardGrid");
-            const select = document.getElementById("formAircraft");
-            grid.innerHTML = ""; select.innerHTML = "";
-            if (fleet.length === 0) {
-                grid.innerHTML = '<div class="col-span-full text-center text-slate-400 glass-panel p-6 rounded-2xl">No fleet data synced yet. Click "Sync Live Data".</div>';
-                select.innerHTML = '<option>No aircraft available</option>';
-            } else {
-                fleet.forEach(b => {
-                    const sheetName = toSheetAircraftName(b.shortName) || toSheetAircraftName(b.registration);
-                    const opt = document.createElement("option");
-                    opt.value = b.registration;
-                    opt.setAttribute("data-sheetname", sheetName);
-                    opt.innerText = `${b.registration} (${b.shortName})`;
-                    select.appendChild(opt);
-                    const currentHrs = parseFloat(b.totalHours) || 0;
-                    const baseHrs = parseFloat(b.lastServiceHours) || 0;
-                    const delta = currentHrs - baseHrs;
-                    let percent = Math.min(100, Math.round((delta / 100) * 100));
-                    if (percent < 0) percent = 0;
-                    const remaining = Math.max(0, 100 - delta).toFixed(1);
-                    let barColor = "bg-gradient-to-r from-orange-500 to-amber-500";
-                    let glow = "";
-                    if (percent >= 85) { barColor = "bg-gradient-to-r from-red-500 to-rose-600"; glow = "glow-red"; }
-                    else if (percent >= 65) { barColor = "bg-gradient-to-r from-amber-500 to-orange-500"; glow = "glow-orange"; }
-                    const card = document.createElement("div");
-                    card.className = `glass-panel p-6 rounded-2xl border transition-all ${glow}`;
-                    card.innerHTML = `<div><div class="flex justify-between items-start"><div><span class="bg-black/40 border border-white/10 px-2.5 py-1 rounded text-xs font-black text-white mono">${b.registration}</span><h4 class="text-lg font-black text-white mt-2">${b.shortName}</h4></div><div class="text-right"><p class="text-[10px] text-slate-400 uppercase tracking-wider">Total Airtime</p><p class="text-xl font-bold text-white mono">${currentHrs.toFixed(1)} <span class="text-xs text-slate-400">Hrs</span></p></div></div><div class="space-y-2 mt-6"><div class="flex justify-between text-xs"><span class="text-slate-400">100‑Hr Airworthiness Status</span><span class="font-bold text-white mono">${percent}%</span></div><div class="w-full bg-slate-800 rounded-full h-2.5 overflow-hidden"><div class="${barColor} h-full" style="width: ${percent}%"></div></div><div class="flex justify-between text-[11px]"><span class="text-slate-500">Reset base: ${baseHrs.toFixed(1)} hrs</span><span class="${percent >= 85 ? 'text-red-400 font-bold' : 'text-slate-300'} mono">Remaining: ${remaining} hrs</span></div></div></div>`;
-                    grid.appendChild(card);
-                });
+        function filterCertCards(status) {
+            const btns = ["all", "Critical", "Warning"];
+            btns.forEach(b => {
+                const el = document.getElementById(`certFilter-${b}`);
+                if(b === status) { el.className = "px-3 py-1.5 text-xs font-semibold rounded-lg bg-orange-500 text-white transition"; }
+                else { el.className = "px-3 py-1.5 text-xs font-semibold rounded-lg bg-white/5 text-slate-400 hover:bg-white/10 transition"; }
+            });
+            const cards = document.getElementById("certGridContainer").children;
+            for(let card of cards) {
+                if(status === 'all' || card.getAttribute("data-status") === status) { card.classList.remove("hidden"); }
+                else { card.classList.add("hidden"); }
             }
+        }
 
-            let risk = 0;
-            certificates.forEach(c => { if (c.permitStatus === "Critical" || c.permitStatus === "Warning") risk++; });
-            document.getElementById("bannerCount").innerText = risk;
-            document.getElementById("globalNoticeBanner").classList.toggle("hidden", risk === 0);
-            if (fleet.length === 0) return;
+        function renderHistoryTable() {
+            const body = document.getElementById("historyTableBody");
+            body.innerHTML = "";
+            allLogs.forEach(l => {
+                let badge = "bg-blue-500/10 text-blue-400 border-blue-500/20";
+                if(l.company === "Annual Structural Airworthiness Audit") badge = "bg-purple-500/10 text-purple-400 border-purple-500/20";
+                else if(l.company === "Maintenance Repair Service") badge = "bg-amber-500/10 text-amber-400 border-amber-500/20";
+                
+                const tr = document.createElement("tr");
+                tr.className = "hover:bg-white/[0.02] transition border-b border-white/5";
+                tr.innerHTML = `
+                    <td class="p-3.5 mono text-slate-300 font-medium">${l.date}</td>
+                    <td class="p-3.5 font-bold text-white">${l.aircraft}</td>
+                    <td class="p-3.5 text-slate-300">${l.pilot || "—"}</td>
+                    <td class="p-3.5"><span class="text-[10px] font-semibold border px-2 py-0.5 rounded-md ${badge}">${toSheetAircraftName(l.company)}</span></td>
+                    <td class="p-3.5 text-center mono font-bold text-orange-400">${l.hours}h ${l.minutes}m</td>
+                    <td class="p-3.5 text-slate-400">${l.client || "—"}</td>
+                    <td class="p-3.5 text-xs text-slate-400 max-w-xs truncate" title="${l.remarks}">${l.remarks || "—"}</td>
+                `;
+                body.appendChild(tr);
+            });
+        }
 
-            // Leaderboards
-            const balloonDiv = document.getElementById("balloonLeaderboard");
-            const sortedB = [...fleet].sort((a,b) => (parseFloat(b.totalHours)||0) - (parseFloat(a.totalHours)||0));
-            balloonDiv.innerHTML = sortedB.map((b, i) => `<div class="flex justify-between items-center border-b border-white/10 pb-2"><div class="flex items-center gap-2"><span class="text-orange-400 font-mono w-5">${i+1}</span><span class="font-bold">${b.registration} (${b.shortName})</span></div><span class="mono text-slate-300">${(parseFloat(b.totalHours)||0).toFixed(1)} hrs</span></div>`).join('');
-            const pilotDiv = document.getElementById("pilotLeaderboard");
-            if (insights && insights.length) {
-                const sortedP = [...insights].sort((a,b) => (b.flights||0) - (a.flights||0));
-                pilotDiv.innerHTML = sortedP.map((p, i) => `<div class="flex justify-between items-center border-b border-white/10 pb-2"><div class="flex items-center gap-2"><span class="text-orange-400 font-mono w-5">${i+1}</span><span class="font-bold">${p.name}</span></div><span class="mono text-slate-300">${p.flights} flights · ${p.hours} hrs</span></div>`).join('');
-            } else pilotDiv.innerHTML = '<div class="text-slate-400 text-center py-4">No pilot data synced yet.</div>';
-
-            let crit=0, warn=0, good=0;
-            fleet.forEach(b => { const rem = 100 - (parseFloat(b.totalHours||0) - parseFloat(b.lastServiceHours||0)); if (rem <= 0) crit++; else if (rem < 20) warn++; else good++; });
-            const dCtx = document.getElementById('fleetDonut')?.getContext('2d');
-            if (dCtx) { if (fleetDonutChart) fleetDonutChart.destroy(); fleetDonutChart = new Chart(dCtx, { type: 'doughnut', data: { labels: ['Airworthy (>20hrs left)', 'Due Soon (<20hrs)', 'Critical (Overdue)'], datasets: [{ data: [good, warn, crit], backgroundColor: ['#10b981', '#f59e0b', '#ef4444'], borderWidth: 0 }] }, options: { cutout: '65%', responsive: true, maintainAspectRatio: true, plugins: { legend: { display: false } } } }); }
-            document.getElementById("fleetStatusLegend").innerHTML = `<span class="text-emerald-400">● Airworthy: ${good}</span> <span class="text-amber-400">● Due soon: ${warn}</span> <span class="text-red-400">● Critical: ${crit}</span>`;
-            const gauges = document.getElementById("inspectionGauges");
-            gauges.innerHTML = fleet.map(b => {
-                const used = Math.min(100, Math.max(0, (parseFloat(b.totalHours||0) - parseFloat(b.lastServiceHours||0))));
-                const remain = Math.max(0, 100 - used);
-                const percent = (used / 100) * 100;
-                const color = remain <= 0 ? '#ef4444' : (remain < 20 ? '#f59e0b' : '#10b981');
-                return `<div class="flex items-center gap-4"><div class="relative w-12 h-12"><svg class="w-12 h-12 transform -rotate-90"><circle cx="24" cy="24" r="20" stroke="#2d3748" stroke-width="4" fill="none"/><circle class="progress-ring__circle" cx="24" cy="24" r="20" stroke="${color}" stroke-width="4" fill="none" stroke-dasharray="${2 * Math.PI * 20}" stroke-dashoffset="${2 * Math.PI * 20 * (1 - percent/100)}"/></svg><div class="absolute inset-0 flex items-center justify-center text-[10px] font-bold">${Math.round(percent)}%</div></div><div class="flex-1"><span class="font-bold">${b.registration}</span><span class="text-slate-400 text-xs ml-2">${remain.toFixed(1)} hrs left</span></div></div>`;
-            }).join('');
-            let totalRem = 0;
-            fleet.forEach(b => totalRem += Math.max(0, 100 - (parseFloat(b.totalHours||0) - parseFloat(b.lastServiceHours||0))));
-            const avgRem = totalRem / fleet.length;
-            const healthCtx = document.getElementById('fleetHealthGauge')?.getContext('2d');
-            if (healthCtx) { if (fleetHealthGauge) fleetHealthGauge.destroy(); fleetHealthGauge = new Chart(healthCtx, { type: 'doughnut', data: { datasets: [{ data: [Math.min(100, (avgRem/100)*100), 100-Math.min(100, (avgRem/100)*100)], backgroundColor: ['#f97316', '#2d3748'], borderWidth: 0, cutout: '70%' }] }, options: { plugins: { tooltip: { callbacks: { label: () => `Average remaining: ${avgRem.toFixed(1)} hrs` } }, legend: { display: false } } } }); }
-            document.getElementById("healthIndexValue").innerHTML = `<span class="text-2xl font-bold">${avgRem.toFixed(1)}</span> <span class="text-xs text-slate-400">hrs average</span>`;
-
-            // Monthly flights chart
-            if (allLogs.length) {
-                const months = [], monthMap = new Map(), aircraftSet = new Set();
-                allLogs.forEach(log => {
-                    const date = new Date(log.date);
-                    if (isNaN(date)) return;
-                    const ym = `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}`;
-                    if (!monthMap.has(ym)) { monthMap.set(ym, months.length); months.push(ym); }
-                    const ac = toSheetAircraftName(log.aircraft);
-                    if (ac) aircraftSet.add(ac);
-                });
-                months.sort();
-                const aircrafts = Array.from(aircraftSet).sort();
-                const datasets = aircrafts.map(ac => {
-                    const data = new Array(months.length).fill(0);
-                    allLogs.forEach(log => {
-                        const date = new Date(log.date);
-                        if (isNaN(date)) return;
-                        const ym = `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}`;
-                        const idx = monthMap.get(ym);
-                        if (idx !== undefined && toSheetAircraftName(log.aircraft) === ac) data[idx] += 1;
-                    });
-                    const colors = ['#3b82f6', '#f97316', '#10b981', '#8b5cf6', '#ef4444', '#f59e0b'];
-                    const color = colors[aircrafts.indexOf(ac) % colors.length];
-                    return { label: ac, data, borderColor: color, backgroundColor: color+'20', tension: 0.2, fill: false, pointRadius: 3, pointHoverRadius: 5 };
-                });
-                const ctx = document.getElementById('monthlyFlightsChart')?.getContext('2d');
-                if (ctx) { if (monthlyChart) monthlyChart.destroy(); monthlyChart = new Chart(ctx, { type: 'line', data: { labels: months.map(m => m.substring(5)+'/'+m.substring(0,4)), datasets }, options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'top', labels: { color: '#cbd5e1', font: { size: 10 } } } }, scales: { y: { title: { display: true, text: 'Number of Flights', color: '#94a3b8' }, grid: { color: '#1e293b' }, ticks: { color: '#cbd5e1' } }, x: { ticks: { color: '#cbd5e1', rotate: 45, autoSkip: true, maxRotation: 45 } } } } }); }
+        function filterHistoryLogs() {
+            const query = document.getElementById("logSearchInput").value.toLowerCase();
+            const rows = document.getElementById("historyTableBody").getElementsByTagName("tr");
+            for(let row of rows) {
+                const text = row.textContent.toLowerCase();
+                if(text.includes(query)) row.classList.remove("hidden");
+                else row.classList.add("hidden");
             }
+        }
 
-            // Repair heatmap
-            const repairCounts = {};
-            allLogs.forEach(log => {
-                const company = (log.company || "").toLowerCase();
-                if (company.includes("repair") || company.includes("maintenance repair")) {
-                    let ac = toSheetAircraftName(log.aircraft);
-                    if (ac) repairCounts[ac] = (repairCounts[ac] || 0) + 1;
+        // ---------- DATA HISTOGRAM & CHARTS RENDERING ----------
+        function renderCharts() {
+            if(fleet.length === 0) return;
+            
+            // 1. Chart Data Processing: Fleet Allocation
+            const fleetLabels = fleet.map(b => b.shortName);
+            const fleetDataValues = fleet.map(b => b.totalHours);
+
+            if (fleetDonutChart) fleetDonutChart.destroy();
+            const ctxDonut = document.getElementById('fleetDonutChart').getContext('2d');
+            fleetDonutChart = new Chart(ctxDonut, {
+                type: 'doughnut',
+                data: {
+                    labels: fleetLabels,
+                    datasets: [{
+                        data: fleetDataValues,
+                        backgroundColor: ['#f97316', '#3b82f6', '#10b981', '#a855f7', '#eab308', '#6366f1'],
+                        borderWidth: 0,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    plugins: { legend: { display: true, position: 'bottom', labels: { color: '#94a3b8', boxWidth: 10, font: { size: 10 } } } },
+                    cutout: '75%'
                 }
             });
-            const repairContainer = document.getElementById("repairHeatmap");
-            if (Object.keys(repairCounts).length === 0) repairContainer.innerHTML = '<div class="col-span-full text-center text-slate-400 py-4">No unscheduled repairs logged yet.</div>';
-            else repairContainer.innerHTML = Object.entries(repairCounts).map(([ac, cnt]) => `<div class="bg-slate-900/40 rounded-xl p-3 text-center border border-white/5"><div class="font-mono text-orange-400 font-bold">${ac}</div><div class="text-2xl font-black mt-1">${cnt}</div><div class="text-[10px] text-slate-400">unscheduled repair(s)</div></div>`).join('');
 
-            // Top clients
-            const clientCount = {};
-            allLogs.forEach(log => { const client = (log.client || "").trim(); if (client && client !== "N/A") clientCount[client] = (clientCount[client] || 0) + 1; });
-            const sortedClients = Object.entries(clientCount).sort((a,b) => b[1] - a[1]).slice(0,10);
-            const clientContainer = document.getElementById("topClientsList");
-            if (sortedClients.length === 0) clientContainer.innerHTML = '<div class="text-slate-400 text-center py-4">No client data available.</div>';
-            else clientContainer.innerHTML = sortedClients.map(([c, cnt], idx) => `<div class="flex justify-between items-center border-b border-white/10 pb-2"><div class="flex items-center gap-2"><span class="text-orange-400 font-mono w-6">${idx+1}</span><span class="font-medium">${c}</span></div><span class="mono text-slate-300">${cnt} flights</span></div>`).join('');
+            // 2. Chart Data Processing: Monthly Distribution
+            const monthlyCounts = {};
+            allLogs.forEach(l => {
+                if(l.month && l.month !== "undefined") {
+                    monthlyCounts[l.month] = (monthlyCounts[l.month] || 0) + (l.hours + l.minutes/60);
+                }
+            });
+            const monthLabels = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+            const chartMonths = monthLabels.filter(m => monthlyCounts[m] !== undefined || Object.keys(monthlyCounts).length === 0);
+            const chartDataValues = chartMonths.map(m => monthlyCounts[m] || 0);
 
-            // Certificates cards
-            const certContainer = document.getElementById("certCardsContainer");
-            if (!certificates.length) certContainer.innerHTML = '<div class="col-span-full text-center text-slate-400">No certificate data loaded.</div>';
-            else {
-                const today = new Date();
-                certContainer.innerHTML = certificates.map(c => {
-                    const pDate = new Date(c.permitExpiry), cDate = new Date(c.cofrExpiry);
-                    const pDays = Math.ceil((pDate - today) / (1000*3600*24));
-                    const cDays = Math.ceil((cDate - today) / (1000*3600*24));
-                    const pFill = Math.min(100, Math.max(0, (pDays / 365) * 100));
-                    const cFill = Math.min(100, Math.max(0, (cDays / 730) * 100));
-                    const pCol = pDays < 30 ? '#ef4444' : (pDays < 90 ? '#f59e0b' : '#10b981');
-                    const cCol = cDays < 30 ? '#ef4444' : (cDays < 90 ? '#f59e0b' : '#10b981');
-                    return `<div class="cert-card glass-panel rounded-2xl p-5 border border-white/10"><div class="flex justify-between items-start mb-3"><div><span class="text-2xl font-black">${c.registration}</span><span class="text-xs text-slate-400 ml-2">${c.shortName || ""}</span></div><span class="text-[10px] bg-emerald-500/20 text-emerald-300 px-2 py-1 rounded-full">Active</span></div><div class="space-y-4"><div><div class="flex justify-between text-xs mb-1"><span>Permit to Fly</span><span class="mono">${pDate.toLocaleDateString()}</span><span class="${pDays<0?'text-red-400':'text-slate-300'}">${pDays<0?'Expired':pDays+' days left'}</span></div><div class="expiry-bar"><div class="expiry-fill" style="width: ${pFill}%; background: ${pCol};"></div></div></div><div><div class="flex justify-between text-xs mb-1"><span>CoFR (2-Year)</span><span class="mono">${cDate.toLocaleDateString()}</span><span class="${cDays<0?'text-red-400':'text-slate-300'}">${cDays<0?'Expired':cDays+' days left'}</span></div><div class="expiry-bar"><div class="expiry-fill" style="width: ${cFill}%; background: ${cCol};"></div></div></div></div><div class="mt-4 pt-3 border-t border-white/10 text-center text-[11px] text-slate-400"><i class="fa-regular fa-circle-check text-emerald-400"></i> Fully compliant</div></div>`;
-                }).join('');
+            if (monthlyChart) monthlyChart.destroy();
+            const ctxLine = document.getElementById('monthlyChart').getContext('2d');
+            monthlyChart = new Chart(ctxLine, {
+                type: 'bar',
+                data: {
+                    labels: chartMonths.map(m => m.substring(0,3)),
+                    datasets: [{
+                        label: 'Flight Hours Generated',
+                        data: chartDataValues,
+                        backgroundColor: 'rgba(249, 115, 22, 0.2)',
+                        borderColor: '#f97316',
+                        borderWidth: 2,
+                        borderRadius: 6,
+                        barThickness: 16
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#64748b', font: { size: 9 } } },
+                        x: { grid: { display: false }, ticks: { color: '#64748b', font: { size: 9 } } }
+                    }
+                }
+            });
+        }
+
+        // ---------- HISTORICAL TABLES SORT ELEMENTARY ALGORITHM ----------
+        let sortDirections = [true, true, true, true, true];
+        function sortHistoryTable(colIndex) {
+            const table = document.getElementById("historyTable");
+            const tbody = document.getElementById("historyTableBody");
+            const rows = Array.from(tbody.rows);
+            const isAscending = sortDirections[colIndex];
+            
+            rows.sort((rowA, rowB) => {
+                let cellA = rowA.cells[colIndex].textContent.trim();
+                let cellB = rowB.cells[colIndex].textContent.trim();
+
+                if (colIndex === 0) { // Date compare
+                    return isAscending ? new Date(cellA) - new Date(cellB) : new Date(cellB) - new Date(cellA);
+                }
+                if (colIndex === 4) { // Duration parsing compare
+                    let valA = parseFloat(cellA.replace('h', '').replace('m', '')) || 0;
+                    let valB = parseFloat(cellB.replace('h', '').replace('m', '')) || 0;
+                    return isAscending ? valA - valB : valB - valA;
+                }
+                return isAscending ? cellA.localeCompare(cellB) : cellB.localeCompare(cellA);
+            });
+
+            sortDirections[colIndex] = !isAscending;
+            rows.forEach(row => tbody.appendChild(row));
+            
+            // Update UI elements for visual queues
+            for(let i=0; i<=4; i++) {
+                const el = document.getElementById(`sort-icon-${i}`);
+                if(!el) continue;
+                if(i === colIndex) {
+                    el.innerHTML = isAscending ? '<i class="fa-solid fa-sort-up text-orange-500"></i>' : '<i class="fa-solid fa-sort-down text-orange-500"></i>';
+                    el.style.opacity = "1";
+                } else {
+                    el.innerHTML = '<i class="fa-solid fa-sort"></i>';
+                    el.style.opacity = "0.4";
+                }
             }
-
-            // Logbook dropdown
-            const logbookSelect = document.getElementById("logbookAircraftSelect");
-            logbookSelect.innerHTML = '<option value="">-- Choose an aircraft --</option>';
-            fleet.forEach(b => { const sheetName = toSheetAircraftName(b.shortName) || toSheetAircraftName(b.registration); const opt = document.createElement("option"); opt.value = sheetName; opt.textContent = `${b.registration} (${b.shortName})`; logbookSelect.appendChild(opt); });
-            logbookSelect.onchange = () => { if (logbookSelect.value) renderLogbookTable(logbookSelect.value); else document.getElementById("logbookTableBody").innerHTML = '<tr><td colspan="6" class="px-4 py-8 text-center text-slate-400">Select an aircraft to view logs.</td></tr>'; };
         }
 
-        // Logbook table
-        let currentSort = { column: 'date', direction: 'desc' };
-        let currentLogsData = [];
-        function renderLogbookTable(sheetName) {
-            const filtered = allLogs.filter(log => toSheetAircraftName(log.aircraft) === sheetName).map(log => ({
-                date: log.date, company: log.company || "-", pilot: log.pilot || "-", client: log.client || "-",
-                flightTime: `${log.hours || 0}h ${log.minutes || 0}m`,
-                flightMinutes: (log.hours||0)*60 + (log.minutes||0),
-                remarks: log.remarks || "-", rawDate: new Date(log.date)
-            }));
-            currentLogsData = filtered;
-            applySortingAndRender();
-        }
-        function applySortingAndRender() {
-            const sorted = [...currentLogsData];
-            const col = currentSort.column, dir = currentSort.direction;
-            sorted.sort((a,b) => {
-                let valA, valB;
-                if (col === 'date') { valA = a.rawDate; valB = b.rawDate; }
-                else if (col === 'flightTime') { valA = a.flightMinutes; valB = b.flightMinutes; }
-                else { valA = a[col]?.toString().toLowerCase() || ""; valB = b[col]?.toString().toLowerCase() || ""; }
-                if (valA < valB) return dir === 'asc' ? -1 : 1;
-                if (valA > valB) return dir === 'asc' ? 1 : -1;
-                return 0;
-            });
-            const tbody = document.getElementById("logbookTableBody");
-            if (sorted.length === 0) { tbody.innerHTML = '<tr><td colspan="6" class="px-4 py-8 text-center text-slate-400">No flight logs found for this aircraft.</td></tr>'; return; }
-            tbody.innerHTML = sorted.map(row => `<tr class="hover:bg-white/5"><td class="px-4 py-3 font-mono text-xs">${row.date ? new Date(row.date).toLocaleDateString('en-GB') : "N/A"}<\/td><td class="px-4 py-3 text-xs">${row.company}<\/td><td class="px-4 py-3 text-xs">${row.pilot}<\/td><td class="px-4 py-3 text-xs">${row.client}<\/td><td class="px-4 py-3 text-xs font-mono">${row.flightTime}<\/td><td class="px-4 py-3 text-xs max-w-xs truncate" title="${row.remarks}">${row.remarks}<\/td><\/tr>`).join('');
-            document.querySelectorAll("#logbookTable .sortable-header").forEach(th => {
-                const colName = th.getAttribute("data-sort");
-                const icon = th.querySelector(".sort-icon i");
-                if (colName === currentSort.column) icon.className = currentSort.direction === 'asc' ? "fa-solid fa-arrow-up-wide-short" : "fa-solid fa-arrow-down-wide-short";
-                else icon.className = "fa-solid fa-sort";
-            });
-        }
         function attachLogbookSorting() {
-            document.querySelectorAll("#logbookTable .sortable-header").forEach(th => {
-                th.addEventListener("click", () => {
-                    const col = th.getAttribute("data-sort");
-                    if (currentSort.column === col) currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
-                    else { currentSort.column = col; currentSort.direction = 'desc'; }
-                    applySortingAndRender();
-                });
-            });
+            for(let i=0; i<=4; i++) {
+                const el = document.getElementById(`sort-icon-${i}`);
+                if(el) el.style.opacity = "0.4";
+            }
         }
 
-        // Sidebar controls
-        document.getElementById("sidebarToggle").addEventListener("click", () => {
-            document.getElementById("teamSidebar").classList.toggle("open");
-        });
-        document.getElementById("closeSidebarBtn").addEventListener("click", () => {
-            document.getElementById("teamSidebar").classList.remove("open");
-        });
-        document.getElementById("postMessageBtn").addEventListener("click", postMessage);
-
-        function filterCertCards() {
-            const q = document.getElementById("certSearch").value.toLowerCase();
-            document.querySelectorAll("#certCardsContainer .cert-card").forEach(card => card.style.display = card.innerText.toLowerCase().includes(q) ? "" : "none");
-        }
-        function showToast(title, body, variant) {
+        // ---------- FLOATING ALERT MESSAGES NOTIFICATION SYSTEM ----------
+        function showToast(title, body, variant = 'info') {
             const toast = document.getElementById("toastNotification");
             toast.innerHTML = "";
             const icon = document.createElement("div"); icon.className = "p-2 rounded-xl text-lg";
