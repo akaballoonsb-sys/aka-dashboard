@@ -78,6 +78,7 @@
         .sortable-header:hover { background: rgba(255,255,255,0.1); }
         .sort-icon { margin-left: 0.25rem; font-size: 0.7rem; opacity: 0.6; }
         
+        /* Collapsible sidebar */
         .sidebar {
             position: fixed;
             top: 0;
@@ -119,6 +120,7 @@
             background: rgba(249, 115, 22, 1);
             padding-right: 10px;
         }
+        /* message status badge */
         .status-badge {
             font-size: 0.7rem;
             padding: 0.2rem 0.6rem;
@@ -317,8 +319,7 @@
                     </div>
                     <div class="overflow-x-auto">
                         <table class="logs-table w-full text-left text-sm" id="logbookTable">
-                            <thead class="bg-slate-900/80 text-slate-300 text-[10px] uppercase sticky top-0">
-                                <tr><th class="px-4 py-3 sortable-header" data-sort="date">Date <span class="sort-icon"><i class="fa-solid fa-sort"></i></span></th><th class="px-4 py-3 sortable-header" data-sort="company">Company <span class="sort-icon"><i class="fa-solid fa-sort"></i></span></th><th class="px-4 py-3 sortable-header" data-sort="pilot">Pilot <span class="sort-icon"><i class="fa-solid fa-sort"></i></span></th><th class="px-4 py-3 sortable-header" data-sort="client">Client / Event <span class="sort-icon"><i class="fa-solid fa-sort"></i></span></th><th class="px-4 py-3 sortable-header" data-sort="flightTime">Flight Time <span class="sort-icon"><i class="fa-solid fa-sort"></i></span></th><th class="px-4 py-3 sortable-header" data-sort="remarks">Technical Remarks <span class="sort-icon"><i class="fa-solid fa-sort"></i></span></th></tr></thead>
+                            <thead class="bg-slate-900/80 text-slate-300 text-[10px] uppercase sticky top-0"><tr><th class="px-4 py-3 sortable-header" data-sort="date">Date <span class="sort-icon"><i class="fa-solid fa-sort"></i></span></th><th class="px-4 py-3 sortable-header" data-sort="company">Company <span class="sort-icon"><i class="fa-solid fa-sort"></i></span></th><th class="px-4 py-3 sortable-header" data-sort="pilot">Pilot <span class="sort-icon"><i class="fa-solid fa-sort"></i></span></th><th class="px-4 py-3 sortable-header" data-sort="client">Client / Event <span class="sort-icon"><i class="fa-solid fa-sort"></i></span></th><th class="px-4 py-3 sortable-header" data-sort="flightTime">Flight Time <span class="sort-icon"><i class="fa-solid fa-sort"></i></span></th><th class="px-4 py-3 sortable-header" data-sort="remarks">Technical Remarks <span class="sort-icon"><i class="fa-solid fa-sort"></i></span></th></tr></thead>
                             <tbody id="logbookTableBody" class="divide-y divide-white/10"><tr><td colspan="6" class="px-4 py-8 text-center text-slate-400">Select an aircraft to view logs.</td></tr></tbody>
                         </table>
                     </div>
@@ -331,13 +332,13 @@
 
     <script>
         // ---------- CONFIGURATION ----------
-        // REPLACE THIS URL WITH YOUR NEWLY DEPLOYED APPS SCRIPT URL
-        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby2mHVT1burcZYDpyeShNDRt7dZcdJkFmD-Shse8U5CTyrRKDSe3Bl20JrEPZuE25ZwTA/exec";
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx2guxVeYF9AZym8-e-wGH1ukGqOj-8SwosQmN1BFUCIqLDBFqMjv70JaQILdtXC53i/exec";
         const DASHBOARD_PASSWORD = "Rudy56";
 
         let fleet = [], certificates = [], insights = [], allLogs = [], teamMessages = [], currentOperatorName = "";
         let fleetDonutChart = null, fleetHealthGauge = null, monthlyChart = null;
 
+        // Mapping for aircraft sheet names
         const SHEET_AIRCRAFT_NAMES = {
             "9M-AKA": "AKA", "AKA": "AKA",
             "9M-BFW": "Moon", "MOON": "Moon", "Moon": "Moon",
@@ -355,6 +356,7 @@
             return key;
         }
 
+        // ---------- LOGIN / LOGOUT ----------
         function handleLogin(e) {
             e.preventDefault();
             const pwd = document.getElementById("passwordInput").value;
@@ -419,6 +421,7 @@
             else { container.classList.remove("hidden"); document.getElementById("formRemarks").value = ""; }
         }
 
+        // ---------- SYNC MAIN DATA ----------
         function syncWithGoogleSheets() {
             const icon = document.getElementById("syncIcon"), text = document.getElementById("syncText");
             icon.classList.add("fa-spin");
@@ -437,6 +440,7 @@
             .finally(() => { icon.classList.remove("fa-spin"); text.innerText = "Sync Live Data"; });
         }
 
+        // ---------- SUBMIT LOGBOOK ENTRY ----------
         function submitLogbookEntry(e) {
             e.preventDefault();
             const btn = document.getElementById("formSubmitBtn");
@@ -446,34 +450,38 @@
             else if (mode === "Repair") companyField = "Maintenance Repair Service";
             const selectedOption = document.getElementById("formAircraft");
             const sheetAircraft = selectedOption.options[selectedOption.selectedIndex]?.getAttribute("data-sheetname") || selectedOption.value;
-            
-            const formData = new FormData();
-            formData.append("date", document.getElementById("formDate").value);
-            formData.append("company", companyField);
-            formData.append("aircraft", sheetAircraft);
-            formData.append("hours", mode === "Audit" ? 0 : (parseFloat(document.getElementById("formHours").value) || 0));
-            formData.append("minutes", mode === "Audit" ? 0 : (parseFloat(document.getElementById("formMinutes").value) || 0));
-            formData.append("pilot", mode === "Audit" ? "" : (document.getElementById("formPilot").value || "Engineering Crew"));
-            formData.append("client", mode === "Audit" ? "" : (document.getElementById("formClient").value || "N/A"));
-            formData.append("remarks", document.getElementById("formRemarks").value);
-            
+            const payload = {
+                date: document.getElementById("formDate").value,
+                company: companyField,
+                aircraft: sheetAircraft,
+                hours: mode === "Audit" ? 0 : (parseFloat(document.getElementById("formHours").value) || 0),
+                minutes: mode === "Audit" ? 0 : (parseFloat(document.getElementById("formMinutes").value) || 0),
+                pilot: mode === "Audit" ? "" : (document.getElementById("formPilot").value || "Engineering Crew"),
+                client: mode === "Audit" ? "" : (document.getElementById("formClient").value || "N/A"),
+                remarks: document.getElementById("formRemarks").value
+            };
             btn.disabled = true;
             btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> <span>Transmitting...</span>`;
             fetch(GOOGLE_SCRIPT_URL, {
                 method: "POST",
-                body: formData   // FormData = no preflight, no CORS issues
+                mode: "cors",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
             })
-            .then(() => {
-                showToast("Transmission Safe", "Logbook entry sent. Sync to see changes.", "success");
+            .then(async response => {
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                await response.json();
+                showToast("Transmission Safe", "Logbook entry recorded.", "success");
                 document.getElementById("logbookForm").reset();
                 document.getElementById("formDate").valueAsDate = new Date();
                 toggleFormMode();
-                setTimeout(() => syncWithGoogleSheets(), 2000);
+                setTimeout(() => syncWithGoogleSheets(), 1500);
             })
-            .catch(err => { console.error(err); showToast("Write Error", "Could not send to sheet.", "danger"); })
+            .catch(err => { console.error(err); showToast("Write Error", "Could not save to sheet.", "danger"); })
             .finally(() => { btn.disabled = false; btn.innerHTML = `<i class="fa-solid fa-paper-plane"></i><span>Transmit to Google Sheet</span>`; });
         }
 
+        // ---------- TEAM MESSAGES ----------
         async function fetchTeamMessages() {
             try {
                 const res = await fetch(`${GOOGLE_SCRIPT_URL}?action=getMessages`);
@@ -486,33 +494,28 @@
             const textarea = document.getElementById("newMessageText");
             const message = textarea.value.trim();
             if (!message) return;
-            const formData = new FormData();
-            formData.append("action", "postMessage");
-            formData.append("author", currentOperatorName);
-            formData.append("message", message);
             try {
-                await fetch(GOOGLE_SCRIPT_URL, {
+                const res = await fetch(GOOGLE_SCRIPT_URL, {
                     method: "POST",
-                    body: formData
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ action: "postMessage", author: currentOperatorName, message: message })
                 });
-                textarea.value = "";
-                showToast("Posted", "Message sent to Team Comms.", "success");
-                setTimeout(() => fetchTeamMessages(), 1500);
+                if (res.ok) {
+                    textarea.value = "";
+                    await fetchTeamMessages();
+                    showToast("Posted", "Message sent to Team Comms.", "success");
+                } else throw new Error();
             } catch (err) { showToast("Error", "Could not post message.", "danger"); }
         }
         async function toggleStatus(timestamp, currentStatus) {
             const newStatus = currentStatus === "Ongoing" ? "Resolved" : "Ongoing";
-            const formData = new FormData();
-            formData.append("action", "toggleStatus");
-            formData.append("timestamp", timestamp);
-            formData.append("author", currentOperatorName);
-            formData.append("newStatus", newStatus);
             try {
                 await fetch(GOOGLE_SCRIPT_URL, {
                     method: "POST",
-                    body: formData
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ action: "toggleStatus", timestamp: timestamp, author: currentOperatorName, newStatus: newStatus })
                 });
-                setTimeout(() => fetchTeamMessages(), 1000);
+                await fetchTeamMessages();
             } catch (err) { showToast("Error", "Could not update status.", "danger"); }
         }
         function renderTeamMessages() {
@@ -536,6 +539,7 @@
                     </div>
                 `;
             }).join('');
+            // attach toggle event listeners
             document.querySelectorAll('.toggle-status-btn').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     const timestamp = btn.getAttribute('data-timestamp');
@@ -545,14 +549,234 @@
             });
         }
 
-        // renderDashboard and all other functions remain exactly the same as before...
-        // (They are identical to the previous working version, omitted here for brevity)
-        // In the final answer I will include the full renderDashboard – but to keep this message within limits,
-        // I assume you have the full working version from earlier.
-        // I will provide the complete, final HTML file in the chat – one single block.
-        
-        // For the sake of completeness, the remainder of the script (renderDashboard, etc.) is present in the final code.
-        // I will now produce the final answer with the complete HTML.
+        // ---------- RENDER DASHBOARD (all tabs) ----------
+        function renderDashboard() {
+            // Fleet cards & dropdown
+            const grid = document.getElementById("fleetCardGrid");
+            const select = document.getElementById("formAircraft");
+            grid.innerHTML = ""; select.innerHTML = "";
+            if (fleet.length === 0) {
+                grid.innerHTML = '<div class="col-span-full text-center text-slate-400 glass-panel p-6 rounded-2xl">No fleet data synced yet. Click "Sync Live Data".</div>';
+                select.innerHTML = '<option>No aircraft available</option>';
+            } else {
+                fleet.forEach(b => {
+                    const sheetName = toSheetAircraftName(b.shortName) || toSheetAircraftName(b.registration);
+                    const opt = document.createElement("option");
+                    opt.value = b.registration;
+                    opt.setAttribute("data-sheetname", sheetName);
+                    opt.innerText = `${b.registration} (${b.shortName})`;
+                    select.appendChild(opt);
+                    const currentHrs = parseFloat(b.totalHours) || 0;
+                    const baseHrs = parseFloat(b.lastServiceHours) || 0;
+                    const delta = currentHrs - baseHrs;
+                    let percent = Math.min(100, Math.round((delta / 100) * 100));
+                    if (percent < 0) percent = 0;
+                    const remaining = Math.max(0, 100 - delta).toFixed(1);
+                    let barColor = "bg-gradient-to-r from-orange-500 to-amber-500";
+                    let glow = "";
+                    if (percent >= 85) { barColor = "bg-gradient-to-r from-red-500 to-rose-600"; glow = "glow-red"; }
+                    else if (percent >= 65) { barColor = "bg-gradient-to-r from-amber-500 to-orange-500"; glow = "glow-orange"; }
+                    const card = document.createElement("div");
+                    card.className = `glass-panel p-6 rounded-2xl border transition-all ${glow}`;
+                    card.innerHTML = `<div><div class="flex justify-between items-start"><div><span class="bg-black/40 border border-white/10 px-2.5 py-1 rounded text-xs font-black text-white mono">${b.registration}</span><h4 class="text-lg font-black text-white mt-2">${b.shortName}</h4></div><div class="text-right"><p class="text-[10px] text-slate-400 uppercase tracking-wider">Total Airtime</p><p class="text-xl font-bold text-white mono">${currentHrs.toFixed(1)} <span class="text-xs text-slate-400">Hrs</span></p></div></div><div class="space-y-2 mt-6"><div class="flex justify-between text-xs"><span class="text-slate-400">100‑Hr Airworthiness Status</span><span class="font-bold text-white mono">${percent}%</span></div><div class="w-full bg-slate-800 rounded-full h-2.5 overflow-hidden"><div class="${barColor} h-full" style="width: ${percent}%"></div></div><div class="flex justify-between text-[11px]"><span class="text-slate-500">Reset base: ${baseHrs.toFixed(1)} hrs</span><span class="${percent >= 85 ? 'text-red-400 font-bold' : 'text-slate-300'} mono">Remaining: ${remaining} hrs</span></div></div></div>`;
+                    grid.appendChild(card);
+                });
+            }
+
+            let risk = 0;
+            certificates.forEach(c => { if (c.permitStatus === "Critical" || c.permitStatus === "Warning") risk++; });
+            document.getElementById("bannerCount").innerText = risk;
+            document.getElementById("globalNoticeBanner").classList.toggle("hidden", risk === 0);
+            if (fleet.length === 0) return;
+
+            // Leaderboards
+            const balloonDiv = document.getElementById("balloonLeaderboard");
+            const sortedB = [...fleet].sort((a,b) => (parseFloat(b.totalHours)||0) - (parseFloat(a.totalHours)||0));
+            balloonDiv.innerHTML = sortedB.map((b, i) => `<div class="flex justify-between items-center border-b border-white/10 pb-2"><div class="flex items-center gap-2"><span class="text-orange-400 font-mono w-5">${i+1}</span><span class="font-bold">${b.registration} (${b.shortName})</span></div><span class="mono text-slate-300">${(parseFloat(b.totalHours)||0).toFixed(1)} hrs</span></div>`).join('');
+            const pilotDiv = document.getElementById("pilotLeaderboard");
+            if (insights && insights.length) {
+                const sortedP = [...insights].sort((a,b) => (b.flights||0) - (a.flights||0));
+                pilotDiv.innerHTML = sortedP.map((p, i) => `<div class="flex justify-between items-center border-b border-white/10 pb-2"><div class="flex items-center gap-2"><span class="text-orange-400 font-mono w-5">${i+1}</span><span class="font-bold">${p.name}</span></div><span class="mono text-slate-300">${p.flights} flights · ${p.hours} hrs</span></div>`).join('');
+            } else pilotDiv.innerHTML = '<div class="text-slate-400 text-center py-4">No pilot data synced yet.</div>';
+
+            let crit=0, warn=0, good=0;
+            fleet.forEach(b => { const rem = 100 - (parseFloat(b.totalHours||0) - parseFloat(b.lastServiceHours||0)); if (rem <= 0) crit++; else if (rem < 20) warn++; else good++; });
+            const dCtx = document.getElementById('fleetDonut')?.getContext('2d');
+            if (dCtx) { if (fleetDonutChart) fleetDonutChart.destroy(); fleetDonutChart = new Chart(dCtx, { type: 'doughnut', data: { labels: ['Airworthy (>20hrs left)', 'Due Soon (<20hrs)', 'Critical (Overdue)'], datasets: [{ data: [good, warn, crit], backgroundColor: ['#10b981', '#f59e0b', '#ef4444'], borderWidth: 0 }] }, options: { cutout: '65%', responsive: true, maintainAspectRatio: true, plugins: { legend: { display: false } } } }); }
+            document.getElementById("fleetStatusLegend").innerHTML = `<span class="text-emerald-400">● Airworthy: ${good}</span> <span class="text-amber-400">● Due soon: ${warn}</span> <span class="text-red-400">● Critical: ${crit}</span>`;
+            const gauges = document.getElementById("inspectionGauges");
+            gauges.innerHTML = fleet.map(b => {
+                const used = Math.min(100, Math.max(0, (parseFloat(b.totalHours||0) - parseFloat(b.lastServiceHours||0))));
+                const remain = Math.max(0, 100 - used);
+                const percent = (used / 100) * 100;
+                const color = remain <= 0 ? '#ef4444' : (remain < 20 ? '#f59e0b' : '#10b981');
+                return `<div class="flex items-center gap-4"><div class="relative w-12 h-12"><svg class="w-12 h-12 transform -rotate-90"><circle cx="24" cy="24" r="20" stroke="#2d3748" stroke-width="4" fill="none"/><circle class="progress-ring__circle" cx="24" cy="24" r="20" stroke="${color}" stroke-width="4" fill="none" stroke-dasharray="${2 * Math.PI * 20}" stroke-dashoffset="${2 * Math.PI * 20 * (1 - percent/100)}"/></svg><div class="absolute inset-0 flex items-center justify-center text-[10px] font-bold">${Math.round(percent)}%</div></div><div class="flex-1"><span class="font-bold">${b.registration}</span><span class="text-slate-400 text-xs ml-2">${remain.toFixed(1)} hrs left</span></div></div>`;
+            }).join('');
+            let totalRem = 0;
+            fleet.forEach(b => totalRem += Math.max(0, 100 - (parseFloat(b.totalHours||0) - parseFloat(b.lastServiceHours||0))));
+            const avgRem = totalRem / fleet.length;
+            const healthCtx = document.getElementById('fleetHealthGauge')?.getContext('2d');
+            if (healthCtx) { if (fleetHealthGauge) fleetHealthGauge.destroy(); fleetHealthGauge = new Chart(healthCtx, { type: 'doughnut', data: { datasets: [{ data: [Math.min(100, (avgRem/100)*100), 100-Math.min(100, (avgRem/100)*100)], backgroundColor: ['#f97316', '#2d3748'], borderWidth: 0, cutout: '70%' }] }, options: { plugins: { tooltip: { callbacks: { label: () => `Average remaining: ${avgRem.toFixed(1)} hrs` } }, legend: { display: false } } } }); }
+            document.getElementById("healthIndexValue").innerHTML = `<span class="text-2xl font-bold">${avgRem.toFixed(1)}</span> <span class="text-xs text-slate-400">hrs average</span>`;
+
+            // Monthly flights chart
+            if (allLogs.length) {
+                const months = [], monthMap = new Map(), aircraftSet = new Set();
+                allLogs.forEach(log => {
+                    const date = new Date(log.date);
+                    if (isNaN(date)) return;
+                    const ym = `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}`;
+                    if (!monthMap.has(ym)) { monthMap.set(ym, months.length); months.push(ym); }
+                    const ac = toSheetAircraftName(log.aircraft);
+                    if (ac) aircraftSet.add(ac);
+                });
+                months.sort();
+                const aircrafts = Array.from(aircraftSet).sort();
+                const datasets = aircrafts.map(ac => {
+                    const data = new Array(months.length).fill(0);
+                    allLogs.forEach(log => {
+                        const date = new Date(log.date);
+                        if (isNaN(date)) return;
+                        const ym = `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}`;
+                        const idx = monthMap.get(ym);
+                        if (idx !== undefined && toSheetAircraftName(log.aircraft) === ac) data[idx] += 1;
+                    });
+                    const colors = ['#3b82f6', '#f97316', '#10b981', '#8b5cf6', '#ef4444', '#f59e0b'];
+                    const color = colors[aircrafts.indexOf(ac) % colors.length];
+                    return { label: ac, data, borderColor: color, backgroundColor: color+'20', tension: 0.2, fill: false, pointRadius: 3, pointHoverRadius: 5 };
+                });
+                const ctx = document.getElementById('monthlyFlightsChart')?.getContext('2d');
+                if (ctx) { if (monthlyChart) monthlyChart.destroy(); monthlyChart = new Chart(ctx, { type: 'line', data: { labels: months.map(m => m.substring(5)+'/'+m.substring(0,4)), datasets }, options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'top', labels: { color: '#cbd5e1', font: { size: 10 } } } }, scales: { y: { title: { display: true, text: 'Number of Flights', color: '#94a3b8' }, grid: { color: '#1e293b' }, ticks: { color: '#cbd5e1' } }, x: { ticks: { color: '#cbd5e1', rotate: 45, autoSkip: true, maxRotation: 45 } } } } }); }
+            }
+
+            // Repair heatmap
+            const repairCounts = {};
+            allLogs.forEach(log => {
+                const company = (log.company || "").toLowerCase();
+                if (company.includes("repair") || company.includes("maintenance repair")) {
+                    let ac = toSheetAircraftName(log.aircraft);
+                    if (ac) repairCounts[ac] = (repairCounts[ac] || 0) + 1;
+                }
+            });
+            const repairContainer = document.getElementById("repairHeatmap");
+            if (Object.keys(repairCounts).length === 0) repairContainer.innerHTML = '<div class="col-span-full text-center text-slate-400 py-4">No unscheduled repairs logged yet.</div>';
+            else repairContainer.innerHTML = Object.entries(repairCounts).map(([ac, cnt]) => `<div class="bg-slate-900/40 rounded-xl p-3 text-center border border-white/5"><div class="font-mono text-orange-400 font-bold">${ac}</div><div class="text-2xl font-black mt-1">${cnt}</div><div class="text-[10px] text-slate-400">unscheduled repair(s)</div></div>`).join('');
+
+            // Top clients
+            const clientCount = {};
+            allLogs.forEach(log => { const client = (log.client || "").trim(); if (client && client !== "N/A") clientCount[client] = (clientCount[client] || 0) + 1; });
+            const sortedClients = Object.entries(clientCount).sort((a,b) => b[1] - a[1]).slice(0,10);
+            const clientContainer = document.getElementById("topClientsList");
+            if (sortedClients.length === 0) clientContainer.innerHTML = '<div class="text-slate-400 text-center py-4">No client data available.</div>';
+            else clientContainer.innerHTML = sortedClients.map(([c, cnt], idx) => `<div class="flex justify-between items-center border-b border-white/10 pb-2"><div class="flex items-center gap-2"><span class="text-orange-400 font-mono w-6">${idx+1}</span><span class="font-medium">${c}</span></div><span class="mono text-slate-300">${cnt} flights</span></div>`).join('');
+
+            // Certificates cards
+            const certContainer = document.getElementById("certCardsContainer");
+            if (!certificates.length) certContainer.innerHTML = '<div class="col-span-full text-center text-slate-400">No certificate data loaded.</div>';
+            else {
+                const today = new Date();
+                certContainer.innerHTML = certificates.map(c => {
+                    const pDate = new Date(c.permitExpiry), cDate = new Date(c.cofrExpiry);
+                    const pDays = Math.ceil((pDate - today) / (1000*3600*24));
+                    const cDays = Math.ceil((cDate - today) / (1000*3600*24));
+                    const pFill = Math.min(100, Math.max(0, (pDays / 365) * 100));
+                    const cFill = Math.min(100, Math.max(0, (cDays / 730) * 100));
+                    const pCol = pDays < 30 ? '#ef4444' : (pDays < 90 ? '#f59e0b' : '#10b981');
+                    const cCol = cDays < 30 ? '#ef4444' : (cDays < 90 ? '#f59e0b' : '#10b981');
+                    return `<div class="cert-card glass-panel rounded-2xl p-5 border border-white/10"><div class="flex justify-between items-start mb-3"><div><span class="text-2xl font-black">${c.registration}</span><span class="text-xs text-slate-400 ml-2">${c.shortName || ""}</span></div><span class="text-[10px] bg-emerald-500/20 text-emerald-300 px-2 py-1 rounded-full">Active</span></div><div class="space-y-4"><div><div class="flex justify-between text-xs mb-1"><span>Permit to Fly</span><span class="mono">${pDate.toLocaleDateString()}</span><span class="${pDays<0?'text-red-400':'text-slate-300'}">${pDays<0?'Expired':pDays+' days left'}</span></div><div class="expiry-bar"><div class="expiry-fill" style="width: ${pFill}%; background: ${pCol};"></div></div></div><div><div class="flex justify-between text-xs mb-1"><span>CoFR (2-Year)</span><span class="mono">${cDate.toLocaleDateString()}</span><span class="${cDays<0?'text-red-400':'text-slate-300'}">${cDays<0?'Expired':cDays+' days left'}</span></div><div class="expiry-bar"><div class="expiry-fill" style="width: ${cFill}%; background: ${cCol};"></div></div></div></div><div class="mt-4 pt-3 border-t border-white/10 text-center text-[11px] text-slate-400"><i class="fa-regular fa-circle-check text-emerald-400"></i> Fully compliant</div></div>`;
+                }).join('');
+            }
+
+            // Logbook dropdown
+            const logbookSelect = document.getElementById("logbookAircraftSelect");
+            logbookSelect.innerHTML = '<option value="">-- Choose an aircraft --</option>';
+            fleet.forEach(b => { const sheetName = toSheetAircraftName(b.shortName) || toSheetAircraftName(b.registration); const opt = document.createElement("option"); opt.value = sheetName; opt.textContent = `${b.registration} (${b.shortName})`; logbookSelect.appendChild(opt); });
+            logbookSelect.onchange = () => { if (logbookSelect.value) renderLogbookTable(logbookSelect.value); else document.getElementById("logbookTableBody").innerHTML = '<tr><td colspan="6" class="px-4 py-8 text-center text-slate-400">Select an aircraft to view logs.</td></tr>'; };
+        }
+
+        // Logbook table
+        let currentSort = { column: 'date', direction: 'desc' };
+        let currentLogsData = [];
+        function renderLogbookTable(sheetName) {
+            const filtered = allLogs.filter(log => toSheetAircraftName(log.aircraft) === sheetName).map(log => ({
+                date: log.date, company: log.company || "-", pilot: log.pilot || "-", client: log.client || "-",
+                flightTime: `${log.hoursUsed || 0}h ${log.minutesUsed || 0}m`,
+                flightMinutes: (log.hoursUsed||0)*60 + (log.minutesUsed||0),
+                remarks: log.technicalRemarks || "-", rawDate: new Date(log.date)
+            }));
+            currentLogsData = filtered;
+            applySortingAndRender();
+        }
+        function applySortingAndRender() {
+            const sorted = [...currentLogsData];
+            const col = currentSort.column, dir = currentSort.direction;
+            sorted.sort((a,b) => {
+                let valA, valB;
+                if (col === 'date') { valA = a.rawDate; valB = b.rawDate; }
+                else if (col === 'flightTime') { valA = a.flightMinutes; valB = b.flightMinutes; }
+                else { valA = a[col]?.toString().toLowerCase() || ""; valB = b[col]?.toString().toLowerCase() || ""; }
+                if (valA < valB) return dir === 'asc' ? -1 : 1;
+                if (valA > valB) return dir === 'asc' ? 1 : -1;
+                return 0;
+            });
+            const tbody = document.getElementById("logbookTableBody");
+            if (sorted.length === 0) { tbody.innerHTML = '<tr><td colspan="6" class="px-4 py-8 text-center text-slate-400">No flight logs found for this aircraft.</td></tr>'; return; }
+            tbody.innerHTML = sorted.map(row => `<tr class="hover:bg-white/5"><td class="px-4 py-3 font-mono text-xs">${row.date ? new Date(row.date).toLocaleDateString('en-GB') : "N/A"}<\/td><td class="px-4 py-3 text-xs">${row.company}<\/td><td class="px-4 py-3 text-xs">${row.pilot}<\/td><td class="px-4 py-3 text-xs">${row.client}<\/td><td class="px-4 py-3 text-xs font-mono">${row.flightTime}<\/td><td class="px-4 py-3 text-xs max-w-xs truncate" title="${row.remarks}">${row.remarks}<\/td><\/tr>`).join('');
+            document.querySelectorAll("#logbookTable .sortable-header").forEach(th => {
+                const colName = th.getAttribute("data-sort");
+                const icon = th.querySelector(".sort-icon i");
+                if (colName === currentSort.column) icon.className = currentSort.direction === 'asc' ? "fa-solid fa-arrow-up-wide-short" : "fa-solid fa-arrow-down-wide-short";
+                else icon.className = "fa-solid fa-sort";
+            });
+        }
+        function attachLogbookSorting() {
+            document.querySelectorAll("#logbookTable .sortable-header").forEach(th => {
+                th.addEventListener("click", () => {
+                    const col = th.getAttribute("data-sort");
+                    if (currentSort.column === col) currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+                    else { currentSort.column = col; currentSort.direction = 'desc'; }
+                    applySortingAndRender();
+                });
+            });
+        }
+
+        // Sidebar controls
+        document.getElementById("sidebarToggle").addEventListener("click", () => {
+            document.getElementById("teamSidebar").classList.toggle("open");
+        });
+        document.getElementById("closeSidebarBtn").addEventListener("click", () => {
+            document.getElementById("teamSidebar").classList.remove("open");
+        });
+        document.getElementById("postMessageBtn").addEventListener("click", postMessage);
+
+        function filterCertCards() {
+            const q = document.getElementById("certSearch").value.toLowerCase();
+            document.querySelectorAll("#certCardsContainer .cert-card").forEach(card => card.style.display = card.innerText.toLowerCase().includes(q) ? "" : "none");
+        }
+        function showToast(title, body, variant) {
+            const toast = document.getElementById("toastNotification");
+            toast.innerHTML = "";
+            const icon = document.createElement("div"); icon.className = "p-2 rounded-xl text-lg";
+            let iconHtml = "", border = "border-white/15";
+            if (variant === 'success') { border = "border-emerald-500/40"; iconHtml = '<i class="fa-solid fa-circle-check text-emerald-400"></i>'; }
+            else if (variant === 'danger') { border = "border-red-500/40"; iconHtml = '<i class="fa-solid fa-triangle-exclamation text-red-400"></i>'; }
+            else { border = "border-orange-500/30"; iconHtml = '<i class="fa-solid fa-circle-info text-orange-400"></i>'; }
+            icon.innerHTML = iconHtml;
+            const textDiv = document.createElement("div"); textDiv.className = "flex-1"; textDiv.innerHTML = `<h4 class="font-bold text-sm text-white">${title}</h4><p class="text-xs text-slate-300 mt-1">${body}</p>`;
+            toast.appendChild(icon); toast.appendChild(textDiv);
+            toast.classList.add(border);
+            toast.classList.remove("translate-y-24", "opacity-0");
+            setTimeout(() => toast.classList.add("translate-y-24", "opacity-0"), 4000);
+        }
+
+        window.toggleFormMode = toggleFormMode;
+        window.switchToTab = switchToTab;
+        window.submitLogbookEntry = submitLogbookEntry;
+        window.syncWithGoogleSheets = syncWithGoogleSheets;
+        window.filterCertCards = filterCertCards;
+        window.handleLogin = handleLogin;
+        window.handleLogout = handleLogout;
+        attachLogbookSorting();
     </script>
 </body>
 </html>
