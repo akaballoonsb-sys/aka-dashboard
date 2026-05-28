@@ -134,7 +134,6 @@
 </head>
 <body class="min-h-screen flex flex-col antialiased">
 
-    <!-- LOGIN OVERLAY -->
     <div id="loginOverlay" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-xl transition-all duration-500">
         <div class="glass-panel max-w-md w-full mx-4 p-8 rounded-3xl border border-white/15 shadow-2xl">
             <div class="text-center mb-8">
@@ -171,7 +170,6 @@
         </div>
     </div>
 
-    <!-- WELCOME OVERLAY -->
     <div id="welcomeOverlay" class="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-xl hidden">
         <div class="text-center">
             <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-white/5 border border-white/20 text-4xl mb-6">
@@ -186,7 +184,6 @@
         </div>
     </div>
 
-    <!-- TEAM COMMS SIDEBAR -->
     <div id="teamSidebar" class="sidebar">
         <div class="flex flex-col h-full p-4">
             <div class="flex justify-between items-center border-b border-white/10 pb-3 mb-4">
@@ -206,7 +203,6 @@
         <i class="fa-regular fa-comments"></i> TEAM
     </div>
 
-    <!-- MAIN DASHBOARD -->
     <div id="dashboardContainer" class="hidden flex-1 flex-col">
         <header class="glass-panel sticky top-0 z-40 mx-6 mt-4 rounded-2xl px-5 py-3 shadow-xl border-b-0">
             <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
@@ -254,7 +250,6 @@
         <div id="toastNotification" class="fixed bottom-6 right-6 z-50 transform translate-y-24 opacity-0 transition-all duration-300 max-w-sm w-full p-4 rounded-2xl border shadow-2xl flex items-start gap-3 glass-panel"></div>
 
         <main class="flex-grow max-w-7xl w-full mx-auto px-6 py-8 space-y-8">
-            <!-- FLIGHT LOGGER TAB -->
             <section id="tab-fleet" class="space-y-8 fade-slide-up">
                 <div id="fleetCardGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
                 <div class="glass-panel p-6 rounded-2xl">
@@ -280,7 +275,6 @@
                 </div>
             </section>
 
-            <!-- ANALYTICS TAB -->
             <section id="tab-analysis" class="space-y-8 hidden fade-slide-up">
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <div class="glass-panel rounded-2xl p-5"><div class="flex items-center gap-2 mb-4"><i class="fa-solid fa-trophy text-orange-400 text-xl"></i><h3 class="font-bold text-white text-md">🏆 Balloon Utilization Leaderboard</h3></div><div id="balloonLeaderboard" class="space-y-3 text-sm"></div></div>
@@ -296,18 +290,15 @@
                 <div class="glass-panel rounded-2xl p-5"><div class="flex items-center gap-2 mb-4"><i class="fa-solid fa-handshake text-orange-400"></i><h3 class="font-bold text-white">🏆 Top Clients / Events</h3></div><div id="topClientsList" class="space-y-2 text-sm"></div></div>
             </section>
 
-            <!-- RENEWALS REGISTRY -->
             <section id="tab-certificates" class="space-y-6 hidden fade-slide-up">
                 <div class="flex justify-between items-center mb-2 flex-wrap gap-3"><div><h3 class="text-lg font-bold text-white">✈️ Permit & CoFR Expiry Timeline</h3><p class="text-xs text-slate-400">Card‑based registry with days‑left counters</p></div><input type="text" id="certSearch" onkeyup="filterCertCards()" placeholder="Filter by registration..." class="text-xs bg-slate-900/60 border border-slate-700 rounded-xl px-3 py-2 text-white placeholder-slate-400 focus:border-orange-500 w-64"></div>
                 <div id="certCardsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"></div>
             </section>
 
-            <!-- SCHEDULE -->
             <section id="tab-schedule" class="space-y-6 hidden fade-slide-up">
                 <div class="glass-panel rounded-2xl overflow-hidden p-1"><div class="px-5 pt-5 pb-2 flex justify-between items-center flex-wrap gap-3"><div><h3 class="text-lg font-bold text-white flex items-center gap-2"><i class="fa-regular fa-calendar-circle-plus text-orange-400"></i> Fleet & Event Calendar</h3><p class="text-xs text-slate-400">Integrated Google Calendar — operational flights, maintenance windows & corporate events</p></div><a href="https://calendar.google.com/calendar/u/0/r" target="_blank" class="text-xs bg-white/5 border border-white/15 rounded-xl px-3 py-2 text-slate-300 hover:text-white hover:border-orange-500 transition flex items-center gap-2"><i class="fa-solid fa-arrow-up-right-from-square"></i> Open in Google</a></div><div class="p-1"><iframe class="calendar-iframe" src="https://calendar.google.com/calendar/embed?showCalendars=1&mode=MONTH&src=akaballoonsb%40gmail.com&src=gff8tq53eren4hloo7rdgiv7b4%40group.calendar.google.com&src=g16ndapjat4lholjhkdu6c0ogs%40group.calendar.google.com&ctz=Asia%2FKuala_Lumpur" frameborder="0" scrolling="no" style="width:100%; height:700px; border-radius: 20px; background: rgba(0,0,0,0.2);"></iframe></div></div>
             </section>
 
-            <!-- LOGBOOK TAB -->
             <section id="tab-logbook" class="space-y-6 hidden fade-slide-up">
                 <div class="glass-panel rounded-2xl p-5">
                     <h3 class="font-bold text-white mb-4 flex items-center gap-2"><i class="fa-solid fa-book-open text-orange-400"></i> Aircraft Flight Logs</h3>
@@ -332,7 +323,7 @@
 
     <script>
         // ---------- CONFIGURATION ----------
-        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx2guxVeYF9AZym8-e-wGH1ukGqOj-8SwosQmN1BFUCIqLDBFqMjv70JaQILdtXC53i/exec";
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby2mHVT1burcZYDpyeShNDRt7dZcdJkFmD-Shse8U5CTyrRKDSe3Bl20JrEPZuE25ZwTA/exec";
         const DASHBOARD_PASSWORD = "Rudy56";
 
         let fleet = [], certificates = [], insights = [], allLogs = [], teamMessages = [], currentOperatorName = "";
@@ -432,7 +423,7 @@
                 if (data.fleet) fleet = data.fleet;
                 if (data.certificates) certificates = data.certificates;
                 if (data.insights) insights = data.insights;
-                if (data.logs) allLogs = data.logs;
+                if (data.allLogs) allLogs = data.allLogs;
                 renderDashboard();
                 showToast("Sync Success", `Loaded ${allLogs.length} flight logs.`, "success");
             })
@@ -450,7 +441,10 @@
             else if (mode === "Repair") companyField = "Maintenance Repair Service";
             const selectedOption = document.getElementById("formAircraft");
             const sheetAircraft = selectedOption.options[selectedOption.selectedIndex]?.getAttribute("data-sheetname") || selectedOption.value;
-            const payload = {
+            
+            // Re-routed parameters safely into URL string configuration to pass standard CORS gate
+            const queryParams = new URLSearchParams({
+                action: "submitLogbook",
                 date: document.getElementById("formDate").value,
                 company: companyField,
                 aircraft: sheetAircraft,
@@ -459,23 +453,26 @@
                 pilot: mode === "Audit" ? "" : (document.getElementById("formPilot").value || "Engineering Crew"),
                 client: mode === "Audit" ? "" : (document.getElementById("formClient").value || "N/A"),
                 remarks: document.getElementById("formRemarks").value
-            };
+            });
+
             btn.disabled = true;
             btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> <span>Transmitting...</span>`;
-            fetch(GOOGLE_SCRIPT_URL, {
-                method: "POST",
-                mode: "cors",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload)
+            
+            fetch(`${GOOGLE_SCRIPT_URL}?${queryParams.toString()}`, {
+                method: "GET"
             })
             .then(async response => {
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                await response.json();
-                showToast("Transmission Safe", "Logbook entry recorded.", "success");
-                document.getElementById("logbookForm").reset();
-                document.getElementById("formDate").valueAsDate = new Date();
-                toggleFormMode();
-                setTimeout(() => syncWithGoogleSheets(), 1500);
+                const data = await response.json();
+                if (data.success) {
+                    showToast("Transmission Safe", "Logbook entry recorded.", "success");
+                    document.getElementById("logbookForm").reset();
+                    document.getElementById("formDate").valueAsDate = new Date();
+                    toggleFormMode();
+                    setTimeout(() => syncWithGoogleSheets(), 1500);
+                } else {
+                    showToast("Write Error", "Data refused by sheets connection engine.", "danger");
+                }
             })
             .catch(err => { console.error(err); showToast("Write Error", "Could not save to sheet.", "danger"); })
             .finally(() => { btn.disabled = false; btn.innerHTML = `<i class="fa-solid fa-paper-plane"></i><span>Transmit to Google Sheet</span>`; });
@@ -486,38 +483,56 @@
             try {
                 const res = await fetch(`${GOOGLE_SCRIPT_URL}?action=getMessages`);
                 const msgs = await res.json();
-                teamMessages = Array.isArray(msgs) ? msgs : [];
+                teamMessages = Array.isArray(msgs.messages) ? msgs.messages : [];
                 renderTeamMessages();
             } catch (err) { console.error("Failed to load messages", err); }
         }
+        
         async function postMessage() {
             const textarea = document.getElementById("newMessageText");
             const message = textarea.value.trim();
             if (!message) return;
+            
+            const btn = document.getElementById("postMessageBtn");
+            btn.disabled = true;
+
+            const queryParams = new URLSearchParams({
+                action: "postMessage",
+                author: currentOperatorName,
+                message: message
+            });
+
             try {
-                const res = await fetch(GOOGLE_SCRIPT_URL, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ action: "postMessage", author: currentOperatorName, message: message })
+                const res = await fetch(`${GOOGLE_SCRIPT_URL}?${queryParams.toString()}`, {
+                    method: "GET"
                 });
-                if (res.ok) {
+                const data = await res.json();
+                if (data.success) {
                     textarea.value = "";
                     await fetchTeamMessages();
                     showToast("Posted", "Message sent to Team Comms.", "success");
                 } else throw new Error();
             } catch (err) { showToast("Error", "Could not post message.", "danger"); }
+            finally { btn.disabled = false; }
         }
-        async function toggleStatus(timestamp, currentStatus) {
-            const newStatus = currentStatus === "Ongoing" ? "Resolved" : "Ongoing";
+        
+        async function toggleStatus(msgId) {
+            const queryParams = new URLSearchParams({
+                action: "toggleStatus",
+                id: msgId
+            });
+
             try {
-                await fetch(GOOGLE_SCRIPT_URL, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ action: "toggleStatus", timestamp: timestamp, author: currentOperatorName, newStatus: newStatus })
+                const res = await fetch(`${GOOGLE_SCRIPT_URL}?${queryParams.toString()}`, {
+                    method: "GET"
                 });
-                await fetchTeamMessages();
+                const data = await res.json();
+                if (data.success) {
+                    await fetchTeamMessages();
+                }
             } catch (err) { showToast("Error", "Could not update status.", "danger"); }
         }
+        
         function renderTeamMessages() {
             const container = document.getElementById("messagesContainer");
             if (!teamMessages.length) { container.innerHTML = '<div class="text-center text-slate-400 py-8">No messages yet. Be the first to post!</div>'; return; }
@@ -531,7 +546,7 @@
                             <div class="font-bold text-orange-400">${msg.author}</div>
                             <div class="flex items-center gap-2">
                                 <span class="status-badge ${statusClass}">${msg.status}</span>
-                                ${isAuthor ? `<button class="toggle-status-btn text-xs text-slate-400 hover:text-white" data-timestamp="${msg.timestamp}" data-status="${msg.status}"><i class="fa-solid fa-arrows-spin"></i> Toggle</button>` : ''}
+                                ${isAuthor ? `<button class="toggle-status-btn text-xs text-slate-400 hover:text-white" data-msgid="${msg.id}"><i class="fa-solid fa-arrows-spin"></i> Toggle</button>` : ''}
                             </div>
                         </div>
                         <div class="text-sm text-slate-200 mt-1">${msg.message}</div>
@@ -539,12 +554,12 @@
                     </div>
                 `;
             }).join('');
+            
             // attach toggle event listeners
             document.querySelectorAll('.toggle-status-btn').forEach(btn => {
                 btn.addEventListener('click', (e) => {
-                    const timestamp = btn.getAttribute('data-timestamp');
-                    const currentStatus = btn.getAttribute('data-status');
-                    toggleStatus(timestamp, currentStatus);
+                    const msgId = btn.getAttribute('data-msgid');
+                    toggleStatus(msgId);
                 });
             });
         }
@@ -700,9 +715,9 @@
         function renderLogbookTable(sheetName) {
             const filtered = allLogs.filter(log => toSheetAircraftName(log.aircraft) === sheetName).map(log => ({
                 date: log.date, company: log.company || "-", pilot: log.pilot || "-", client: log.client || "-",
-                flightTime: `${log.hoursUsed || 0}h ${log.minutesUsed || 0}m`,
-                flightMinutes: (log.hoursUsed||0)*60 + (log.minutesUsed||0),
-                remarks: log.technicalRemarks || "-", rawDate: new Date(log.date)
+                flightTime: `${log.hours || 0}h ${log.minutes || 0}m`,
+                flightMinutes: (log.hours||0)*60 + (log.minutes||0),
+                remarks: log.remarks || "-", rawDate: new Date(log.date)
             }));
             currentLogsData = filtered;
             applySortingAndRender();
